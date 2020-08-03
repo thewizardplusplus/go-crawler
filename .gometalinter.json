@@ -1,0 +1,6 @@
+{
+  "Vendor": true,
+  "Test": true,
+  "EnableAll": true,
+  "Disable": ["dupl"]
+}
