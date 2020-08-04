@@ -2,6 +2,7 @@ package crawler
 
 import (
 	"context"
+	"sync"
 )
 
 // LinkExtractor ...
@@ -30,4 +31,32 @@ type Dependencies struct {
 	LinkChecker   LinkChecker
 	LinkHandler   LinkHandler
 	ErrorHandler  ErrorHandler
+}
+
+// HandleLink ...
+func HandleLink(
+	ctx context.Context,
+	waiter *sync.WaitGroup,
+	links chan string,
+	link string,
+	dependencies Dependencies,
+) {
+	defer waiter.Done()
+
+	dependencies.LinkHandler.HandleLink(link)
+
+	extractedLinks, err := dependencies.LinkExtractor.ExtractLinks(ctx, link)
+	if err != nil {
+		dependencies.ErrorHandler.HandleError(err)
+		return
+	}
+
+	for _, link := range extractedLinks {
+		if !dependencies.LinkChecker.CheckLink(link) {
+			continue
+		}
+
+		waiter.Add(1)
+		links <- link
+	}
 }
