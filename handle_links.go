@@ -23,3 +23,11 @@ type LinkHandler interface {
 type ErrorHandler interface {
 	HandleError(err error)
 }
+
+// Dependencies ...
+type Dependencies struct {
+	LinkExtractor LinkExtractor
+	LinkChecker   LinkChecker
+	LinkHandler   LinkHandler
+	ErrorHandler  ErrorHandler
+}
