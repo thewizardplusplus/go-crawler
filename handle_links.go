@@ -18,3 +18,8 @@ type LinkChecker interface {
 type LinkHandler interface {
 	HandleLink(link string)
 }
+
+// ErrorHandler ...
+type ErrorHandler interface {
+	HandleError(err error)
+}
