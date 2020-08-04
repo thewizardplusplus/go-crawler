@@ -188,6 +188,7 @@
   input-imports = [
     "github.com/alecthomas/gometalinter",
     "github.com/cweill/gotests/gotests",
+    "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
     "github.com/vektra/mockery/cmd/mockery",
   ]
