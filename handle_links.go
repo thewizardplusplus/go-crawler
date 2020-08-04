@@ -13,3 +13,8 @@ type LinkExtractor interface {
 type LinkChecker interface {
 	CheckLink(link string) bool
 }
+
+// LinkHandler ...
+type LinkHandler interface {
+	HandleLink(link string)
+}
