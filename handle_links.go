@@ -33,6 +33,18 @@ type Dependencies struct {
 	ErrorHandler  ErrorHandler
 }
 
+// HandleLinks ...
+func HandleLinks(
+	ctx context.Context,
+	waiter *sync.WaitGroup,
+	links chan string,
+	dependencies Dependencies,
+) {
+	for link := range links {
+		HandleLink(ctx, waiter, links, link, dependencies)
+	}
+}
+
 // HandleLink ...
 func HandleLink(
 	ctx context.Context,
