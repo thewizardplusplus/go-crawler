@@ -2,7 +2,6 @@ package crawler
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +11,6 @@ import (
 func TestHandleLink(test *testing.T) {
 	type args struct {
 		ctx          context.Context
-		waiter       *sync.WaitGroup
 		link         string
 		dependencies Dependencies
 	}
@@ -27,13 +25,7 @@ func TestHandleLink(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			links := make(chan string, data.linkCount)
-			HandleLink(
-				data.args.ctx,
-				data.args.waiter,
-				links,
-				data.args.link,
-				data.args.dependencies,
-			)
+			HandleLink(data.args.ctx, links, data.args.link, data.args.dependencies)
 			close(links)
 
 			var gotLinks []string
@@ -43,6 +35,7 @@ func TestHandleLink(test *testing.T) {
 
 			mock.AssertExpectationsForObjects(
 				test,
+				data.args.dependencies.Waiter,
 				data.args.dependencies.LinkExtractor,
 				data.args.dependencies.LinkChecker,
 				data.args.dependencies.LinkHandler,

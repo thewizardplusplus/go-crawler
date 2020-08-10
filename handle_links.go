@@ -2,8 +2,16 @@ package crawler
 
 import (
 	"context"
-	"sync"
 )
+
+//go:generate mockery -name=Waiter -inpkg -case=underscore -testonly
+
+// Waiter ...
+type Waiter interface {
+	Add(delta int)
+	Done()
+	Wait()
+}
 
 //go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
 
@@ -35,6 +43,7 @@ type ErrorHandler interface {
 
 // Dependencies ...
 type Dependencies struct {
+	Waiter        Waiter
 	LinkExtractor LinkExtractor
 	LinkChecker   LinkChecker
 	LinkHandler   LinkHandler
@@ -44,24 +53,22 @@ type Dependencies struct {
 // HandleLinks ...
 func HandleLinks(
 	ctx context.Context,
-	waiter *sync.WaitGroup,
 	links chan string,
 	dependencies Dependencies,
 ) {
 	for link := range links {
-		HandleLink(ctx, waiter, links, link, dependencies)
+		HandleLink(ctx, links, link, dependencies)
 	}
 }
 
 // HandleLink ...
 func HandleLink(
 	ctx context.Context,
-	waiter *sync.WaitGroup,
 	links chan string,
 	link string,
 	dependencies Dependencies,
 ) {
-	defer waiter.Done()
+	defer dependencies.Waiter.Done()
 
 	dependencies.LinkHandler.HandleLink(link)
 
@@ -76,7 +83,7 @@ func HandleLink(
 			continue
 		}
 
-		waiter.Add(1)
+		dependencies.Waiter.Add(1)
 		links <- link
 	}
 }
