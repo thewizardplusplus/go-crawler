@@ -24,7 +24,7 @@ type LinkExtractor interface {
 
 // LinkChecker ...
 type LinkChecker interface {
-	CheckLink(link string) bool
+	CheckLink(parentLink string, link string) bool
 }
 
 //go:generate mockery -name=LinkHandler -inpkg -case=underscore -testonly
@@ -78,8 +78,8 @@ func HandleLink(
 		return
 	}
 
-	for _, link := range extractedLinks {
-		if !dependencies.LinkChecker.CheckLink(link) {
+	for _, extractedLink := range extractedLinks {
+		if !dependencies.LinkChecker.CheckLink(link, extractedLink) {
 			continue
 		}
 
