@@ -57,17 +57,19 @@ func HandleLinks(
 	dependencies Dependencies,
 ) {
 	for link := range links {
-		HandleLink(ctx, links, link, dependencies)
+		extractedLinks := HandleLink(ctx, link, dependencies)
+		for _, extractedLink := range extractedLinks {
+			links <- extractedLink
+		}
 	}
 }
 
 // HandleLink ...
 func HandleLink(
 	ctx context.Context,
-	links chan string,
 	link string,
 	dependencies Dependencies,
-) {
+) []string {
 	defer dependencies.Waiter.Done()
 
 	dependencies.LinkHandler.HandleLink(link)
@@ -75,15 +77,19 @@ func HandleLink(
 	extractedLinks, err := dependencies.LinkExtractor.ExtractLinks(ctx, link)
 	if err != nil {
 		dependencies.ErrorHandler.HandleError(err)
-		return
+		return nil
 	}
 
+	var checkedExtractedLinks []string
 	for _, extractedLink := range extractedLinks {
 		if !dependencies.LinkChecker.CheckLink(link, extractedLink) {
 			continue
 		}
 
+		checkedExtractedLinks = append(checkedExtractedLinks, extractedLink)
+		// it should be called before the dependencies.Waiter.Done() call
 		dependencies.Waiter.Add(1)
-		links <- link
 	}
+
+	return checkedExtractedLinks
 }

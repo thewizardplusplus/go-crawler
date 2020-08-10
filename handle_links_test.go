@@ -17,21 +17,13 @@ func TestHandleLink(test *testing.T) {
 
 	for _, data := range []struct {
 		name      string
-		linkCount int
 		args      args
 		wantLinks []string
 	}{
 		// TODO: Add test cases.
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			links := make(chan string, data.linkCount)
-			HandleLink(data.args.ctx, links, data.args.link, data.args.dependencies)
-			close(links)
-
-			var gotLinks []string
-			for link := range links {
-				gotLinks = append(gotLinks, link)
-			}
+			gotLinks := HandleLink(data.args.ctx, data.args.link, data.args.dependencies)
 
 			mock.AssertExpectationsForObjects(
 				test,
