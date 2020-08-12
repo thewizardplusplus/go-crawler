@@ -44,6 +44,14 @@
   version = "v1.1.1"
 
 [[projects]]
+  digest = "1:3df0d990f145cfd287f955bd80b8ba2e670441f61a0204cd36d5e4e632326650"
+  name = "github.com/go-log/log"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cbf5cacfbfff319fd20a42367df566e0ace3d4ee"
+  version = "v0.2.0"
+
+[[projects]]
   branch = "master"
   digest = "1:ae4407ca7731ceb7b54b059fced30f335d32486a2148e262b19067261f959b42"
   name = "github.com/google/shlex"
@@ -188,6 +196,7 @@
   input-imports = [
     "github.com/alecthomas/gometalinter",
     "github.com/cweill/gotests/gotests",
+    "github.com/go-log/log",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
     "github.com/vektra/mockery/cmd/mockery",
