@@ -2,6 +2,8 @@ package crawler
 
 import (
 	"context"
+
+	"github.com/go-log/log"
 )
 
 //go:generate mockery -name=Waiter -inpkg -case=underscore -testonly
@@ -34,20 +36,13 @@ type LinkHandler interface {
 	HandleLink(link string)
 }
 
-//go:generate mockery -name=ErrorHandler -inpkg -case=underscore -testonly
-
-// ErrorHandler ...
-type ErrorHandler interface {
-	HandleError(err error)
-}
-
 // Dependencies ...
 type Dependencies struct {
 	Waiter        Waiter
 	LinkExtractor LinkExtractor
 	LinkChecker   LinkChecker
 	LinkHandler   LinkHandler
-	ErrorHandler  ErrorHandler
+	Logger        log.Logger
 }
 
 // HandleLinks ...
@@ -76,7 +71,7 @@ func HandleLink(
 
 	extractedLinks, err := dependencies.LinkExtractor.ExtractLinks(ctx, link)
 	if err != nil {
-		dependencies.ErrorHandler.HandleError(err)
+		dependencies.Logger.Logf("unable to extract links: %s", err)
 		return nil
 	}
 

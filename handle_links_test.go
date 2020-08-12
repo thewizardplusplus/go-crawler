@@ -59,7 +59,7 @@ func TestHandleLink(test *testing.T) {
 
 						return linkHandler
 					}(),
-					ErrorHandler: new(MockErrorHandler),
+					Logger: new(MockLogger),
 				},
 			},
 			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
@@ -102,7 +102,7 @@ func TestHandleLink(test *testing.T) {
 
 						return linkHandler
 					}(),
-					ErrorHandler: new(MockErrorHandler),
+					Logger: new(MockLogger),
 				},
 			},
 			wantLinks: []string{"http://example.com/2"},
@@ -134,11 +134,13 @@ func TestHandleLink(test *testing.T) {
 
 						return linkHandler
 					}(),
-					ErrorHandler: func() ErrorHandler {
-						errorHandler := new(MockErrorHandler)
-						errorHandler.On("HandleError", iotest.ErrTimeout).Return()
+					Logger: func() Logger {
+						logger := new(MockLogger)
+						logger.
+							On("Logf", "unable to extract links: %s", iotest.ErrTimeout).
+							Return()
 
-						return errorHandler
+						return logger
 					}(),
 				},
 			},
@@ -154,7 +156,7 @@ func TestHandleLink(test *testing.T) {
 				data.args.dependencies.LinkExtractor,
 				data.args.dependencies.LinkChecker,
 				data.args.dependencies.LinkHandler,
-				data.args.dependencies.ErrorHandler,
+				data.args.dependencies.Logger,
 			)
 			assert.Equal(test, data.wantLinks, gotLinks)
 		})
