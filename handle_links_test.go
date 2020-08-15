@@ -7,8 +7,98 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	testutils "github.com/thewizardplusplus/go-crawler/internal/test-utils"
 	"github.com/thewizardplusplus/go-crawler/waiter"
 )
+
+func TestHandleLinks(test *testing.T) {
+	type args struct {
+		ctx          context.Context
+		links        chan string
+		dependencies Dependencies
+	}
+
+	for _, data := range []struct {
+		name string
+		args args
+	}{
+		{
+			name: "success",
+			args: args{
+				ctx: context.Background(),
+				links: func() chan string {
+					links := make(chan string, 3)
+					links <- "http://example.com/"
+
+					return links
+				}(),
+				dependencies: Dependencies{
+					Waiter: func() waiter.Waiter {
+						waiter := new(MockWaiter)
+						waiter.On("Add", 1).Return().Times(3)
+						waiter.On("Done").Return().Times(3)
+
+						return waiter
+					}(),
+					LinkExtractor: func() LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/").
+							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/1").
+							Return(nil, nil)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/2").
+							Return(nil, nil)
+
+						return extractor
+					}(),
+					LinkChecker: func() LinkChecker {
+						checker := new(MockLinkChecker)
+						checker.
+							On("CheckLink", "http://example.com/", "http://example.com/1").
+							Return(true)
+						checker.
+							On("CheckLink", "http://example.com/", "http://example.com/2").
+							Return(true)
+
+						return checker
+					}(),
+					LinkHandler: func() LinkHandler {
+						handler := new(MockLinkHandler)
+						handler.On("HandleLink", "http://example.com/").Return()
+						handler.On("HandleLink", "http://example.com/1").Return()
+						handler.On("HandleLink", "http://example.com/2").Return()
+
+						return handler
+					}(),
+					Logger: new(MockLogger),
+				},
+			},
+		},
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			waiter := data.args.dependencies.Waiter
+			synchronousWaiter := testutils.NewSynchronousWaiter(waiter)
+			synchronousWaiter.Add(len(data.args.links))
+
+			data.args.dependencies.Waiter = synchronousWaiter
+
+			go HandleLinks(data.args.ctx, data.args.links, data.args.dependencies)
+			synchronousWaiter.Wait()
+
+			mock.AssertExpectationsForObjects(
+				test,
+				waiter,
+				data.args.dependencies.LinkExtractor,
+				data.args.dependencies.LinkChecker,
+				data.args.dependencies.LinkHandler,
+				data.args.dependencies.Logger,
+			)
+		})
+	}
+}
 
 func TestHandleLink(test *testing.T) {
 	type args struct {
