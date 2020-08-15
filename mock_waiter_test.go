@@ -18,8 +18,3 @@ func (_m *MockWaiter) Add(delta int) {
 func (_m *MockWaiter) Done() {
 	_m.Called()
 }
-
-// Wait provides a mock function with given fields:
-func (_m *MockWaiter) Wait() {
-	_m.Called()
-}
