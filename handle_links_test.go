@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/thewizardplusplus/go-crawler/waiter"
 )
 
 func TestHandleLink(test *testing.T) {
@@ -27,7 +28,7 @@ func TestHandleLink(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 				dependencies: Dependencies{
-					Waiter: func() Waiter {
+					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(2)
 						waiter.On("Done").Return().Times(1)
@@ -70,7 +71,7 @@ func TestHandleLink(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 				dependencies: Dependencies{
-					Waiter: func() Waiter {
+					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(1)
 						waiter.On("Done").Return().Times(1)
@@ -113,7 +114,7 @@ func TestHandleLink(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 				dependencies: Dependencies{
-					Waiter: func() Waiter {
+					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Done").Return().Times(1)
 

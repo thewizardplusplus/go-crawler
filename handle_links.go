@@ -4,16 +4,8 @@ import (
 	"context"
 
 	"github.com/go-log/log"
+	"github.com/thewizardplusplus/go-crawler/waiter"
 )
-
-//go:generate mockery -name=Waiter -inpkg -case=underscore -testonly
-
-// Waiter ...
-type Waiter interface {
-	Add(delta int)
-	Done()
-	Wait()
-}
 
 //go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
 
@@ -38,7 +30,7 @@ type LinkHandler interface {
 
 // Dependencies ...
 type Dependencies struct {
-	Waiter        Waiter
+	Waiter        waiter.Waiter
 	LinkExtractor LinkExtractor
 	LinkChecker   LinkChecker
 	LinkHandler   LinkHandler
