@@ -54,10 +54,10 @@ func TestHandleLink(test *testing.T) {
 						return checker
 					}(),
 					LinkHandler: func() LinkHandler {
-						linkHandler := new(MockLinkHandler)
-						linkHandler.On("HandleLink", "http://example.com/").Return()
+						handler := new(MockLinkHandler)
+						handler.On("HandleLink", "http://example.com/").Return()
 
-						return linkHandler
+						return handler
 					}(),
 					Logger: new(MockLogger),
 				},
@@ -97,10 +97,10 @@ func TestHandleLink(test *testing.T) {
 						return checker
 					}(),
 					LinkHandler: func() LinkHandler {
-						linkHandler := new(MockLinkHandler)
-						linkHandler.On("HandleLink", "http://example.com/").Return()
+						handler := new(MockLinkHandler)
+						handler.On("HandleLink", "http://example.com/").Return()
 
-						return linkHandler
+						return handler
 					}(),
 					Logger: new(MockLogger),
 				},
@@ -129,10 +129,10 @@ func TestHandleLink(test *testing.T) {
 					}(),
 					LinkChecker: new(MockLinkChecker),
 					LinkHandler: func() LinkHandler {
-						linkHandler := new(MockLinkHandler)
-						linkHandler.On("HandleLink", "http://example.com/").Return()
+						handler := new(MockLinkHandler)
+						handler.On("HandleLink", "http://example.com/").Return()
 
-						return linkHandler
+						return handler
 					}(),
 					Logger: func() Logger {
 						logger := new(MockLogger)
