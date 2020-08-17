@@ -8,6 +8,8 @@ import (
 	"github.com/thewizardplusplus/go-html-selector/builders"
 )
 
+//go:generate mockery -name=HTTPClient -inpkg -case=underscore -testonly
+
 // HTTPClient ...
 type HTTPClient interface {
 	Do(request *http.Request) (*http.Response, error)
