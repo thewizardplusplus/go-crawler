@@ -108,6 +108,17 @@
   version = "v1.6.1"
 
 [[projects]]
+  digest = "1:dc0f1e808ca650c6cbbbde526e33391459f66d27b5c7352fa7359d9100ed6044"
+  name = "github.com/thewizardplusplus/go-html-selector"
+  packages = [
+    ".",
+    "byte-utils",
+  ]
+  pruneopts = "UT"
+  revision = "f13a4ff946605c93aceee71676bd678bd70eb1a7"
+  version = "v1.4"
+
+[[projects]]
   digest = "1:b49f6e75d8aa6f18a320671f674a75a3f35eec1e9da5cb1631605eb1058dae3c"
   name = "github.com/vektra/mockery"
   packages = [
@@ -128,6 +139,17 @@
   pruneopts = "UT"
   revision = "859b3ef565e237f9f1a0fb6b55385c497545680d"
   version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:ca901dc31bf65bcdf4ceb1b9b83292ea7b71bf9e4e22a807093900c737e1d960"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom",
+  ]
+  pruneopts = "UT"
+  revision = "3edf25e44fccea9e11b919341e952fca722ef460"
 
 [[projects]]
   branch = "master"
@@ -199,6 +221,7 @@
     "github.com/go-log/log",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
+    "github.com/thewizardplusplus/go-html-selector",
     "github.com/vektra/mockery/cmd/mockery",
   ]
   solver-name = "gps-cdcl"
