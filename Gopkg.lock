@@ -81,6 +81,14 @@
   version = "v1.8.0"
 
 [[projects]]
+  digest = "1:9e1d37b58d17113ec3cb5608ac0382313c5b59470b94ed97d0976e69c7022314"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "614d223910a179a466c1767a985424175c39b465"
+  version = "v0.9.1"
+
+[[projects]]
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
@@ -108,10 +116,11 @@
   version = "v1.6.1"
 
 [[projects]]
-  digest = "1:dc0f1e808ca650c6cbbbde526e33391459f66d27b5c7352fa7359d9100ed6044"
+  digest = "1:c078608aa57118f5a115e8517c89228a5a7539128d30fe1d10cfce541d416379"
   name = "github.com/thewizardplusplus/go-html-selector"
   packages = [
     ".",
+    "builders",
     "byte-utils",
   ]
   pruneopts = "UT"
@@ -219,9 +228,11 @@
     "github.com/alecthomas/gometalinter",
     "github.com/cweill/gotests/gotests",
     "github.com/go-log/log",
+    "github.com/pkg/errors",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
     "github.com/thewizardplusplus/go-html-selector",
+    "github.com/thewizardplusplus/go-html-selector/builders",
     "github.com/vektra/mockery/cmd/mockery",
   ]
   solver-name = "gps-cdcl"

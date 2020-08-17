@@ -19,3 +19,7 @@ required = [
 [[constraint]]
   name = "github.com/thewizardplusplus/go-html-selector"
   version = "1.4.0"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.9.1"
