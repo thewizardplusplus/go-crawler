@@ -1,6 +1,8 @@
 package checkers
 
 import (
+	"errors"
+	"net/url"
 	"testing"
 
 	"github.com/go-log/log"
@@ -23,7 +25,66 @@ func TestHostChecker_CheckLink(test *testing.T) {
 		args   args
 		want   assert.BoolAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success with different hosts",
+			fields: fields{
+				Logger: new(MockLogger),
+			},
+			args: args{
+				parentLink: "http://example1.com/",
+				link:       "http://example2.com/test",
+			},
+			want: assert.False,
+		},
+		{
+			name: "success with same hosts",
+			fields: fields{
+				Logger: new(MockLogger),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       "http://example.com/test",
+			},
+			want: assert.True,
+		},
+		{
+			name: "error with the parent link",
+			fields: fields{
+				Logger: func() Logger {
+					err := errors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
+					logger := new(MockLogger)
+					logger.On("Logf", "unable to parse the parent link: %s", urlErr).Return()
+
+					return logger
+				}(),
+			},
+			args: args{
+				parentLink: ":",
+				link:       "http://example.com/test",
+			},
+			want: assert.False,
+		},
+		{
+			name: "error with the link",
+			fields: fields{
+				Logger: func() Logger {
+					err := errors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
+					logger := new(MockLogger)
+					logger.On("Logf", "unable to parse the link: %s", urlErr).Return()
+
+					return logger
+				}(),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       ":",
+			},
+			want: assert.False,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			checker := HostChecker{
