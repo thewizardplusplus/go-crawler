@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/pkg/errors"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	"github.com/thewizardplusplus/go-html-selector/builders"
 )
@@ -25,13 +26,13 @@ type DefaultExtractor struct {
 func (extractor DefaultExtractor) ExtractLinks(ctx context.Context, link string) ([]string, error) {
 	request, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to create the request")
 	}
 	request = request.WithContext(ctx)
 
 	response, err := extractor.HTTPClient.Do(request)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to send the request")
 	}
 	defer response.Body.Close()
 
@@ -43,7 +44,7 @@ func (extractor DefaultExtractor) ExtractLinks(ctx context.Context, link string)
 		htmlselector.SkipEmptyTags(),
 		htmlselector.SkipEmptyAttributes(),
 	); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to select tags")
 	}
 
 	var links []string
