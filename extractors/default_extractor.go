@@ -23,7 +23,10 @@ type DefaultExtractor struct {
 }
 
 // ExtractLinks ...
-func (extractor DefaultExtractor) ExtractLinks(ctx context.Context, link string) ([]string, error) {
+func (extractor DefaultExtractor) ExtractLinks(
+	ctx context.Context,
+	link string,
+) ([]string, error) {
 	request, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create the request")
@@ -34,7 +37,7 @@ func (extractor DefaultExtractor) ExtractLinks(ctx context.Context, link string)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to send the request")
 	}
-	defer response.Body.Close()
+	defer response.Body.Close() // nolint: errcheck
 
 	var builder builders.FlattenBuilder
 	if err := htmlselector.SelectTags(
