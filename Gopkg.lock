@@ -44,9 +44,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:3df0d990f145cfd287f955bd80b8ba2e670441f61a0204cd36d5e4e632326650"
+  digest = "1:85138d5daba3306acc15e3b1c9226a2866e068c4822bbf0875d5143db225face"
   name = "github.com/go-log/log"
-  packages = ["."]
+  packages = [
+    ".",
+    "print",
+  ]
   pruneopts = "UT"
   revision = "cbf5cacfbfff319fd20a42367df566e0ace3d4ee"
   version = "v0.2.0"
@@ -228,6 +231,7 @@
     "github.com/alecthomas/gometalinter",
     "github.com/cweill/gotests/gotests",
     "github.com/go-log/log",
+    "github.com/go-log/log/print",
     "github.com/pkg/errors",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
