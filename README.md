@@ -5,6 +5,18 @@
 [![Build Status](https://travis-ci.org/thewizardplusplus/go-crawler.svg?branch=master)](https://travis-ci.org/thewizardplusplus/go-crawler)
 [![codecov](https://codecov.io/gh/thewizardplusplus/go-crawler/branch/master/graph/badge.svg)](https://codecov.io/gh/thewizardplusplus/go-crawler)
 
+The library that implements crawling of all relative links for specified ones.
+
+## Features
+
+- crawling of all relative links for specified ones;
+- calling of an outer handler for an each found link:
+  - it's called directly during crawling;
+- custom filtering of considered links:
+  - by relativity of a link (optional);
+- supporting of background working:
+  - automatic completion after processing all filtered links.
+
 ## Installation
 
 Prepare the directory:
