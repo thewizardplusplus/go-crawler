@@ -3,6 +3,7 @@ package extractors
 import (
 	"context"
 	"testing"
+	"testing/iotest"
 	"time"
 
 	"github.com/go-log/log"
@@ -30,7 +31,119 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		wantLinks []string
 		wantErr   assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success on the first repeat",
+			fields: fields{
+				LinkExtractor: func() LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), "http://example.com/").
+						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+
+					return extractor
+				}(),
+				RepeatCount: 5,
+				RepeatDelay: 100 * time.Millisecond,
+				Logger:      new(MockLogger),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success on the last repeat",
+			fields: fields{
+				LinkExtractor: func() LinkExtractor {
+					var repeat int
+
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), "http://example.com/").
+						Return(
+							func(context.Context, string) []string {
+								if repeat < 4 {
+									return nil
+								}
+
+								return []string{"http://example.com/1", "http://example.com/2"}
+							},
+							func(context.Context, string) error {
+								defer func() { repeat++ }()
+
+								if repeat < 4 {
+									return iotest.ErrTimeout
+								}
+
+								return nil
+							},
+						)
+
+					return extractor
+				}(),
+				RepeatCount: 5,
+				RepeatDelay: 100 * time.Millisecond,
+				Logger: func() Logger {
+					logger := new(MockLogger)
+					for repeat := 0; repeat < 4; repeat++ {
+						logger.
+							On(
+								"Logf",
+								"unable to extract links (repeat #%d): %s",
+								repeat,
+								iotest.ErrTimeout,
+							).
+							Return()
+					}
+
+					return logger
+				}(),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "error",
+			fields: fields{
+				LinkExtractor: func() LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), "http://example.com/").
+						Return(nil, iotest.ErrTimeout)
+
+					return extractor
+				}(),
+				RepeatCount: 5,
+				RepeatDelay: 100 * time.Millisecond,
+				Logger: func() Logger {
+					logger := new(MockLogger)
+					for repeat := 0; repeat < 4; repeat++ {
+						logger.
+							On(
+								"Logf",
+								"unable to extract links (repeat #%d): %s",
+								repeat,
+								iotest.ErrTimeout,
+							).
+							Return()
+					}
+
+					return logger
+				}(),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/",
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := RepeatingExtractor{
