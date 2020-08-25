@@ -55,6 +55,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/go-log/log/print"
 	crawler "github.com/thewizardplusplus/go-crawler"
@@ -83,7 +84,7 @@ func main() {
 			return
 		}
 
-		fmt.Fprintf(
+		fmt.Fprintf( // nolint: errcheck
 			writer,
 			`<ul>
 				<li><a href="http://%[1]s/1">1</a></li>
@@ -106,11 +107,16 @@ func main() {
 
 	go crawler.HandleLinks(context.Background(), links, crawler.Dependencies{
 		Waiter: &waiter,
-		LinkExtractor: extractors.DefaultExtractor{
-			HTTPClient: http.DefaultClient,
-			Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-				"a": {"href"},
-			}),
+		LinkExtractor: extractors.RepeatingExtractor{
+			LinkExtractor: extractors.DefaultExtractor{
+				HTTPClient: http.DefaultClient,
+				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+					"a": {"href"},
+				}),
+			},
+			RepeatCount: 5,
+			RepeatDelay: time.Second,
+			Logger:      wrappedLogger,
 		},
 		LinkChecker: checkers.HostChecker{
 			Logger: wrappedLogger,
