@@ -1,6 +1,7 @@
 package extractors
 
 import (
+	"context"
 	"time"
 
 	"github.com/go-log/log"
@@ -13,4 +14,27 @@ type RepeatingExtractor struct {
 	RepeatCount   int
 	RepeatDelay   time.Duration
 	Logger        log.Logger
+}
+
+// ExtractLinks ...
+func (extractor RepeatingExtractor) ExtractLinks(
+	ctx context.Context,
+	link string,
+) ([]string, error) {
+	var links []string
+	for repeat := 0; repeat < extractor.RepeatCount; repeat++ {
+		var err error
+		links, err = extractor.LinkExtractor.ExtractLinks(ctx, link)
+		if err == nil {
+			break
+		}
+		if repeat == extractor.RepeatCount-1 {
+			return nil, err
+		}
+
+		extractor.Logger.Logf("unable to extract links (repeat #%d): %s", repeat, err)
+		time.Sleep(extractor.RepeatDelay)
+	}
+
+	return links, nil
 }
