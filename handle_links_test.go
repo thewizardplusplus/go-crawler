@@ -29,7 +29,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 				ctx:               context.Background(),
 				concurrencyFactor: 10,
 				links: func() chan string {
-					links := make(chan string, 3)
+					links := make(chan string, 1)
 					links <- "http://example.com/"
 
 					return links
@@ -123,7 +123,7 @@ func TestHandleLinks(test *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				links: func() chan string {
-					links := make(chan string, 3)
+					links := make(chan string, 1)
 					links <- "http://example.com/"
 
 					return links
