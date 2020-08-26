@@ -37,6 +37,19 @@ type Dependencies struct {
 	Logger        log.Logger
 }
 
+// HandleLinksConcurrently ...
+func HandleLinksConcurrently(
+	ctx context.Context,
+	concurrencyFactor int,
+	links chan string,
+	dependencies Dependencies,
+) {
+	for i := 0; i < concurrencyFactor; i++ {
+		// waiting for completion is done via dependencies.Waiter
+		go HandleLinks(ctx, links, dependencies)
+	}
+}
+
 // HandleLinks ...
 func HandleLinks(
 	ctx context.Context,
