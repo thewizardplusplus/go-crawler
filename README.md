@@ -41,7 +41,7 @@ $ dep ensure -vendor-only
 
 ## Examples
 
-`crawler.HandleLinks()`:
+`crawler.HandleLinksConcurrently()`:
 
 ```go
 package main
@@ -53,6 +53,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -105,31 +106,36 @@ func main() {
 	// wrap the standard logger via the github.com/go-log/log package
 	wrappedLogger := print.New(logger)
 
-	go crawler.HandleLinks(context.Background(), links, crawler.Dependencies{
-		Waiter: &waiter,
-		LinkExtractor: extractors.RepeatingExtractor{
-			LinkExtractor: extractors.DefaultExtractor{
-				HTTPClient: http.DefaultClient,
-				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-					"a": {"href"},
-				}),
+	crawler.HandleLinksConcurrently(
+		context.Background(),
+		runtime.NumCPU(),
+		links,
+		crawler.Dependencies{
+			Waiter: &waiter,
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount: 5,
+				RepeatDelay: time.Second,
+				Logger:      wrappedLogger,
 			},
-			RepeatCount: 5,
-			RepeatDelay: time.Second,
-			Logger:      wrappedLogger,
-		},
-		LinkChecker: checkers.HostChecker{
+			LinkChecker: checkers.HostChecker{
+				Logger: wrappedLogger,
+			},
+			LinkHandler: LinkHandler{
+				ServerURL: server.URL,
+			},
 			Logger: wrappedLogger,
 		},
-		LinkHandler: LinkHandler{
-			ServerURL: server.URL,
-		},
-		Logger: wrappedLogger,
-	})
+	)
 
 	waiter.Wait()
 
-	// Output:
+	// Unordered output:
 	// have got the link: http://example.com
 	// have got the link: http://example.com/1
 	// have got the link: http://example.com/2
