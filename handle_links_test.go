@@ -11,6 +11,47 @@ import (
 	"github.com/thewizardplusplus/go-crawler/waiter"
 )
 
+func TestHandleLinksConcurrently(test *testing.T) {
+	type args struct {
+		ctx               context.Context
+		concurrencyFactor int
+		links             chan string
+		dependencies      Dependencies
+	}
+
+	for _, data := range []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(t *testing.T) {
+			waiter := data.args.dependencies.Waiter
+			synchronousWaiter := testutils.NewSynchronousWaiter(waiter)
+			synchronousWaiter.Add(len(data.args.links))
+
+			data.args.dependencies.Waiter = synchronousWaiter
+
+			HandleLinksConcurrently(
+				data.args.ctx,
+				data.args.concurrencyFactor,
+				data.args.links,
+				data.args.dependencies,
+			)
+			synchronousWaiter.Wait()
+
+			mock.AssertExpectationsForObjects(
+				test,
+				waiter,
+				data.args.dependencies.LinkExtractor,
+				data.args.dependencies.LinkChecker,
+				data.args.dependencies.LinkHandler,
+				data.args.dependencies.Logger,
+			)
+		})
+	}
+}
+
 func TestHandleLinks(test *testing.T) {
 	type args struct {
 		ctx          context.Context
