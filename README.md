@@ -9,13 +9,19 @@ The library that implements crawling of all relative links for specified ones.
 
 ## Features
 
-- crawling of all relative links for specified ones;
+- crawling of all relative links for specified ones:
+  - repeated extracting of relative links on error (optional):
+    - only specified repeat count;
+    - supporting of delay between repeats;
 - calling of an outer handler for an each found link:
   - it's called directly during crawling;
 - custom filtering of considered links:
   - by relativity of a link (optional);
-- supporting of background working:
-  - automatic completion after processing all filtered links.
+- parallelization possibilities:
+  - crawling of relative links in parallel;
+  - supporting of background working:
+    - automatic completion after processing all filtered links;
+  - simulate an unbounded channel of links to avoid a deadlock.
 
 ## Installation
 
