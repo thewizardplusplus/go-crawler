@@ -87,6 +87,13 @@ func main() {
 		writer http.ResponseWriter,
 		request *http.Request,
 	) {
+		if request.URL.Path != "/common" {
+			fmt.Fprintf( // nolint: errcheck
+				writer,
+				`<p><a href="http://%[1]s/common">common</a></p>`,
+				request.Host,
+			)
+		}
 		if request.URL.Path != "/" {
 			return
 		}
@@ -145,6 +152,9 @@ func main() {
 	// have got the link: http://example.com
 	// have got the link: http://example.com/1
 	// have got the link: http://example.com/2
+	// have got the link: http://example.com/common
+	// have got the link: http://example.com/common
+	// have got the link: http://example.com/common
 }
 ```
 
