@@ -150,12 +150,12 @@ func main() {
 	waiter.Wait()
 
 	// Unordered output:
-	// have got the link: http://example.com
 	// have got the link: http://example.com/1
 	// have got the link: http://example.com/2
 	// have got the link: http://example.com/common
 	// have got the link: http://example.com/common
 	// have got the link: http://example.com/common
+	// have got the link: https://golang.org/
 }
 ```
 
