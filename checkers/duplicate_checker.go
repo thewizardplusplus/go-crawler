@@ -1,14 +1,18 @@
 package checkers
 
+import (
+	mapset "github.com/deckarep/golang-set"
+)
+
 // DuplicateChecker ...
 type DuplicateChecker struct {
-	checkedLinks map[string]struct{}
+	checkedLinks mapset.Set
 }
 
 // CheckLink ...
 func (checker DuplicateChecker) CheckLink(parentLink string, link string) bool {
-	_, isDuplicate := checker.checkedLinks[link]
-	checker.checkedLinks[link] = struct{}{}
+	isDuplicate := checker.checkedLinks.Contains(link)
+	checker.checkedLinks.Add(link)
 
 	return isDuplicate
 }
