@@ -51,6 +51,7 @@ func ExampleHandleLinksConcurrently() {
 			`<ul>
 				<li><a href="http://%[1]s/1">1</a></li>
 				<li><a href="http://%[1]s/2">2</a></li>
+				<li><a href="https://golang.org/">https://golang.org/</a></li>
 			</ul>`,
 			request.Host,
 		)
