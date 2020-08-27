@@ -44,6 +44,14 @@
   version = "v1.1.1"
 
 [[projects]]
+  digest = "1:e47d51dab652d26c3fba6f8cba403f922d02757a82abdc77e90df7948daf296e"
+  name = "github.com/deckarep/golang-set"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cbaa98ba5575e67703b32b4b19f73c91f3c4159e"
+  version = "v1.7.1"
+
+[[projects]]
   digest = "1:85138d5daba3306acc15e3b1c9226a2866e068c4822bbf0875d5143db225face"
   name = "github.com/go-log/log"
   packages = [
@@ -230,6 +238,7 @@
   input-imports = [
     "github.com/alecthomas/gometalinter",
     "github.com/cweill/gotests/gotests",
+    "github.com/deckarep/golang-set",
     "github.com/go-log/log",
     "github.com/go-log/log/print",
     "github.com/pkg/errors",
