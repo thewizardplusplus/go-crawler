@@ -77,8 +77,6 @@ func HandleLink(
 ) []string {
 	defer dependencies.Waiter.Done()
 
-	dependencies.LinkHandler.HandleLink(link)
-
 	extractedLinks, err := dependencies.LinkExtractor.ExtractLinks(ctx, link)
 	if err != nil {
 		dependencies.Logger.Logf("unable to extract links: %s", err)
@@ -87,6 +85,8 @@ func HandleLink(
 
 	var checkedExtractedLinks []string
 	for _, extractedLink := range extractedLinks {
+		dependencies.LinkHandler.HandleLink(extractedLink)
+
 		if !dependencies.LinkChecker.CheckLink(link, extractedLink) {
 			continue
 		}
