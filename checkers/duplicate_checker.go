@@ -3,6 +3,7 @@ package checkers
 import (
 	"net/url"
 	"path"
+	"sync"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/go-log/log"
@@ -23,6 +24,7 @@ type DuplicateChecker struct {
 	sanitizeLink LinkSanitizing
 	logger       log.Logger
 
+	locker       sync.RWMutex
 	checkedLinks mapset.Set
 }
 
@@ -30,8 +32,8 @@ type DuplicateChecker struct {
 func NewDuplicateChecker(
 	sanitizeLink LinkSanitizing,
 	logger log.Logger,
-) DuplicateChecker {
-	return DuplicateChecker{
+) *DuplicateChecker {
+	return &DuplicateChecker{
 		sanitizeLink: sanitizeLink,
 		logger:       logger,
 
@@ -40,7 +42,13 @@ func NewDuplicateChecker(
 }
 
 // CheckLink ...
-func (checker DuplicateChecker) CheckLink(parentLink string, link string) bool {
+func (checker *DuplicateChecker) CheckLink(
+	parentLink string,
+	link string,
+) bool {
+	checker.locker.Lock()
+	defer checker.locker.Unlock()
+
 	if checker.sanitizeLink == SanitizeLink {
 		var err error
 		link, err = sanitizeLink(link)
