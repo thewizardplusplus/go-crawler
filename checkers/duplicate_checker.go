@@ -9,9 +9,18 @@ import (
 	"github.com/pkg/errors"
 )
 
+// LinkSanitizing ...
+type LinkSanitizing int
+
+// ...
+const (
+	DoNotSanitizeLink LinkSanitizing = iota
+	SanitizeLink
+)
+
 // DuplicateChecker ...
 type DuplicateChecker struct {
-	sanitizeLink bool
+	sanitizeLink LinkSanitizing
 	logger       log.Logger
 
 	checkedLinks mapset.Set
@@ -19,7 +28,7 @@ type DuplicateChecker struct {
 
 // NewDuplicateChecker ...
 func NewDuplicateChecker(
-	sanitizeLink bool,
+	sanitizeLink LinkSanitizing,
 	logger log.Logger,
 ) DuplicateChecker {
 	return DuplicateChecker{
@@ -32,7 +41,7 @@ func NewDuplicateChecker(
 
 // CheckLink ...
 func (checker DuplicateChecker) CheckLink(parentLink string, link string) bool {
-	if checker.sanitizeLink {
+	if checker.sanitizeLink == SanitizeLink {
 		var err error
 		link, err = sanitizeLink(link)
 		if err != nil {

@@ -11,7 +11,7 @@ import (
 
 func TestDuplicateChecker_CheckLink(test *testing.T) {
 	type fields struct {
-		sanitizeLink bool
+		sanitizeLink LinkSanitizing
 		logger       log.Logger
 
 		checkedLinks mapset.Set
