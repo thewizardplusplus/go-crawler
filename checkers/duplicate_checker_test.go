@@ -11,8 +11,8 @@ import (
 
 func TestDuplicateChecker_CheckLink(test *testing.T) {
 	type fields struct {
-		SanitizeLink bool
-		Logger       log.Logger
+		sanitizeLink bool
+		logger       log.Logger
 
 		checkedLinks mapset.Set
 	}
@@ -31,14 +31,14 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			checker := DuplicateChecker{
-				SanitizeLink: data.fields.SanitizeLink,
-				Logger:       data.fields.Logger,
+				sanitizeLink: data.fields.sanitizeLink,
+				logger:       data.fields.logger,
 
 				checkedLinks: data.fields.checkedLinks,
 			}
 			got := checker.CheckLink(data.args.parentLink, data.args.link)
 
-			mock.AssertExpectationsForObjects(test, data.fields.Logger)
+			mock.AssertExpectationsForObjects(test, data.fields.logger)
 			data.want(test, got)
 		})
 	}

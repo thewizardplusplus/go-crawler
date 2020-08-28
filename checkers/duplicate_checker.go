@@ -11,19 +11,32 @@ import (
 
 // DuplicateChecker ...
 type DuplicateChecker struct {
-	SanitizeLink bool
-	Logger       log.Logger
+	sanitizeLink bool
+	logger       log.Logger
 
 	checkedLinks mapset.Set
 }
 
+// NewDuplicateChecker ...
+func NewDuplicateChecker(
+	sanitizeLink bool,
+	logger log.Logger,
+) DuplicateChecker {
+	return DuplicateChecker{
+		sanitizeLink: sanitizeLink,
+		logger:       logger,
+
+		checkedLinks: mapset.NewSet(),
+	}
+}
+
 // CheckLink ...
 func (checker DuplicateChecker) CheckLink(parentLink string, link string) bool {
-	if checker.SanitizeLink {
+	if checker.sanitizeLink {
 		var err error
 		link, err = sanitizeLink(link)
 		if err != nil {
-			checker.Logger.Logf("unable to sanitize the link: %s", err)
+			checker.logger.Logf("unable to sanitize the link: %s", err)
 			return false
 		}
 	}
