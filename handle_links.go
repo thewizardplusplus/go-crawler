@@ -25,7 +25,7 @@ type LinkChecker interface {
 
 // LinkHandler ...
 type LinkHandler interface {
-	HandleLink(link string)
+	HandleLink(parentLink string, link string)
 }
 
 // Dependencies ...
@@ -85,7 +85,7 @@ func HandleLink(
 
 	var checkedExtractedLinks []string
 	for _, extractedLink := range extractedLinks {
-		dependencies.LinkHandler.HandleLink(extractedLink)
+		dependencies.LinkHandler.HandleLink(link, extractedLink)
 
 		if !dependencies.LinkChecker.CheckLink(link, extractedLink) {
 			continue

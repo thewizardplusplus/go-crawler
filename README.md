@@ -75,7 +75,7 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link string) {
+func (handler LinkHandler) HandleLink(parentLink string, link string) {
 	// replace the test server URL for reproducibility of the example
 	link = strings.Replace(link, handler.ServerURL, "http://example.com", -1)
 
