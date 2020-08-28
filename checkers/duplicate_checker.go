@@ -37,7 +37,7 @@ func NewDuplicateChecker(
 		sanitizeLink: sanitizeLink,
 		logger:       logger,
 
-		checkedLinks: mapset.NewSet(),
+		checkedLinks: mapset.NewThreadUnsafeSet(),
 	}
 }
 
@@ -46,9 +46,6 @@ func (checker *DuplicateChecker) CheckLink(
 	parentLink string,
 	link string,
 ) bool {
-	checker.locker.Lock()
-	defer checker.locker.Unlock()
-
 	if checker.sanitizeLink == SanitizeLink {
 		var err error
 		link, err = sanitizeLink(link)
@@ -58,8 +55,13 @@ func (checker *DuplicateChecker) CheckLink(
 		}
 	}
 
+	checker.locker.Lock()
+	defer checker.locker.Unlock()
+
 	isDuplicate := checker.checkedLinks.Contains(link)
-	checker.checkedLinks.Add(link)
+	if !isDuplicate {
+		checker.checkedLinks.Add(link)
+	}
 
 	return isDuplicate
 }
