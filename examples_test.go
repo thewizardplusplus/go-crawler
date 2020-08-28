@@ -24,10 +24,16 @@ type LinkHandler struct {
 }
 
 func (handler LinkHandler) HandleLink(parentLink string, link string) {
-	// replace the test server URL for reproducibility of the example
-	link = strings.Replace(link, handler.ServerURL, "http://example.com", -1)
+	fmt.Printf(
+		"have got the link %q from the page %q\n",
+		handler.replaceServerURL(link),
+		handler.replaceServerURL(parentLink),
+	)
+}
 
-	fmt.Printf("have got the link: %s\n", link)
+// replace the test server URL for reproducibility of the example
+func (handler LinkHandler) replaceServerURL(link string) string {
+	return strings.Replace(link, handler.ServerURL, "http://example.com", -1)
 }
 
 func ExampleHandleLinksConcurrently() {
@@ -98,10 +104,10 @@ func ExampleHandleLinksConcurrently() {
 	waiter.Wait()
 
 	// Unordered output:
-	// have got the link: http://example.com/1
-	// have got the link: http://example.com/2
-	// have got the link: http://example.com/common
-	// have got the link: http://example.com/common
-	// have got the link: http://example.com/common
-	// have got the link: https://golang.org/
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/common" from the page "http://example.com"
+	// have got the link "http://example.com/common" from the page "http://example.com/1"
+	// have got the link "http://example.com/common" from the page "http://example.com/2"
+	// have got the link "https://golang.org/" from the page "http://example.com"
 }
