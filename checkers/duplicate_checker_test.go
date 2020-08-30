@@ -1,6 +1,8 @@
 package checkers
 
 import (
+	"errors"
+	"net/url"
 	"testing"
 
 	mapset "github.com/deckarep/golang-set"
@@ -27,7 +29,70 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		args   args
 		want   assert.BoolAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success without a duplicate",
+			fields: fields{
+				sanitizeLink: DoNotSanitizeLink,
+				logger:       new(MockLogger),
+
+				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       "http://example.com/3",
+			},
+			want: assert.True,
+		},
+		{
+			name: "success with a duplicate and without link sanitizing",
+			fields: fields{
+				sanitizeLink: DoNotSanitizeLink,
+				logger:       new(MockLogger),
+
+				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       "http://example.com/2",
+			},
+			want: assert.False,
+		},
+		{
+			name: "success with a duplicate and with link sanitizing",
+			fields: fields{
+				sanitizeLink: SanitizeLink,
+				logger:       new(MockLogger),
+
+				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       "http://example.com/test/../2",
+			},
+			want: assert.False,
+		},
+		{
+			name: "error",
+			fields: fields{
+				sanitizeLink: SanitizeLink,
+				logger: func() Logger {
+					err := errors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
+					logger := new(MockLogger)
+					logger.On("Logf", "unable to parse the link: %s", urlErr).Return()
+
+					return logger
+				}(),
+
+				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       ":",
+			},
+			want: assert.False,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			checker := DuplicateChecker{
