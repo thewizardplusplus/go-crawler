@@ -7,7 +7,6 @@ import (
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/go-log/log"
-	"github.com/pkg/errors"
 )
 
 // LinkSanitizing ...
@@ -50,7 +49,7 @@ func (checker *DuplicateChecker) CheckLink(
 		var err error
 		link, err = sanitizeLink(link)
 		if err != nil {
-			checker.logger.Logf("unable to sanitize the link: %s", err)
+			checker.logger.Logf("unable to parse the link: %s", err)
 			return false
 		}
 	}
@@ -63,13 +62,13 @@ func (checker *DuplicateChecker) CheckLink(
 		checker.checkedLinks.Add(link)
 	}
 
-	return isDuplicate
+	return !isDuplicate
 }
 
 func sanitizeLink(link string) (string, error) {
 	parsedLink, err := url.Parse(link)
 	if err != nil {
-		return "", errors.Wrap(err, "unable to parse the link")
+		return "", err
 	}
 
 	parsedLink.Path = path.Clean(parsedLink.Path)
