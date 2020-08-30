@@ -9,7 +9,19 @@ import (
 	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
+
+func TestNewDuplicateChecker(test *testing.T) {
+	logger := new(MockLogger)
+	got := NewDuplicateChecker(SanitizeLink, logger)
+
+	mock.AssertExpectationsForObjects(test, logger)
+	require.NotNil(test, got)
+	assert.Equal(test, SanitizeLink, got.sanitizeLink)
+	assert.Equal(test, logger, got.logger)
+	assert.NotNil(test, got.checkedLinks)
+}
 
 func TestDuplicateChecker_CheckLink(test *testing.T) {
 	type fields struct {
