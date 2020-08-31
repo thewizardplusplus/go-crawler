@@ -19,7 +19,60 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 		args     args
 		want     assert.BoolAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name:     "empty",
+			checkers: nil,
+			args: args{
+				parentLink: "http://example.com/",
+				link:       "http://example.com/test",
+			},
+			want: assert.True,
+		},
+		{
+			name: "without failed checkings",
+			checkers: CheckerGroup{
+				func() LinkChecker {
+					checker := new(MockLinkChecker)
+					checker.
+						On("CheckLink", "http://example.com/", "http://example.com/test").
+						Return(true)
+
+					return checker
+				}(),
+				func() LinkChecker {
+					checker := new(MockLinkChecker)
+					checker.
+						On("CheckLink", "http://example.com/", "http://example.com/test").
+						Return(true)
+
+					return checker
+				}(),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       "http://example.com/test",
+			},
+			want: assert.True,
+		},
+		{
+			name: "with a failed checking",
+			checkers: CheckerGroup{
+				func() LinkChecker {
+					checker := new(MockLinkChecker)
+					checker.
+						On("CheckLink", "http://example.com/", "http://example.com/test").
+						Return(false)
+
+					return checker
+				}(),
+				new(MockLinkChecker),
+			},
+			args: args{
+				parentLink: "http://example.com/",
+				link:       "http://example.com/test",
+			},
+			want: assert.False,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			got := data.checkers.CheckLink(data.args.parentLink, data.args.link)
