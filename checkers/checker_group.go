@@ -15,5 +15,6 @@ func (checkers CheckerGroup) CheckLink(parentLink string, link string) bool {
 		}
 	}
 
-	return true
+	// to prohibit using an empty group as a filter that passes everything
+	return len(checkers) != 0
 }

@@ -26,7 +26,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				parentLink: "http://example.com/",
 				link:       "http://example.com/test",
 			},
-			want: assert.True,
+			want: assert.False,
 		},
 		{
 			name: "without failed checkings",
