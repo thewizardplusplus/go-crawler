@@ -18,14 +18,14 @@ type LinkExtractor interface {
 
 // LinkChecker ...
 type LinkChecker interface {
-	CheckLink(parentLink string, link string) bool
+	CheckLink(sourceLink string, link string) bool
 }
 
 //go:generate mockery -name=LinkHandler -inpkg -case=underscore -testonly
 
 // LinkHandler ...
 type LinkHandler interface {
-	HandleLink(parentLink string, link string)
+	HandleLink(sourceLink string, link string)
 }
 
 // Dependencies ...

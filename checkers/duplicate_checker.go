@@ -42,7 +42,7 @@ func NewDuplicateChecker(
 
 // CheckLink ...
 func (checker *DuplicateChecker) CheckLink(
-	parentLink string,
+	sourceLink string,
 	link string,
 ) bool {
 	if checker.sanitizeLink == SanitizeLink {

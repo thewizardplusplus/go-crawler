@@ -12,8 +12,8 @@ type HostChecker struct {
 }
 
 // CheckLink ...
-func (checker HostChecker) CheckLink(parentLink string, link string) bool {
-	parsedParentLink, err := url.Parse(parentLink)
+func (checker HostChecker) CheckLink(sourceLink string, link string) bool {
+	parsedSourceLink, err := url.Parse(sourceLink)
 	if err != nil {
 		checker.Logger.Logf("unable to parse the parent link: %s", err)
 		return false
@@ -25,5 +25,5 @@ func (checker HostChecker) CheckLink(parentLink string, link string) bool {
 		return false
 	}
 
-	return parsedLink.Host == parsedParentLink.Host
+	return parsedLink.Host == parsedSourceLink.Host
 }

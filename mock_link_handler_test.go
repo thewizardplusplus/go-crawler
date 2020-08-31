@@ -9,7 +9,7 @@ type MockLinkHandler struct {
 	mock.Mock
 }
 
-// HandleLink provides a mock function with given fields: parentLink, link
-func (_m *MockLinkHandler) HandleLink(parentLink string, link string) {
-	_m.Called(parentLink, link)
+// HandleLink provides a mock function with given fields: sourceLink, link
+func (_m *MockLinkHandler) HandleLink(sourceLink string, link string) {
+	_m.Called(sourceLink, link)
 }

@@ -9,7 +9,7 @@ import (
 
 func TestCheckerGroup_CheckLink(test *testing.T) {
 	type args struct {
-		parentLink string
+		sourceLink string
 		link       string
 	}
 
@@ -23,7 +23,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 			name:     "empty",
 			checkers: nil,
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       "http://example.com/test",
 			},
 			want: assert.False,
@@ -49,7 +49,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       "http://example.com/test",
 			},
 			want: assert.True,
@@ -68,14 +68,14 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				new(MockLinkChecker),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       "http://example.com/test",
 			},
 			want: assert.False,
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			got := data.checkers.CheckLink(data.args.parentLink, data.args.link)
+			got := data.checkers.CheckLink(data.args.sourceLink, data.args.link)
 
 			for _, checker := range data.checkers {
 				mock.AssertExpectationsForObjects(test, checker)

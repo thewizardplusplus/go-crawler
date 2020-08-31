@@ -75,11 +75,11 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(parentLink string, link string) {
+func (handler LinkHandler) HandleLink(sourceLink string, link string) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link),
-		handler.replaceServerURL(parentLink),
+		handler.replaceServerURL(sourceLink),
 	)
 }
 

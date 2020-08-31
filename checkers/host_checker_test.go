@@ -15,7 +15,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 		Logger log.Logger
 	}
 	type args struct {
-		parentLink string
+		sourceLink string
 		link       string
 	}
 
@@ -31,7 +31,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
-				parentLink: "http://example1.com/",
+				sourceLink: "http://example1.com/",
 				link:       "http://example2.com/test",
 			},
 			want: assert.False,
@@ -42,7 +42,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       "http://example.com/test",
 			},
 			want: assert.True,
@@ -61,7 +61,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
-				parentLink: ":",
+				sourceLink: ":",
 				link:       "http://example.com/test",
 			},
 			want: assert.False,
@@ -80,7 +80,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       ":",
 			},
 			want: assert.False,
@@ -90,7 +90,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 			checker := HostChecker{
 				Logger: data.fields.Logger,
 			}
-			got := checker.CheckLink(data.args.parentLink, data.args.link)
+			got := checker.CheckLink(data.args.sourceLink, data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.Logger)
 			data.want(test, got)

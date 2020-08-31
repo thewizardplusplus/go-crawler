@@ -31,7 +31,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		checkedLinks mapset.Set
 	}
 	type args struct {
-		parentLink string
+		sourceLink string
 		link       string
 	}
 
@@ -50,7 +50,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       "http://example.com/3",
 			},
 			want: assert.True,
@@ -64,7 +64,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       "http://example.com/2",
 			},
 			want: assert.False,
@@ -78,7 +78,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       "http://example.com/test/../2",
 			},
 			want: assert.False,
@@ -100,7 +100,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
 			},
 			args: args{
-				parentLink: "http://example.com/",
+				sourceLink: "http://example.com/",
 				link:       ":",
 			},
 			want: assert.False,
@@ -113,7 +113,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 
 				checkedLinks: data.fields.checkedLinks,
 			}
-			got := checker.CheckLink(data.args.parentLink, data.args.link)
+			got := checker.CheckLink(data.args.sourceLink, data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.logger)
 			data.want(test, got)
