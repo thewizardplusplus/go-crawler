@@ -89,8 +89,8 @@ func (handler LinkHandler) replaceServerURL(link string) string {
 	return strings.Replace(link, handler.ServerURL, "http://example.com", -1)
 }
 
-func main() {
-	server := httptest.NewServer(http.HandlerFunc(func(
+func RunServer() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(
 		writer http.ResponseWriter,
 		request *http.Request,
 	) {
@@ -118,6 +118,10 @@ func main() {
 		)
 		template.Execute(writer, links) // nolint: errcheck
 	}))
+}
+
+func main() {
+	server := RunServer()
 	defer server.Close()
 
 	links := make(chan string, 1000)

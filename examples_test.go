@@ -37,8 +37,8 @@ func (handler LinkHandler) replaceServerURL(link string) string {
 	return strings.Replace(link, handler.ServerURL, "http://example.com", -1)
 }
 
-func ExampleHandleLinksConcurrently() {
-	server := httptest.NewServer(http.HandlerFunc(func(
+func RunServer() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(
 		writer http.ResponseWriter,
 		request *http.Request,
 	) {
@@ -66,6 +66,10 @@ func ExampleHandleLinksConcurrently() {
 		)
 		template.Execute(writer, links) // nolint: errcheck
 	}))
+}
+
+func ExampleHandleLinksConcurrently() {
+	server := RunServer()
 	defer server.Close()
 
 	links := make(chan string, 1000)
