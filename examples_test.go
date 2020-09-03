@@ -45,7 +45,7 @@ func ExampleHandleLinksConcurrently() {
 		var links []string
 		switch request.URL.Path {
 		case "/":
-			links = []string{"/1", "/2", "https://golang.org/"}
+			links = []string{"/1", "/2", "/2", "https://golang.org/"}
 		case "/1":
 			links = []string{"/1/1", "/1/2"}
 		case "/2":
@@ -112,7 +112,10 @@ func ExampleHandleLinksConcurrently() {
 	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
 	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
 	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2" from the page "http://example.com"
 	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
