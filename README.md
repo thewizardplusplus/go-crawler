@@ -15,8 +15,14 @@ The library that implements crawling of all relative links for specified ones.
     - supporting of delay between repeats;
 - calling of an outer handler for an each found link:
   - it's called directly during crawling;
+  - handling of links immediately after they have been extracted;
+  - passing of the source link in the outer handler;
 - custom filtering of considered links:
   - by relativity of a link (optional);
+  - by uniqueness of an extracted link (optional):
+    - supporting of sanitizing of a link before checking of uniqueness (optional);
+  - supporting of grouping of link filters:
+    - result of group filtering is successful only when all filters are successful;
 - parallelization possibilities:
   - crawling of relative links in parallel;
   - supporting of background working:
