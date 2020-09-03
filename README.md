@@ -55,6 +55,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"html/template"
 	stdlog "log"
 	"net/http"
 	"net/http/httptest"
@@ -93,19 +94,29 @@ func main() {
 		writer http.ResponseWriter,
 		request *http.Request,
 	) {
-		if request.URL.Path != "/" {
-			return
+		var links []string
+		switch request.URL.Path {
+		case "/":
+			links = []string{"/1", "/2", "https://golang.org/"}
+		case "/1":
+			links = []string{"/1/1", "/1/2"}
+		case "/2":
+			links = []string{"/2/1", "/2/2"}
+		}
+		for index := range links {
+			if strings.HasPrefix(links[index], "/") {
+				links[index] = "http://" + request.Host + links[index]
+			}
 		}
 
-		fmt.Fprintf( // nolint: errcheck
-			writer,
+		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
-				<li><a href="http://%[1]s/1">1</a></li>
-				<li><a href="http://%[1]s/2">2</a></li>
-				<li><a href="https://golang.org/">https://golang.org/</a></li>
+				{{ range $link := . }}
+					<li><a href="{{ $link }}">{{ $link }}</a></li>
+				{{ end }}
 			</ul>`,
-			request.Host,
 		)
+		template.Execute(writer, links) // nolint: errcheck
 	}))
 	defer server.Close()
 
@@ -150,7 +161,11 @@ func main() {
 
 	// Unordered output:
 	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
 	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
 ```
