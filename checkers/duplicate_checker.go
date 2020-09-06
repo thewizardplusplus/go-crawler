@@ -39,7 +39,7 @@ func (checker *DuplicateChecker) CheckLink(
 		var err error
 		link, err = sanitizing.ApplyLinkSanitizing(link)
 		if err != nil {
-			checker.logger.Logf("unable to parse the link: %s", err)
+			checker.logger.Logf("unable to sanitize the link: %s", err)
 			return false
 		}
 	}

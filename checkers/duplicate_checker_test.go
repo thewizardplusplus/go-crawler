@@ -1,12 +1,14 @@
 package checkers
 
 import (
-	"errors"
+	stderrors "errors"
 	"net/url"
+	"reflect"
 	"testing"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/go-log/log"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -89,11 +91,20 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 			fields: fields{
 				sanitizeLink: sanitizing.SanitizeLink,
 				logger: func() Logger {
-					err := errors.New("missing protocol scheme")
+					err := stderrors.New("missing protocol scheme")
 					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
 
 					logger := new(MockLogger)
-					logger.On("Logf", "unable to parse the link: %s", urlErr).Return()
+					logger.
+						On(
+							"Logf",
+							"unable to sanitize the link: %s",
+							mock.MatchedBy(func(err error) bool {
+								unwrappedErr := errors.Cause(err)
+								return reflect.DeepEqual(unwrappedErr, urlErr)
+							}),
+						).
+						Return()
 
 					return logger
 				}(),
