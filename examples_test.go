@@ -17,6 +17,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -159,7 +160,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicates() {
 				checkers.HostChecker{
 					Logger: wrappedLogger,
 				},
-				checkers.NewDuplicateChecker(checkers.SanitizeLink, wrappedLogger),
+				checkers.NewDuplicateChecker(sanitizing.SanitizeLink, wrappedLogger),
 			},
 			LinkHandler: LinkHandler{
 				ServerURL: server.URL,

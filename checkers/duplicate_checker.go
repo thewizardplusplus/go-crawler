@@ -7,20 +7,12 @@ import (
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/go-log/log"
-)
-
-// LinkSanitizing ...
-type LinkSanitizing int
-
-// ...
-const (
-	DoNotSanitizeLink LinkSanitizing = iota
-	SanitizeLink
+	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
 
 // DuplicateChecker ...
 type DuplicateChecker struct {
-	sanitizeLink LinkSanitizing
+	sanitizeLink sanitizing.LinkSanitizing
 	logger       log.Logger
 
 	locker       sync.RWMutex
@@ -29,7 +21,7 @@ type DuplicateChecker struct {
 
 // NewDuplicateChecker ...
 func NewDuplicateChecker(
-	sanitizeLink LinkSanitizing,
+	sanitizeLink sanitizing.LinkSanitizing,
 	logger log.Logger,
 ) *DuplicateChecker {
 	return &DuplicateChecker{
@@ -45,7 +37,7 @@ func (checker *DuplicateChecker) CheckLink(
 	sourceLink string,
 	link string,
 ) bool {
-	if checker.sanitizeLink == SanitizeLink {
+	if checker.sanitizeLink == sanitizing.SanitizeLink {
 		var err error
 		link, err = sanitizeLink(link)
 		if err != nil {

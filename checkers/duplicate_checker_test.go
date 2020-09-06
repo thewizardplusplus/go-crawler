@@ -10,22 +10,23 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
 
 func TestNewDuplicateChecker(test *testing.T) {
 	logger := new(MockLogger)
-	got := NewDuplicateChecker(SanitizeLink, logger)
+	got := NewDuplicateChecker(sanitizing.SanitizeLink, logger)
 
 	mock.AssertExpectationsForObjects(test, logger)
 	require.NotNil(test, got)
-	assert.Equal(test, SanitizeLink, got.sanitizeLink)
+	assert.Equal(test, sanitizing.SanitizeLink, got.sanitizeLink)
 	assert.Equal(test, logger, got.logger)
 	assert.NotNil(test, got.checkedLinks)
 }
 
 func TestDuplicateChecker_CheckLink(test *testing.T) {
 	type fields struct {
-		sanitizeLink LinkSanitizing
+		sanitizeLink sanitizing.LinkSanitizing
 		logger       log.Logger
 
 		checkedLinks mapset.Set
@@ -44,7 +45,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		{
 			name: "success without a duplicate",
 			fields: fields{
-				sanitizeLink: DoNotSanitizeLink,
+				sanitizeLink: sanitizing.DoNotSanitizeLink,
 				logger:       new(MockLogger),
 
 				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
@@ -58,7 +59,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		{
 			name: "success with a duplicate and without link sanitizing",
 			fields: fields{
-				sanitizeLink: DoNotSanitizeLink,
+				sanitizeLink: sanitizing.DoNotSanitizeLink,
 				logger:       new(MockLogger),
 
 				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
@@ -72,7 +73,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		{
 			name: "success with a duplicate and with link sanitizing",
 			fields: fields{
-				sanitizeLink: SanitizeLink,
+				sanitizeLink: sanitizing.SanitizeLink,
 				logger:       new(MockLogger),
 
 				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
@@ -86,7 +87,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		{
 			name: "error",
 			fields: fields{
-				sanitizeLink: SanitizeLink,
+				sanitizeLink: sanitizing.SanitizeLink,
 				logger: func() Logger {
 					err := errors.New("missing protocol scheme")
 					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
