@@ -18,3 +18,18 @@ type UniqueHandler struct {
 	locker       sync.RWMutex
 	handledLinks mapset.Set
 }
+
+// NewUniqueHandler ...
+func NewUniqueHandler(
+	sanitizeLink sanitizing.LinkSanitizing,
+	linkHandler crawler.LinkHandler,
+	logger log.Logger,
+) *UniqueHandler {
+	return &UniqueHandler{
+		sanitizeLink: sanitizeLink,
+		linkHandler:  linkHandler,
+		logger:       logger,
+
+		handledLinks: mapset.NewThreadUnsafeSet(),
+	}
+}
