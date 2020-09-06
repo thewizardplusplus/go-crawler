@@ -17,7 +17,30 @@ func TestApplyLinkSanitizing(test *testing.T) {
 		wantLink string
 		wantErr  assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success without sanitizing",
+			args: args{
+				link: "http://example.com/test",
+			},
+			wantLink: "http://example.com/test",
+			wantErr:  assert.NoError,
+		},
+		{
+			name: "success with sanitizing",
+			args: args{
+				link: "http://example.com/one/../two",
+			},
+			wantLink: "http://example.com/two",
+			wantErr:  assert.NoError,
+		},
+		{
+			name: "error",
+			args: args{
+				link: ":",
+			},
+			wantLink: "",
+			wantErr:  assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			gotLink, gotErr := ApplyLinkSanitizing(data.args.link)
