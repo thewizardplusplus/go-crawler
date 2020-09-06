@@ -1,8 +1,6 @@
 package checkers
 
 import (
-	"net/url"
-	"path"
 	"sync"
 
 	mapset "github.com/deckarep/golang-set"
@@ -39,7 +37,7 @@ func (checker *DuplicateChecker) CheckLink(
 ) bool {
 	if checker.sanitizeLink == sanitizing.SanitizeLink {
 		var err error
-		link, err = sanitizeLink(link)
+		link, err = sanitizing.ApplyLinkSanitizing(link)
 		if err != nil {
 			checker.logger.Logf("unable to parse the link: %s", err)
 			return false
@@ -55,14 +53,4 @@ func (checker *DuplicateChecker) CheckLink(
 	}
 
 	return !isDuplicate
-}
-
-func sanitizeLink(link string) (string, error) {
-	parsedLink, err := url.Parse(link)
-	if err != nil {
-		return "", err
-	}
-
-	parsedLink.Path = path.Clean(parsedLink.Path)
-	return parsedLink.String(), nil
 }
