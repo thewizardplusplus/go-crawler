@@ -26,3 +26,17 @@ func NewLinkRegister(
 		registeredLinks: mapset.NewSet(),
 	}
 }
+
+// RegisterLink ...
+func (register LinkRegister) RegisterLink(link string) bool {
+	if register.sanitizeLink == sanitizing.SanitizeLink {
+		var err error
+		link, err = sanitizing.ApplyLinkSanitizing(link)
+		if err != nil {
+			register.logger.Logf("unable to sanitize the link: %s", err)
+			return false
+		}
+	}
+
+	return register.registeredLinks.Add(link)
+}
