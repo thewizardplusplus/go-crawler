@@ -48,13 +48,10 @@ func (handler *UniqueHandler) HandleLink(sourceLink string, link string) {
 	handler.locker.Lock()
 	defer handler.locker.Unlock()
 
-	// checking should be occurred under lock
-	if handler.handledLinks.Contains(link) {
+	wasAdded := handler.handledLinks.Add(link)
+	if !wasAdded {
 		return
 	}
-	// use the defer operator to remember a link
-	// even if the inner handler throws a panic
-	defer handler.handledLinks.Add(link)
 
 	handler.linkHandler.HandleLink(sourceLink, link)
 }
