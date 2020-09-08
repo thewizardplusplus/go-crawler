@@ -1,10 +1,14 @@
 package handlers
 
 import (
+	stderrors "errors"
+	"net/url"
+	"reflect"
 	"testing"
 
 	mapset "github.com/deckarep/golang-set"
 	"github.com/go-log/log"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -43,7 +47,86 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 		fields fields
 		args   args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success without a duplicate",
+			fields: fields{
+				sanitizeLink: sanitizing.DoNotSanitizeLink,
+				linkHandler: func() crawler.LinkHandler {
+					handler := new(MockLinkHandler)
+					handler.
+						On("HandleLink", "http://example.com/", "http://example.com/3").
+						Return()
+
+					return handler
+				}(),
+				logger: new(MockLogger),
+
+				handledLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				sourceLink: "http://example.com/",
+				link:       "http://example.com/3",
+			},
+		},
+		{
+			name: "success with a duplicate and without link sanitizing",
+			fields: fields{
+				sanitizeLink: sanitizing.DoNotSanitizeLink,
+				linkHandler:  new(MockLinkHandler),
+				logger:       new(MockLogger),
+
+				handledLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				sourceLink: "http://example.com/",
+				link:       "http://example.com/2",
+			},
+		},
+		{
+			name: "success with a duplicate and with link sanitizing",
+			fields: fields{
+				sanitizeLink: sanitizing.SanitizeLink,
+				linkHandler:  new(MockLinkHandler),
+				logger:       new(MockLogger),
+
+				handledLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				sourceLink: "http://example.com/",
+				link:       "http://example.com/test/../2",
+			},
+		},
+		{
+			name: "error",
+			fields: fields{
+				sanitizeLink: sanitizing.SanitizeLink,
+				linkHandler:  new(MockLinkHandler),
+				logger: func() Logger {
+					err := stderrors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
+					logger := new(MockLogger)
+					logger.
+						On(
+							"Logf",
+							"unable to sanitize the link: %s",
+							mock.MatchedBy(func(err error) bool {
+								unwrappedErr := errors.Cause(err)
+								return reflect.DeepEqual(unwrappedErr, urlErr)
+							}),
+						).
+						Return()
+
+					return logger
+				}(),
+
+				handledLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+			},
+			args: args{
+				sourceLink: "http://example.com/",
+				link:       ":",
+			},
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			handler := UniqueHandler{
