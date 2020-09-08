@@ -13,3 +13,16 @@ type LinkRegister struct {
 
 	registeredLinks mapset.Set
 }
+
+// NewLinkRegister ...
+func NewLinkRegister(
+	sanitizeLink sanitizing.LinkSanitizing,
+	logger log.Logger,
+) LinkRegister {
+	return LinkRegister{
+		sanitizeLink: sanitizeLink,
+		logger:       logger,
+
+		registeredLinks: mapset.NewSet(),
+	}
+}
