@@ -1,8 +1,6 @@
 package checkers
 
 import (
-	"sync"
-
 	mapset "github.com/deckarep/golang-set"
 	"github.com/go-log/log"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
@@ -13,7 +11,6 @@ type DuplicateChecker struct {
 	sanitizeLink sanitizing.LinkSanitizing
 	logger       log.Logger
 
-	locker       sync.RWMutex
 	checkedLinks mapset.Set
 }
 
@@ -21,17 +18,17 @@ type DuplicateChecker struct {
 func NewDuplicateChecker(
 	sanitizeLink sanitizing.LinkSanitizing,
 	logger log.Logger,
-) *DuplicateChecker {
-	return &DuplicateChecker{
+) DuplicateChecker {
+	return DuplicateChecker{
 		sanitizeLink: sanitizeLink,
 		logger:       logger,
 
-		checkedLinks: mapset.NewThreadUnsafeSet(),
+		checkedLinks: mapset.NewSet(),
 	}
 }
 
 // CheckLink ...
-func (checker *DuplicateChecker) CheckLink(
+func (checker DuplicateChecker) CheckLink(
 	sourceLink string,
 	link string,
 ) bool {
@@ -44,13 +41,6 @@ func (checker *DuplicateChecker) CheckLink(
 		}
 	}
 
-	checker.locker.Lock()
-	defer checker.locker.Unlock()
-
-	isDuplicate := checker.checkedLinks.Contains(link)
-	if !isDuplicate {
-		checker.checkedLinks.Add(link)
-	}
-
-	return !isDuplicate
+	wasAdded := checker.checkedLinks.Add(link)
+	return wasAdded
 }

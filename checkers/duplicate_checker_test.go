@@ -11,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
 
@@ -20,7 +19,6 @@ func TestNewDuplicateChecker(test *testing.T) {
 	got := NewDuplicateChecker(sanitizing.SanitizeLink, logger)
 
 	mock.AssertExpectationsForObjects(test, logger)
-	require.NotNil(test, got)
 	assert.Equal(test, sanitizing.SanitizeLink, got.sanitizeLink)
 	assert.Equal(test, logger, got.logger)
 	assert.NotNil(test, got.checkedLinks)
