@@ -1,35 +1,16 @@
 package checkers
 
 import (
-	stderrors "errors"
-	"net/url"
-	"reflect"
 	"testing"
 
-	mapset "github.com/deckarep/golang-set"
-	"github.com/go-log/log"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/thewizardplusplus/go-crawler/register"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
 
-func TestNewDuplicateChecker(test *testing.T) {
-	logger := new(MockLogger)
-	got := NewDuplicateChecker(sanitizing.SanitizeLink, logger)
-
-	mock.AssertExpectationsForObjects(test, logger)
-	assert.Equal(test, sanitizing.SanitizeLink, got.sanitizeLink)
-	assert.Equal(test, logger, got.logger)
-	assert.NotNil(test, got.checkedLinks)
-}
-
 func TestDuplicateChecker_CheckLink(test *testing.T) {
 	type fields struct {
-		sanitizeLink sanitizing.LinkSanitizing
-		logger       log.Logger
-
-		checkedLinks mapset.Set
+		LinkRegister register.LinkRegister
 	}
 	type args struct {
 		sourceLink string
@@ -37,96 +18,60 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 	}
 
 	for _, data := range []struct {
-		name   string
-		fields fields
-		args   args
-		want   assert.BoolAssertionFunc
+		name             string
+		fields           fields
+		args             args
+		wantLinkRegister register.LinkRegister
+		wantOk           assert.BoolAssertionFunc
 	}{
 		{
-			name: "success without a duplicate",
+			name: "without a duplicate",
 			fields: fields{
-				sanitizeLink: sanitizing.DoNotSanitizeLink,
-				logger:       new(MockLogger),
-
-				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
+				LinkRegister: register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
 			},
 			args: args{
 				sourceLink: "http://example.com/",
-				link:       "http://example.com/3",
+				link:       "http://example.com/test",
 			},
-			want: assert.True,
+			wantLinkRegister: func() register.LinkRegister {
+				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+				linkRegister.RegisterLink("http://example.com/test")
+
+				return linkRegister
+			}(),
+			wantOk: assert.True,
 		},
 		{
-			name: "success with a duplicate and without link sanitizing",
+			name: "with a duplicate",
 			fields: fields{
-				sanitizeLink: sanitizing.DoNotSanitizeLink,
-				logger:       new(MockLogger),
+				LinkRegister: func() register.LinkRegister {
+					linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+					linkRegister.RegisterLink("http://example.com/test")
 
-				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
-			},
-			args: args{
-				sourceLink: "http://example.com/",
-				link:       "http://example.com/2",
-			},
-			want: assert.False,
-		},
-		{
-			name: "success with a duplicate and with link sanitizing",
-			fields: fields{
-				sanitizeLink: sanitizing.SanitizeLink,
-				logger:       new(MockLogger),
-
-				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
-			},
-			args: args{
-				sourceLink: "http://example.com/",
-				link:       "http://example.com/test/../2",
-			},
-			want: assert.False,
-		},
-		{
-			name: "error",
-			fields: fields{
-				sanitizeLink: sanitizing.SanitizeLink,
-				logger: func() Logger {
-					err := stderrors.New("missing protocol scheme")
-					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
-
-					logger := new(MockLogger)
-					logger.
-						On(
-							"Logf",
-							"unable to sanitize the link: %s",
-							mock.MatchedBy(func(err error) bool {
-								unwrappedErr := errors.Cause(err)
-								return reflect.DeepEqual(unwrappedErr, urlErr)
-							}),
-						).
-						Return()
-
-					return logger
+					return linkRegister
 				}(),
-
-				checkedLinks: mapset.NewSet("http://example.com/1", "http://example.com/2"),
 			},
 			args: args{
 				sourceLink: "http://example.com/",
-				link:       ":",
+				link:       "http://example.com/test",
 			},
-			want: assert.False,
+			wantLinkRegister: func() register.LinkRegister {
+				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+				linkRegister.RegisterLink("http://example.com/test")
+
+				return linkRegister
+			}(),
+			wantOk: assert.False,
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			checker := DuplicateChecker{
-				sanitizeLink: data.fields.sanitizeLink,
-				logger:       data.fields.logger,
-
-				checkedLinks: data.fields.checkedLinks,
+				LinkRegister: data.fields.LinkRegister,
 			}
 			got := checker.CheckLink(data.args.sourceLink, data.args.link)
 
-			mock.AssertExpectationsForObjects(test, data.fields.logger)
-			data.want(test, got)
+			assert.Equal(test, data.wantLinkRegister, checker.LinkRegister)
+			data.wantOk(test, got)
 		})
 	}
 }
