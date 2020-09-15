@@ -9,13 +9,16 @@ import (
 func Crawl(
 	ctx context.Context,
 	concurrencyFactor int,
+	bufferSize int,
 	links []string,
 	dependencies Dependencies,
 ) {
-	linkChannel := make(chan string, len(links))
-	for _, link := range links {
-		linkChannel <- link
-	}
+	linkChannel := make(chan string, bufferSize)
+	go func() {
+		for _, link := range links {
+			linkChannel <- link
+		}
+	}()
 
 	var waiter sync.WaitGroup
 	waiter.Add(len(links))

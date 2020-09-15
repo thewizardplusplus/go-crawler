@@ -11,6 +11,7 @@ func TestCrawl(test *testing.T) {
 	type args struct {
 		ctx               context.Context
 		concurrencyFactor int
+		bufferSize        int
 		links             []string
 		dependencies      Dependencies
 	}
@@ -24,6 +25,7 @@ func TestCrawl(test *testing.T) {
 			args: args{
 				ctx:               context.Background(),
 				concurrencyFactor: 10,
+				bufferSize:        1000,
 				links:             []string{"http://example.com/"},
 				dependencies: Dependencies{
 					Waiter: nil,
@@ -72,6 +74,7 @@ func TestCrawl(test *testing.T) {
 			Crawl(
 				data.args.ctx,
 				data.args.concurrencyFactor,
+				data.args.bufferSize,
 				data.args.links,
 				data.args.dependencies,
 			)
