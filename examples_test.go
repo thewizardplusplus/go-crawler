@@ -71,6 +71,62 @@ func RunServer() *httptest.Server {
 	}))
 }
 
+func ExampleCrawl() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		runtime.NumCPU(),
+		1000,
+		[]string{server.URL},
+		crawler.Dependencies{
+			Waiter: nil,
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount: 5,
+				RepeatDelay: time.Second,
+				Logger:      wrappedLogger,
+			},
+			LinkChecker: checkers.CheckerGroup{
+				checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				checkers.DuplicateChecker{
+					LinkRegister: register.NewLinkRegister(
+						sanitizing.SanitizeLink,
+						wrappedLogger,
+					),
+				},
+			},
+			LinkHandler: handlers.NewUniqueHandler(
+				// don't use here the link register from the duplicate checker above
+				register.NewLinkRegister(sanitizing.SanitizeLink, wrappedLogger),
+				LinkHandler{ServerURL: server.URL},
+			),
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
 func ExampleHandleLinksConcurrently() {
 	server := RunServer()
 	defer server.Close()
