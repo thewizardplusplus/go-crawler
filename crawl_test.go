@@ -19,7 +19,54 @@ func TestCrawl(test *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			args: args{
+				ctx:               context.Background(),
+				concurrencyFactor: 10,
+				links:             []string{"http://example.com/"},
+				dependencies: Dependencies{
+					Waiter: nil,
+					LinkExtractor: func() LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/").
+							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/1").
+							Return(nil, nil)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/2").
+							Return(nil, nil)
+
+						return extractor
+					}(),
+					LinkChecker: func() LinkChecker {
+						checker := new(MockLinkChecker)
+						checker.
+							On("CheckLink", "http://example.com/", "http://example.com/1").
+							Return(true)
+						checker.
+							On("CheckLink", "http://example.com/", "http://example.com/2").
+							Return(true)
+
+						return checker
+					}(),
+					LinkHandler: func() LinkHandler {
+						handler := new(MockLinkHandler)
+						handler.
+							On("HandleLink", "http://example.com/", "http://example.com/1").
+							Return()
+						handler.
+							On("HandleLink", "http://example.com/", "http://example.com/2").
+							Return()
+
+						return handler
+					}(),
+					Logger: new(MockLogger),
+				},
+			},
+		},
 	} {
 		test.Run(data.name, func(t *testing.T) {
 			Crawl(
