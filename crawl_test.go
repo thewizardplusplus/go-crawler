@@ -21,11 +21,60 @@ func TestCrawl(test *testing.T) {
 		args args
 	}{
 		{
-			name: "success",
+			name: "success with fewer links than the buffer size",
 			args: args{
 				ctx:               context.Background(),
 				concurrencyFactor: 10,
 				bufferSize:        1000,
+				links:             []string{"http://example.com/"},
+				dependencies: Dependencies{
+					Waiter: nil,
+					LinkExtractor: func() LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/").
+							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/1").
+							Return(nil, nil)
+						extractor.
+							On("ExtractLinks", context.Background(), "http://example.com/2").
+							Return(nil, nil)
+
+						return extractor
+					}(),
+					LinkChecker: func() LinkChecker {
+						checker := new(MockLinkChecker)
+						checker.
+							On("CheckLink", "http://example.com/", "http://example.com/1").
+							Return(true)
+						checker.
+							On("CheckLink", "http://example.com/", "http://example.com/2").
+							Return(true)
+
+						return checker
+					}(),
+					LinkHandler: func() LinkHandler {
+						handler := new(MockLinkHandler)
+						handler.
+							On("HandleLink", "http://example.com/", "http://example.com/1").
+							Return()
+						handler.
+							On("HandleLink", "http://example.com/", "http://example.com/2").
+							Return()
+
+						return handler
+					}(),
+					Logger: new(MockLogger),
+				},
+			},
+		},
+		{
+			name: "success without a buffer",
+			args: args{
+				ctx:               context.Background(),
+				concurrencyFactor: 10,
+				bufferSize:        0,
 				links:             []string{"http://example.com/"},
 				dependencies: Dependencies{
 					Waiter: nil,
