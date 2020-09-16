@@ -6,27 +6,6 @@ import (
 	"github.com/thewizardplusplus/go-crawler/waiter"
 )
 
-//go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
-
-// LinkExtractor ...
-type LinkExtractor interface {
-	ExtractLinks(ctx context.Context, link string) ([]string, error)
-}
-
-//go:generate mockery -name=LinkChecker -inpkg -case=underscore -testonly
-
-// LinkChecker ...
-type LinkChecker interface {
-	CheckLink(sourceLink string, link string) bool
-}
-
-//go:generate mockery -name=LinkHandler -inpkg -case=underscore -testonly
-
-// LinkHandler ...
-type LinkHandler interface {
-	HandleLink(sourceLink string, link string)
-}
-
 // HandleLinkDependencies ...
 type HandleLinkDependencies struct {
 	CrawlDependencies
