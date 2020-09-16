@@ -3,7 +3,17 @@ package crawler
 import (
 	"context"
 	"sync"
+
+	"github.com/go-log/log"
 )
+
+// CrawlDependencies ...
+type CrawlDependencies struct {
+	LinkExtractor LinkExtractor
+	LinkChecker   LinkChecker
+	LinkHandler   LinkHandler
+	Logger        log.Logger
+}
 
 // Crawl ...
 func Crawl(
@@ -11,7 +21,7 @@ func Crawl(
 	concurrencyFactor int,
 	bufferSize int,
 	links []string,
-	dependencies HandleLinkDependencies,
+	dependencies CrawlDependencies,
 ) {
 	linkChannel := make(chan string, bufferSize)
 	go func() {

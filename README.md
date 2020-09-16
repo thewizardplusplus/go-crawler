@@ -142,8 +142,7 @@ func main() {
 		runtime.NumCPU(),
 		1000,
 		[]string{server.URL},
-		crawler.HandleLinkDependencies{
-			Waiter: nil,
+		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
 					HTTPClient: http.DefaultClient,

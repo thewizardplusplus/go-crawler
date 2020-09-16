@@ -13,7 +13,7 @@ func TestCrawl(test *testing.T) {
 		concurrencyFactor int
 		bufferSize        int
 		links             []string
-		dependencies      HandleLinkDependencies
+		dependencies      CrawlDependencies
 	}
 
 	for _, data := range []struct {
@@ -27,8 +27,7 @@ func TestCrawl(test *testing.T) {
 				concurrencyFactor: 10,
 				bufferSize:        1000,
 				links:             []string{"http://example.com/"},
-				dependencies: HandleLinkDependencies{
-					Waiter: nil,
+				dependencies: CrawlDependencies{
 					LinkExtractor: func() LinkExtractor {
 						extractor := new(MockLinkExtractor)
 						extractor.
@@ -76,8 +75,7 @@ func TestCrawl(test *testing.T) {
 				concurrencyFactor: 10,
 				bufferSize:        0,
 				links:             []string{"http://example.com/"},
-				dependencies: HandleLinkDependencies{
-					Waiter: nil,
+				dependencies: CrawlDependencies{
 					LinkExtractor: func() LinkExtractor {
 						extractor := new(MockLinkExtractor)
 						extractor.
