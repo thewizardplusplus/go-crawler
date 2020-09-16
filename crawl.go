@@ -38,11 +38,8 @@ func Crawl(
 		concurrencyFactor,
 		linkChannel,
 		HandleLinkDependencies{
-			Waiter:        &waiter,
-			LinkExtractor: dependencies.LinkExtractor,
-			LinkChecker:   dependencies.LinkChecker,
-			LinkHandler:   dependencies.LinkHandler,
-			Logger:        dependencies.Logger,
+			CrawlDependencies: dependencies,
+			Waiter:            &waiter,
 		},
 	)
 

@@ -3,7 +3,6 @@ package crawler
 import (
 	"context"
 
-	"github.com/go-log/log"
 	"github.com/thewizardplusplus/go-crawler/waiter"
 )
 
@@ -30,11 +29,9 @@ type LinkHandler interface {
 
 // HandleLinkDependencies ...
 type HandleLinkDependencies struct {
-	Waiter        waiter.Waiter
-	LinkExtractor LinkExtractor
-	LinkChecker   LinkChecker
-	LinkHandler   LinkHandler
-	Logger        log.Logger
+	CrawlDependencies
+
+	Waiter waiter.Waiter
 }
 
 // HandleLinksConcurrently ...

@@ -35,6 +35,45 @@ func TestHandleLinksConcurrently(test *testing.T) {
 					return links
 				}(),
 				dependencies: HandleLinkDependencies{
+					CrawlDependencies: CrawlDependencies{
+						LinkExtractor: func() LinkExtractor {
+							extractor := new(MockLinkExtractor)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/").
+								Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/1").
+								Return(nil, nil)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/2").
+								Return(nil, nil)
+
+							return extractor
+						}(),
+						LinkChecker: func() LinkChecker {
+							checker := new(MockLinkChecker)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/1").
+								Return(true)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/2").
+								Return(true)
+
+							return checker
+						}(),
+						LinkHandler: func() LinkHandler {
+							handler := new(MockLinkHandler)
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/1").
+								Return()
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/2").
+								Return()
+
+							return handler
+						}(),
+						Logger: new(MockLogger),
+					},
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
@@ -42,43 +81,6 @@ func TestHandleLinksConcurrently(test *testing.T) {
 
 						return waiter
 					}(),
-					LinkExtractor: func() LinkExtractor {
-						extractor := new(MockLinkExtractor)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/").
-							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/1").
-							Return(nil, nil)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/2").
-							Return(nil, nil)
-
-						return extractor
-					}(),
-					LinkChecker: func() LinkChecker {
-						checker := new(MockLinkChecker)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/1").
-							Return(true)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/2").
-							Return(true)
-
-						return checker
-					}(),
-					LinkHandler: func() LinkHandler {
-						handler := new(MockLinkHandler)
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/1").
-							Return()
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/2").
-							Return()
-
-						return handler
-					}(),
-					Logger: new(MockLogger),
 				},
 			},
 		},
@@ -132,6 +134,45 @@ func TestHandleLinks(test *testing.T) {
 					return links
 				}(),
 				dependencies: HandleLinkDependencies{
+					CrawlDependencies: CrawlDependencies{
+						LinkExtractor: func() LinkExtractor {
+							extractor := new(MockLinkExtractor)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/").
+								Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/1").
+								Return(nil, nil)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/2").
+								Return(nil, nil)
+
+							return extractor
+						}(),
+						LinkChecker: func() LinkChecker {
+							checker := new(MockLinkChecker)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/1").
+								Return(true)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/2").
+								Return(true)
+
+							return checker
+						}(),
+						LinkHandler: func() LinkHandler {
+							handler := new(MockLinkHandler)
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/1").
+								Return()
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/2").
+								Return()
+
+							return handler
+						}(),
+						Logger: new(MockLogger),
+					},
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
@@ -139,43 +180,6 @@ func TestHandleLinks(test *testing.T) {
 
 						return waiter
 					}(),
-					LinkExtractor: func() LinkExtractor {
-						extractor := new(MockLinkExtractor)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/").
-							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/1").
-							Return(nil, nil)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/2").
-							Return(nil, nil)
-
-						return extractor
-					}(),
-					LinkChecker: func() LinkChecker {
-						checker := new(MockLinkChecker)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/1").
-							Return(true)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/2").
-							Return(true)
-
-						return checker
-					}(),
-					LinkHandler: func() LinkHandler {
-						handler := new(MockLinkHandler)
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/1").
-							Return()
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/2").
-							Return()
-
-						return handler
-					}(),
-					Logger: new(MockLogger),
 				},
 			},
 		},
@@ -220,6 +224,39 @@ func TestHandleLink(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 				dependencies: HandleLinkDependencies{
+					CrawlDependencies: CrawlDependencies{
+						LinkExtractor: func() LinkExtractor {
+							extractor := new(MockLinkExtractor)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/").
+								Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+
+							return extractor
+						}(),
+						LinkChecker: func() LinkChecker {
+							checker := new(MockLinkChecker)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/1").
+								Return(true)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/2").
+								Return(true)
+
+							return checker
+						}(),
+						LinkHandler: func() LinkHandler {
+							handler := new(MockLinkHandler)
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/1").
+								Return()
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/2").
+								Return()
+
+							return handler
+						}(),
+						Logger: new(MockLogger),
+					},
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(2)
@@ -227,37 +264,6 @@ func TestHandleLink(test *testing.T) {
 
 						return waiter
 					}(),
-					LinkExtractor: func() LinkExtractor {
-						extractor := new(MockLinkExtractor)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/").
-							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
-
-						return extractor
-					}(),
-					LinkChecker: func() LinkChecker {
-						checker := new(MockLinkChecker)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/1").
-							Return(true)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/2").
-							Return(true)
-
-						return checker
-					}(),
-					LinkHandler: func() LinkHandler {
-						handler := new(MockLinkHandler)
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/1").
-							Return()
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/2").
-							Return()
-
-						return handler
-					}(),
-					Logger: new(MockLogger),
 				},
 			},
 			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
@@ -268,6 +274,39 @@ func TestHandleLink(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 				dependencies: HandleLinkDependencies{
+					CrawlDependencies: CrawlDependencies{
+						LinkExtractor: func() LinkExtractor {
+							extractor := new(MockLinkExtractor)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/").
+								Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+
+							return extractor
+						}(),
+						LinkChecker: func() LinkChecker {
+							checker := new(MockLinkChecker)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/1").
+								Return(false)
+							checker.
+								On("CheckLink", "http://example.com/", "http://example.com/2").
+								Return(true)
+
+							return checker
+						}(),
+						LinkHandler: func() LinkHandler {
+							handler := new(MockLinkHandler)
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/1").
+								Return()
+							handler.
+								On("HandleLink", "http://example.com/", "http://example.com/2").
+								Return()
+
+							return handler
+						}(),
+						Logger: new(MockLogger),
+					},
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(1)
@@ -275,37 +314,6 @@ func TestHandleLink(test *testing.T) {
 
 						return waiter
 					}(),
-					LinkExtractor: func() LinkExtractor {
-						extractor := new(MockLinkExtractor)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/").
-							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
-
-						return extractor
-					}(),
-					LinkChecker: func() LinkChecker {
-						checker := new(MockLinkChecker)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/1").
-							Return(false)
-						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/2").
-							Return(true)
-
-						return checker
-					}(),
-					LinkHandler: func() LinkHandler {
-						handler := new(MockLinkHandler)
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/1").
-							Return()
-						handler.
-							On("HandleLink", "http://example.com/", "http://example.com/2").
-							Return()
-
-						return handler
-					}(),
-					Logger: new(MockLogger),
 				},
 			},
 			wantLinks: []string{"http://example.com/2"},
@@ -316,29 +324,31 @@ func TestHandleLink(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 				dependencies: HandleLinkDependencies{
+					CrawlDependencies: CrawlDependencies{
+						LinkExtractor: func() LinkExtractor {
+							extractor := new(MockLinkExtractor)
+							extractor.
+								On("ExtractLinks", context.Background(), "http://example.com/").
+								Return(nil, iotest.ErrTimeout)
+
+							return extractor
+						}(),
+						LinkChecker: new(MockLinkChecker),
+						LinkHandler: new(MockLinkHandler),
+						Logger: func() Logger {
+							logger := new(MockLogger)
+							logger.
+								On("Logf", "unable to extract links: %s", iotest.ErrTimeout).
+								Return()
+
+							return logger
+						}(),
+					},
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Done").Return().Times(1)
 
 						return waiter
-					}(),
-					LinkExtractor: func() LinkExtractor {
-						extractor := new(MockLinkExtractor)
-						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/").
-							Return(nil, iotest.ErrTimeout)
-
-						return extractor
-					}(),
-					LinkChecker: new(MockLinkChecker),
-					LinkHandler: new(MockLinkHandler),
-					Logger: func() Logger {
-						logger := new(MockLogger)
-						logger.
-							On("Logf", "unable to extract links: %s", iotest.ErrTimeout).
-							Return()
-
-						return logger
 					}(),
 				},
 			},

@@ -145,25 +145,27 @@ func ExampleHandleLinksConcurrently() {
 		runtime.NumCPU(),
 		links,
 		crawler.HandleLinkDependencies{
-			Waiter: &waiter,
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.DefaultExtractor{
-					HTTPClient: http.DefaultClient,
-					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-						"a": {"href"},
-					}),
+			CrawlDependencies: crawler.CrawlDependencies{
+				LinkExtractor: extractors.RepeatingExtractor{
+					LinkExtractor: extractors.DefaultExtractor{
+						HTTPClient: http.DefaultClient,
+						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+							"a": {"href"},
+						}),
+					},
+					RepeatCount: 5,
+					RepeatDelay: time.Second,
+					Logger:      wrappedLogger,
 				},
-				RepeatCount: 5,
-				RepeatDelay: time.Second,
-				Logger:      wrappedLogger,
-			},
-			LinkChecker: checkers.HostChecker{
+				LinkChecker: checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				LinkHandler: LinkHandler{
+					ServerURL: server.URL,
+				},
 				Logger: wrappedLogger,
 			},
-			LinkHandler: LinkHandler{
-				ServerURL: server.URL,
-			},
-			Logger: wrappedLogger,
+			Waiter: &waiter,
 		},
 	)
 
@@ -201,33 +203,35 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnExtracting() {
 		runtime.NumCPU(),
 		links,
 		crawler.HandleLinkDependencies{
+			CrawlDependencies: crawler.CrawlDependencies{
+				LinkExtractor: extractors.RepeatingExtractor{
+					LinkExtractor: extractors.DefaultExtractor{
+						HTTPClient: http.DefaultClient,
+						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+							"a": {"href"},
+						}),
+					},
+					RepeatCount: 5,
+					RepeatDelay: time.Second,
+					Logger:      wrappedLogger,
+				},
+				LinkChecker: checkers.CheckerGroup{
+					checkers.HostChecker{
+						Logger: wrappedLogger,
+					},
+					checkers.DuplicateChecker{
+						LinkRegister: register.NewLinkRegister(
+							sanitizing.SanitizeLink,
+							wrappedLogger,
+						),
+					},
+				},
+				LinkHandler: LinkHandler{
+					ServerURL: server.URL,
+				},
+				Logger: wrappedLogger,
+			},
 			Waiter: &waiter,
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.DefaultExtractor{
-					HTTPClient: http.DefaultClient,
-					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-						"a": {"href"},
-					}),
-				},
-				RepeatCount: 5,
-				RepeatDelay: time.Second,
-				Logger:      wrappedLogger,
-			},
-			LinkChecker: checkers.CheckerGroup{
-				checkers.HostChecker{
-					Logger: wrappedLogger,
-				},
-				checkers.DuplicateChecker{
-					LinkRegister: register.NewLinkRegister(
-						sanitizing.SanitizeLink,
-						wrappedLogger,
-					),
-				},
-			},
-			LinkHandler: LinkHandler{
-				ServerURL: server.URL,
-			},
-			Logger: wrappedLogger,
 		},
 	)
 
@@ -263,35 +267,37 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 		runtime.NumCPU(),
 		links,
 		crawler.HandleLinkDependencies{
+			CrawlDependencies: crawler.CrawlDependencies{
+				LinkExtractor: extractors.RepeatingExtractor{
+					LinkExtractor: extractors.DefaultExtractor{
+						HTTPClient: http.DefaultClient,
+						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+							"a": {"href"},
+						}),
+					},
+					RepeatCount: 5,
+					RepeatDelay: time.Second,
+					Logger:      wrappedLogger,
+				},
+				LinkChecker: checkers.CheckerGroup{
+					checkers.HostChecker{
+						Logger: wrappedLogger,
+					},
+					checkers.DuplicateChecker{
+						LinkRegister: register.NewLinkRegister(
+							sanitizing.SanitizeLink,
+							wrappedLogger,
+						),
+					},
+				},
+				LinkHandler: handlers.NewUniqueHandler(
+					// don't use here the link register from the duplicate checker above
+					register.NewLinkRegister(sanitizing.SanitizeLink, wrappedLogger),
+					LinkHandler{ServerURL: server.URL},
+				),
+				Logger: wrappedLogger,
+			},
 			Waiter: &waiter,
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.DefaultExtractor{
-					HTTPClient: http.DefaultClient,
-					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-						"a": {"href"},
-					}),
-				},
-				RepeatCount: 5,
-				RepeatDelay: time.Second,
-				Logger:      wrappedLogger,
-			},
-			LinkChecker: checkers.CheckerGroup{
-				checkers.HostChecker{
-					Logger: wrappedLogger,
-				},
-				checkers.DuplicateChecker{
-					LinkRegister: register.NewLinkRegister(
-						sanitizing.SanitizeLink,
-						wrappedLogger,
-					),
-				},
-			},
-			LinkHandler: handlers.NewUniqueHandler(
-				// don't use here the link register from the duplicate checker above
-				register.NewLinkRegister(sanitizing.SanitizeLink, wrappedLogger),
-				LinkHandler{ServerURL: server.URL},
-			),
-			Logger: wrappedLogger,
 		},
 	)
 
