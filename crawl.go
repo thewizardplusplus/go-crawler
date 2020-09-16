@@ -11,7 +11,7 @@ func Crawl(
 	concurrencyFactor int,
 	bufferSize int,
 	links []string,
-	dependencies Dependencies,
+	dependencies HandleLinkDependencies,
 ) {
 	linkChannel := make(chan string, bufferSize)
 	go func() {
@@ -23,13 +23,18 @@ func Crawl(
 	var waiter sync.WaitGroup
 	waiter.Add(len(links))
 
-	HandleLinksConcurrently(ctx, concurrencyFactor, linkChannel, Dependencies{
-		Waiter:        &waiter,
-		LinkExtractor: dependencies.LinkExtractor,
-		LinkChecker:   dependencies.LinkChecker,
-		LinkHandler:   dependencies.LinkHandler,
-		Logger:        dependencies.Logger,
-	})
+	HandleLinksConcurrently(
+		ctx,
+		concurrencyFactor,
+		linkChannel,
+		HandleLinkDependencies{
+			Waiter:        &waiter,
+			LinkExtractor: dependencies.LinkExtractor,
+			LinkChecker:   dependencies.LinkChecker,
+			LinkHandler:   dependencies.LinkHandler,
+			Logger:        dependencies.Logger,
+		},
+	)
 
 	waiter.Wait()
 }

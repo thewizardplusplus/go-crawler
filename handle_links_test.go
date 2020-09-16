@@ -16,7 +16,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 		ctx               context.Context
 		concurrencyFactor int
 		links             chan string
-		dependencies      Dependencies
+		dependencies      HandleLinkDependencies
 	}
 
 	for _, data := range []struct {
@@ -34,7 +34,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 
 					return links
 				}(),
-				dependencies: Dependencies{
+				dependencies: HandleLinkDependencies{
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
@@ -114,7 +114,7 @@ func TestHandleLinks(test *testing.T) {
 	type args struct {
 		ctx          context.Context
 		links        chan string
-		dependencies Dependencies
+		dependencies HandleLinkDependencies
 	}
 
 	for _, data := range []struct {
@@ -131,7 +131,7 @@ func TestHandleLinks(test *testing.T) {
 
 					return links
 				}(),
-				dependencies: Dependencies{
+				dependencies: HandleLinkDependencies{
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
@@ -206,7 +206,7 @@ func TestHandleLink(test *testing.T) {
 	type args struct {
 		ctx          context.Context
 		link         string
-		dependencies Dependencies
+		dependencies HandleLinkDependencies
 	}
 
 	for _, data := range []struct {
@@ -219,7 +219,7 @@ func TestHandleLink(test *testing.T) {
 			args: args{
 				ctx:  context.Background(),
 				link: "http://example.com/",
-				dependencies: Dependencies{
+				dependencies: HandleLinkDependencies{
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(2)
@@ -267,7 +267,7 @@ func TestHandleLink(test *testing.T) {
 			args: args{
 				ctx:  context.Background(),
 				link: "http://example.com/",
-				dependencies: Dependencies{
+				dependencies: HandleLinkDependencies{
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(1)
@@ -315,7 +315,7 @@ func TestHandleLink(test *testing.T) {
 			args: args{
 				ctx:  context.Background(),
 				link: "http://example.com/",
-				dependencies: Dependencies{
+				dependencies: HandleLinkDependencies{
 					Waiter: func() waiter.Waiter {
 						waiter := new(MockWaiter)
 						waiter.On("Done").Return().Times(1)

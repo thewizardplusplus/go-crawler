@@ -28,8 +28,8 @@ type LinkHandler interface {
 	HandleLink(sourceLink string, link string)
 }
 
-// Dependencies ...
-type Dependencies struct {
+// HandleLinkDependencies ...
+type HandleLinkDependencies struct {
 	Waiter        waiter.Waiter
 	LinkExtractor LinkExtractor
 	LinkChecker   LinkChecker
@@ -42,7 +42,7 @@ func HandleLinksConcurrently(
 	ctx context.Context,
 	concurrencyFactor int,
 	links chan string,
-	dependencies Dependencies,
+	dependencies HandleLinkDependencies,
 ) {
 	for i := 0; i < concurrencyFactor; i++ {
 		// waiting for completion is done via dependencies.Waiter
@@ -54,7 +54,7 @@ func HandleLinksConcurrently(
 func HandleLinks(
 	ctx context.Context,
 	links chan string,
-	dependencies Dependencies,
+	dependencies HandleLinkDependencies,
 ) {
 	for link := range links {
 		extractedLinks := HandleLink(ctx, link, dependencies)
@@ -73,7 +73,7 @@ func HandleLinks(
 func HandleLink(
 	ctx context.Context,
 	link string,
-	dependencies Dependencies,
+	dependencies HandleLinkDependencies,
 ) []string {
 	defer dependencies.Waiter.Done()
 

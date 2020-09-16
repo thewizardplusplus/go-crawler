@@ -84,7 +84,7 @@ func ExampleCrawl() {
 		runtime.NumCPU(),
 		1000,
 		[]string{server.URL},
-		crawler.Dependencies{
+		crawler.HandleLinkDependencies{
 			Waiter: nil,
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
@@ -145,7 +145,7 @@ func ExampleHandleLinksConcurrently() {
 		context.Background(),
 		runtime.NumCPU(),
 		links,
-		crawler.Dependencies{
+		crawler.HandleLinkDependencies{
 			Waiter: &waiter,
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
@@ -201,7 +201,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnExtracting() {
 		context.Background(),
 		runtime.NumCPU(),
 		links,
-		crawler.Dependencies{
+		crawler.HandleLinkDependencies{
 			Waiter: &waiter,
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
@@ -263,7 +263,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 		context.Background(),
 		runtime.NumCPU(),
 		links,
-		crawler.Dependencies{
+		crawler.HandleLinkDependencies{
 			Waiter: &waiter,
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
