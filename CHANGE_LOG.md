@@ -1,5 +1,17 @@
 # Change Log
 
+## [v1.3](https://github.com/thewizardplusplus/go-crawler/tree/v1.3) (2020-09-22)
+
+- calling of an outer handler for an each found link:
+  - handling only of unique links (optional):
+    - supporting of sanitizing of a link before checking of uniqueness (optional);
+- refactoring:
+  - extract the `sanitizing` package;
+  - extract the `register.LinkRegister` structure;
+  - add a function that makes it easier:
+    - to specify initial links;
+    - to wait for completion.
+
 ## [v1.2](https://github.com/thewizardplusplus/go-crawler/tree/v1.2) (2020-09-03)
 
 - calling of an outer handler for an each found link:
