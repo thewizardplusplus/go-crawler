@@ -107,11 +107,16 @@ func ExampleCrawl() {
 					),
 				},
 			},
-			LinkHandler: handlers.NewUniqueHandler(
+			LinkHandler: handlers.UniqueHandler{
 				// don't use here the link register from the duplicate checker above
-				register.NewLinkRegister(sanitizing.SanitizeLink, wrappedLogger),
-				LinkHandler{ServerURL: server.URL},
-			),
+				LinkRegister: register.NewLinkRegister(
+					sanitizing.SanitizeLink,
+					wrappedLogger,
+				),
+				LinkHandler: LinkHandler{
+					ServerURL: server.URL,
+				},
+			},
 			Logger: wrappedLogger,
 		},
 	)
@@ -290,11 +295,16 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 						),
 					},
 				},
-				LinkHandler: handlers.NewUniqueHandler(
+				LinkHandler: handlers.UniqueHandler{
 					// don't use here the link register from the duplicate checker above
-					register.NewLinkRegister(sanitizing.SanitizeLink, wrappedLogger),
-					LinkHandler{ServerURL: server.URL},
-				),
+					LinkRegister: register.NewLinkRegister(
+						sanitizing.SanitizeLink,
+						wrappedLogger,
+					),
+					LinkHandler: LinkHandler{
+						ServerURL: server.URL,
+					},
+				},
 				Logger: wrappedLogger,
 			},
 			Waiter: &waiter,

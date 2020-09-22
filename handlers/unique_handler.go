@@ -1,39 +1,22 @@
 package handlers
 
 import (
-	"sync"
-
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/register"
 )
 
 // UniqueHandler ...
 type UniqueHandler struct {
-	locker       sync.Mutex
-	linkRegister register.LinkRegister
-	linkHandler  crawler.LinkHandler
-}
-
-// NewUniqueHandler ...
-func NewUniqueHandler(
-	linkRegister register.LinkRegister,
-	linkHandler crawler.LinkHandler,
-) *UniqueHandler {
-	return &UniqueHandler{
-		linkRegister: linkRegister,
-		linkHandler:  linkHandler,
-	}
+	LinkRegister register.LinkRegister
+	LinkHandler  crawler.LinkHandler
 }
 
 // HandleLink ...
-func (handler *UniqueHandler) HandleLink(sourceLink string, link string) {
-	handler.locker.Lock()
-	defer handler.locker.Unlock()
-
-	wasRegistered := handler.linkRegister.RegisterLink(link)
+func (handler UniqueHandler) HandleLink(sourceLink string, link string) {
+	wasRegistered := handler.LinkRegister.RegisterLink(link)
 	if !wasRegistered {
 		return
 	}
 
-	handler.linkHandler.HandleLink(sourceLink, link)
+	handler.LinkHandler.HandleLink(sourceLink, link)
 }

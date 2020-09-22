@@ -5,27 +5,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/register"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
 
-func TestNewUniqueHandler(test *testing.T) {
-	linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
-	linkHandler := new(MockLinkHandler)
-	got := NewUniqueHandler(linkRegister, linkHandler)
-
-	mock.AssertExpectationsForObjects(test, linkHandler)
-	require.NotNil(test, got)
-	assert.Equal(test, linkRegister, got.linkRegister)
-	assert.Equal(test, linkHandler, got.linkHandler)
-}
-
 func TestUniqueHandler_HandleLink(test *testing.T) {
 	type fields struct {
-		linkRegister register.LinkRegister
-		linkHandler  crawler.LinkHandler
+		LinkRegister register.LinkRegister
+		LinkHandler  crawler.LinkHandler
 	}
 	type args struct {
 		sourceLink string
@@ -41,8 +29,8 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 		{
 			name: "without a duplicate",
 			fields: fields{
-				linkRegister: register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
-				linkHandler: func() LinkHandler {
+				LinkRegister: register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
+				LinkHandler: func() LinkHandler {
 					handler := new(MockLinkHandler)
 					handler.
 						On("HandleLink", "http://example.com/", "http://example.com/test").
@@ -65,13 +53,13 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 		{
 			name: "with a duplicate",
 			fields: fields{
-				linkRegister: func() register.LinkRegister {
+				LinkRegister: func() register.LinkRegister {
 					linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
 					linkRegister.RegisterLink("http://example.com/test")
 
 					return linkRegister
 				}(),
-				linkHandler: new(MockLinkHandler),
+				LinkHandler: new(MockLinkHandler),
 			},
 			args: args{
 				sourceLink: "http://example.com/",
@@ -87,13 +75,13 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			handler := UniqueHandler{
-				linkRegister: data.fields.linkRegister,
-				linkHandler:  data.fields.linkHandler,
+				LinkRegister: data.fields.LinkRegister,
+				LinkHandler:  data.fields.LinkHandler,
 			}
 			handler.HandleLink(data.args.sourceLink, data.args.link)
 
-			mock.AssertExpectationsForObjects(test, data.fields.linkHandler)
-			assert.Equal(test, data.wantLinkRegister, handler.linkRegister)
+			mock.AssertExpectationsForObjects(test, data.fields.LinkHandler)
+			assert.Equal(test, data.wantLinkRegister, handler.LinkRegister)
 		})
 	}
 }
