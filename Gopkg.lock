@@ -116,12 +116,11 @@
   version = "v0.3.0"
 
 [[projects]]
-  digest = "1:fc44ab3ee6f79e2b4c67ea294f500aa151f7b882a706eb7f3e881aba1de3a729"
+  digest = "1:e1dec70f3d761a66432fa0c7f2b38a63cbe9d91761a50102def809ecf133cec4"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
     "mock",
-    "require",
   ]
   pruneopts = "UT"
   revision = "f654a9112bbeac49ca2cd45bfbe11533c4666cf8"
@@ -138,6 +137,14 @@
   pruneopts = "UT"
   revision = "f13a4ff946605c93aceee71676bd678bd70eb1a7"
   version = "v1.4"
+
+[[projects]]
+  digest = "1:17bdda8989d1457dd9822247c7d7790c51deb396449507e6531a4906c6d68a03"
+  name = "github.com/thewizardplusplus/go-sync-utils"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "74f86728f3e59b7dd74ac4d7fb53a23f29ef5e23"
+  version = "v1.1"
 
 [[projects]]
   digest = "1:b49f6e75d8aa6f18a320671f674a75a3f35eec1e9da5cb1631605eb1058dae3c"
@@ -245,9 +252,9 @@
     "github.com/pkg/errors",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
-    "github.com/stretchr/testify/require",
     "github.com/thewizardplusplus/go-html-selector",
     "github.com/thewizardplusplus/go-html-selector/builders",
+    "github.com/thewizardplusplus/go-sync-utils",
     "github.com/vektra/mockery/cmd/mockery",
   ]
   solver-name = "gps-cdcl"
