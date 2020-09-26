@@ -35,12 +35,8 @@ func HandleLinks(
 	for link := range links {
 		extractedLinks := HandleLink(ctx, link, dependencies)
 		for _, extractedLink := range extractedLinks {
-			// simulate an unbounded channel to avoid a deadlock
-			select {
-			case links <- extractedLink:
-			default:
-				go func(link string) { links <- link }(extractedLink)
-			}
+			// use unbounded sending to avoid a deadlock
+			syncutils.UnboundedSend(links, extractedLink)
 		}
 	}
 }
