@@ -2,12 +2,12 @@ package crawler
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"testing/iotest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	testutils "github.com/thewizardplusplus/go-crawler/internal/test-utils"
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
@@ -78,6 +78,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
 						waiter.On("Done").Return().Times(3)
+						waiter.On("Wait").Return().Times(1)
 
 						return waiter
 					}(),
@@ -87,7 +88,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 	} {
 		test.Run(data.name, func(t *testing.T) {
 			waiter := data.args.dependencies.Waiter
-			synchronousWaiter := testutils.NewSynchronousWaiter(waiter)
+			synchronousWaiter := syncutils.MultiWaitGroup{waiter, new(sync.WaitGroup)}
 			synchronousWaiter.Add(len(data.args.links))
 
 			data.args.dependencies.Waiter = synchronousWaiter
@@ -177,6 +178,7 @@ func TestHandleLinks(test *testing.T) {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
 						waiter.On("Done").Return().Times(3)
+						waiter.On("Wait").Return().Times(1)
 
 						return waiter
 					}(),
@@ -186,7 +188,7 @@ func TestHandleLinks(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			waiter := data.args.dependencies.Waiter
-			synchronousWaiter := testutils.NewSynchronousWaiter(waiter)
+			synchronousWaiter := syncutils.MultiWaitGroup{waiter, new(sync.WaitGroup)}
 			synchronousWaiter.Add(len(data.args.links))
 
 			data.args.dependencies.Waiter = synchronousWaiter
