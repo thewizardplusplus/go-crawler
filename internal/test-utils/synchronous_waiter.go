@@ -3,17 +3,17 @@ package testutils
 import (
 	"sync"
 
-	"github.com/thewizardplusplus/go-crawler/waiter"
+	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
 // SynchronousWaiter ...
 type SynchronousWaiter struct {
-	mock   waiter.Waiter
+	mock   syncutils.WaitGroup
 	actual sync.WaitGroup
 }
 
 // NewSynchronousWaiter ...
-func NewSynchronousWaiter(mock waiter.Waiter) *SynchronousWaiter {
+func NewSynchronousWaiter(mock syncutils.WaitGroup) *SynchronousWaiter {
 	return &SynchronousWaiter{mock: mock}
 }
 

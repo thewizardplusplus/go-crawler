@@ -2,7 +2,7 @@ package crawler
 
 import (
 	"github.com/go-log/log"
-	"github.com/thewizardplusplus/go-crawler/waiter"
+	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
 //go:generate mockery -name=Waiter -inpkg -case=underscore -testonly
@@ -12,7 +12,7 @@ import (
 // It's used only for mock generating.
 //
 type Waiter interface {
-	waiter.Waiter
+	syncutils.WaitGroup
 }
 
 //go:generate mockery -name=Logger -inpkg -case=underscore -testonly

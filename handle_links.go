@@ -3,14 +3,14 @@ package crawler
 import (
 	"context"
 
-	"github.com/thewizardplusplus/go-crawler/waiter"
+	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
 // HandleLinkDependencies ...
 type HandleLinkDependencies struct {
 	CrawlDependencies
 
-	Waiter waiter.Waiter
+	Waiter syncutils.WaitGroup
 }
 
 // HandleLinksConcurrently ...

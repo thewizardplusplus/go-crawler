@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	testutils "github.com/thewizardplusplus/go-crawler/internal/test-utils"
-	"github.com/thewizardplusplus/go-crawler/waiter"
+	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
 func TestHandleLinksConcurrently(test *testing.T) {
@@ -74,7 +74,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 						}(),
 						Logger: new(MockLogger),
 					},
-					Waiter: func() waiter.Waiter {
+					Waiter: func() syncutils.WaitGroup {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
 						waiter.On("Done").Return().Times(3)
@@ -173,7 +173,7 @@ func TestHandleLinks(test *testing.T) {
 						}(),
 						Logger: new(MockLogger),
 					},
-					Waiter: func() waiter.Waiter {
+					Waiter: func() syncutils.WaitGroup {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(3)
 						waiter.On("Done").Return().Times(3)
@@ -257,7 +257,7 @@ func TestHandleLink(test *testing.T) {
 						}(),
 						Logger: new(MockLogger),
 					},
-					Waiter: func() waiter.Waiter {
+					Waiter: func() syncutils.WaitGroup {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(2)
 						waiter.On("Done").Return().Times(1)
@@ -307,7 +307,7 @@ func TestHandleLink(test *testing.T) {
 						}(),
 						Logger: new(MockLogger),
 					},
-					Waiter: func() waiter.Waiter {
+					Waiter: func() syncutils.WaitGroup {
 						waiter := new(MockWaiter)
 						waiter.On("Add", 1).Return().Times(1)
 						waiter.On("Done").Return().Times(1)
@@ -344,7 +344,7 @@ func TestHandleLink(test *testing.T) {
 							return logger
 						}(),
 					},
-					Waiter: func() waiter.Waiter {
+					Waiter: func() syncutils.WaitGroup {
 						waiter := new(MockWaiter)
 						waiter.On("Done").Return().Times(1)
 
