@@ -19,12 +19,13 @@ type RepeatingExtractor struct {
 // ExtractLinks ...
 func (extractor RepeatingExtractor) ExtractLinks(
 	ctx context.Context,
+	threadID int,
 	link string,
 ) ([]string, error) {
 	var links []string
 	for repeat := 0; repeat < extractor.RepeatCount; repeat++ {
 		var err error
-		links, err = extractor.LinkExtractor.ExtractLinks(ctx, 0, link)
+		links, err = extractor.LinkExtractor.ExtractLinks(ctx, threadID, link)
 		if err == nil {
 			break
 		}

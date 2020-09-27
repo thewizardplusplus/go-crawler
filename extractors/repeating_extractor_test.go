@@ -20,8 +20,9 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		Logger        log.Logger
 	}
 	type args struct {
-		ctx  context.Context
-		link string
+		ctx      context.Context
+		threadID int
+		link     string
 	}
 
 	for _, data := range []struct {
@@ -37,7 +38,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				LinkExtractor: func() LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
-						On("ExtractLinks", context.Background(), 0, "http://example.com/").
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
 						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 
 					return extractor
@@ -47,8 +48,9 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				Logger:      new(MockLogger),
 			},
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
 			},
 			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
 			wantErr:   assert.NoError,
@@ -61,7 +63,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					extractor := new(MockLinkExtractor)
 					extractor.
-						On("ExtractLinks", context.Background(), 0, "http://example.com/").
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
 						Return(
 							func(context.Context, int, string) []string {
 								if repeat < 4 {
@@ -102,8 +104,9 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				}(),
 			},
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
 			},
 			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
 			wantErr:   assert.NoError,
@@ -114,7 +117,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				LinkExtractor: func() LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
-						On("ExtractLinks", context.Background(), 0, "http://example.com/").
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
 						Return(nil, iotest.ErrTimeout)
 
 					return extractor
@@ -138,8 +141,9 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				}(),
 			},
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
 			},
 			wantLinks: nil,
 			wantErr:   assert.Error,
@@ -152,7 +156,11 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				RepeatDelay:   data.fields.RepeatDelay,
 				Logger:        data.fields.Logger,
 			}
-			gotLinks, gotErr := extractor.ExtractLinks(data.args.ctx, data.args.link)
+			gotLinks, gotErr := extractor.ExtractLinks(
+				data.args.ctx,
+				data.args.threadID,
+				data.args.link,
+			)
 
 			mock.AssertExpectationsForObjects(
 				test,
