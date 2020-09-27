@@ -116,6 +116,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 func TestHandleLinks(test *testing.T) {
 	type args struct {
 		ctx          context.Context
+		threadID     int
 		links        chan string
 		dependencies HandleLinkDependencies
 	}
@@ -127,7 +128,8 @@ func TestHandleLinks(test *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx: context.Background(),
+				ctx:      context.Background(),
+				threadID: 23,
 				links: func() chan string {
 					links := make(chan string, 1)
 					links <- "http://example.com/"
@@ -139,13 +141,13 @@ func TestHandleLinks(test *testing.T) {
 						LinkExtractor: func() LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
-								On("ExtractLinks", context.Background(), 0, "http://example.com/").
+								On("ExtractLinks", context.Background(), 23, "http://example.com/").
 								Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 							extractor.
-								On("ExtractLinks", context.Background(), 0, "http://example.com/1").
+								On("ExtractLinks", context.Background(), 23, "http://example.com/1").
 								Return(nil, nil)
 							extractor.
-								On("ExtractLinks", context.Background(), 0, "http://example.com/2").
+								On("ExtractLinks", context.Background(), 23, "http://example.com/2").
 								Return(nil, nil)
 
 							return extractor
@@ -193,7 +195,13 @@ func TestHandleLinks(test *testing.T) {
 
 			data.args.dependencies.Waiter = synchronousWaiter
 
-			go HandleLinks(data.args.ctx, data.args.links, data.args.dependencies)
+			go HandleLinks(
+				data.args.ctx,
+				data.args.threadID,
+				data.args.links,
+				data.args.dependencies,
+			)
+
 			synchronousWaiter.Wait()
 
 			mock.AssertExpectationsForObjects(

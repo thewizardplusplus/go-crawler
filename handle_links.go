@@ -22,18 +22,19 @@ func HandleLinksConcurrently(
 ) {
 	for i := 0; i < concurrencyFactor; i++ {
 		// waiting for completion is done via dependencies.Waiter
-		go HandleLinks(ctx, links, dependencies)
+		go HandleLinks(ctx, 0, links, dependencies)
 	}
 }
 
 // HandleLinks ...
 func HandleLinks(
 	ctx context.Context,
+	threadID int,
 	links chan string,
 	dependencies HandleLinkDependencies,
 ) {
 	for link := range links {
-		extractedLinks := HandleLink(ctx, 0, link, dependencies)
+		extractedLinks := HandleLink(ctx, threadID, link, dependencies)
 		for _, extractedLink := range extractedLinks {
 			// use unbounded sending to avoid a deadlock
 			syncutils.UnboundedSend(links, extractedLink)
