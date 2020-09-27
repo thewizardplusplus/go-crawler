@@ -211,6 +211,7 @@ func TestHandleLinks(test *testing.T) {
 func TestHandleLink(test *testing.T) {
 	type args struct {
 		ctx          context.Context
+		threadID     int
 		link         string
 		dependencies HandleLinkDependencies
 	}
@@ -223,14 +224,15 @@ func TestHandleLink(test *testing.T) {
 		{
 			name: "success with all correct links",
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
 						LinkExtractor: func() LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
-								On("ExtractLinks", context.Background(), 0, "http://example.com/").
+								On("ExtractLinks", context.Background(), 23, "http://example.com/").
 								Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 
 							return extractor
@@ -273,14 +275,15 @@ func TestHandleLink(test *testing.T) {
 		{
 			name: "success with some correct links",
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
 						LinkExtractor: func() LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
-								On("ExtractLinks", context.Background(), 0, "http://example.com/").
+								On("ExtractLinks", context.Background(), 23, "http://example.com/").
 								Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 
 							return extractor
@@ -323,14 +326,15 @@ func TestHandleLink(test *testing.T) {
 		{
 			name: "error",
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
 						LinkExtractor: func() LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
-								On("ExtractLinks", context.Background(), 0, "http://example.com/").
+								On("ExtractLinks", context.Background(), 23, "http://example.com/").
 								Return(nil, iotest.ErrTimeout)
 
 							return extractor
@@ -358,7 +362,12 @@ func TestHandleLink(test *testing.T) {
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			gotLinks := HandleLink(data.args.ctx, data.args.link, data.args.dependencies)
+			gotLinks := HandleLink(
+				data.args.ctx,
+				data.args.threadID,
+				data.args.link,
+				data.args.dependencies,
+			)
 
 			mock.AssertExpectationsForObjects(
 				test,

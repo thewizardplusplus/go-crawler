@@ -33,7 +33,7 @@ func HandleLinks(
 	dependencies HandleLinkDependencies,
 ) {
 	for link := range links {
-		extractedLinks := HandleLink(ctx, link, dependencies)
+		extractedLinks := HandleLink(ctx, 0, link, dependencies)
 		for _, extractedLink := range extractedLinks {
 			// use unbounded sending to avoid a deadlock
 			syncutils.UnboundedSend(links, extractedLink)
@@ -44,12 +44,14 @@ func HandleLinks(
 // HandleLink ...
 func HandleLink(
 	ctx context.Context,
+	threadID int,
 	link string,
 	dependencies HandleLinkDependencies,
 ) []string {
 	defer dependencies.Waiter.Done()
 
-	extractedLinks, err := dependencies.LinkExtractor.ExtractLinks(ctx, 0, link)
+	extractedLinks, err :=
+		dependencies.LinkExtractor.ExtractLinks(ctx, threadID, link)
 	if err != nil {
 		dependencies.Logger.Logf("unable to extract links: %s", err)
 		return nil
