@@ -25,6 +25,7 @@ type DefaultExtractor struct {
 // ExtractLinks ...
 func (extractor DefaultExtractor) ExtractLinks(
 	ctx context.Context,
+	threadID int,
 	link string,
 ) ([]string, error) {
 	request, err := http.NewRequest(http.MethodGet, link, nil)
