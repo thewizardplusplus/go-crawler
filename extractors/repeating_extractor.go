@@ -24,7 +24,7 @@ func (extractor RepeatingExtractor) ExtractLinks(
 	var links []string
 	for repeat := 0; repeat < extractor.RepeatCount; repeat++ {
 		var err error
-		links, err = extractor.LinkExtractor.ExtractLinks(ctx, link)
+		links, err = extractor.LinkExtractor.ExtractLinks(ctx, 0, link)
 		if err == nil {
 			break
 		}

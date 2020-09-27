@@ -11,7 +11,7 @@ import (
 
 // LinkExtractor ...
 type LinkExtractor interface {
-	ExtractLinks(ctx context.Context, link string) ([]string, error)
+	ExtractLinks(ctx context.Context, threadID int, link string) ([]string, error)
 }
 
 //go:generate mockery -name=LinkChecker -inpkg -case=underscore -testonly

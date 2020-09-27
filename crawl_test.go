@@ -31,13 +31,13 @@ func TestCrawl(test *testing.T) {
 					LinkExtractor: func() LinkExtractor {
 						extractor := new(MockLinkExtractor)
 						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/").
+							On("ExtractLinks", context.Background(), 0, "http://example.com/").
 							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/1").
+							On("ExtractLinks", context.Background(), 0, "http://example.com/1").
 							Return(nil, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/2").
+							On("ExtractLinks", context.Background(), 0, "http://example.com/2").
 							Return(nil, nil)
 
 						return extractor
@@ -79,13 +79,13 @@ func TestCrawl(test *testing.T) {
 					LinkExtractor: func() LinkExtractor {
 						extractor := new(MockLinkExtractor)
 						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/").
+							On("ExtractLinks", context.Background(), 0, "http://example.com/").
 							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/1").
+							On("ExtractLinks", context.Background(), 0, "http://example.com/1").
 							Return(nil, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), "http://example.com/2").
+							On("ExtractLinks", context.Background(), 0, "http://example.com/2").
 							Return(nil, nil)
 
 						return extractor

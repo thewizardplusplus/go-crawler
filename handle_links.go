@@ -49,7 +49,7 @@ func HandleLink(
 ) []string {
 	defer dependencies.Waiter.Done()
 
-	extractedLinks, err := dependencies.LinkExtractor.ExtractLinks(ctx, link)
+	extractedLinks, err := dependencies.LinkExtractor.ExtractLinks(ctx, 0, link)
 	if err != nil {
 		dependencies.Logger.Logf("unable to extract links: %s", err)
 		return nil

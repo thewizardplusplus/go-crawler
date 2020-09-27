@@ -37,7 +37,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				LinkExtractor: func() LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
-						On("ExtractLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), 0, "http://example.com/").
 						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 
 					return extractor
@@ -61,16 +61,16 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					extractor := new(MockLinkExtractor)
 					extractor.
-						On("ExtractLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), 0, "http://example.com/").
 						Return(
-							func(context.Context, string) []string {
+							func(context.Context, int, string) []string {
 								if repeat < 4 {
 									return nil
 								}
 
 								return []string{"http://example.com/1", "http://example.com/2"}
 							},
-							func(context.Context, string) error {
+							func(context.Context, int, string) error {
 								defer func() { repeat++ }()
 
 								if repeat < 4 {
@@ -114,7 +114,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				LinkExtractor: func() LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
-						On("ExtractLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), 0, "http://example.com/").
 						Return(nil, iotest.ErrTimeout)
 
 					return extractor
