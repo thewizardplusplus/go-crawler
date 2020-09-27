@@ -29,15 +29,34 @@ func TestCrawl(test *testing.T) {
 				links:             []string{"http://example.com/"},
 				dependencies: CrawlDependencies{
 					LinkExtractor: func() LinkExtractor {
+						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
+							return threadID >= 0 && threadID < 10
+						})
+
 						extractor := new(MockLinkExtractor)
 						extractor.
-							On("ExtractLinks", context.Background(), 0, "http://example.com/").
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/",
+							).
 							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), 0, "http://example.com/1").
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/1",
+							).
 							Return(nil, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), 0, "http://example.com/2").
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/2",
+							).
 							Return(nil, nil)
 
 						return extractor
@@ -77,15 +96,34 @@ func TestCrawl(test *testing.T) {
 				links:             []string{"http://example.com/"},
 				dependencies: CrawlDependencies{
 					LinkExtractor: func() LinkExtractor {
+						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
+							return threadID >= 0 && threadID < 10
+						})
+
 						extractor := new(MockLinkExtractor)
 						extractor.
-							On("ExtractLinks", context.Background(), 0, "http://example.com/").
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/",
+							).
 							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), 0, "http://example.com/1").
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/1",
+							).
 							Return(nil, nil)
 						extractor.
-							On("ExtractLinks", context.Background(), 0, "http://example.com/2").
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/2",
+							).
 							Return(nil, nil)
 
 						return extractor

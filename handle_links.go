@@ -20,9 +20,9 @@ func HandleLinksConcurrently(
 	links chan string,
 	dependencies HandleLinkDependencies,
 ) {
-	for i := 0; i < concurrencyFactor; i++ {
+	for threadID := 0; threadID < concurrencyFactor; threadID++ {
 		// waiting for completion is done via dependencies.Waiter
-		go HandleLinks(ctx, 0, links, dependencies)
+		go HandleLinks(ctx, threadID, links, dependencies)
 	}
 }
 
