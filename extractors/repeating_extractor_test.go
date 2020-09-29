@@ -40,7 +40,8 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 					extractor := new(MockLinkExtractor)
 					extractor.
 						On("ExtractLinks", context.Background(), 23, "http://example.com/").
-						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+						Return([]string{"http://example.com/1", "http://example.com/2"}, nil).
+						Times(1)
 
 					return extractor
 				}(),
@@ -83,7 +84,8 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 								return nil
 							},
-						)
+						).
+						Times(5)
 
 					return extractor
 				}(),
@@ -99,14 +101,15 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 								repeat,
 								iotest.ErrTimeout,
 							).
-							Return()
+							Return().
+							Times(1)
 					}
 
 					return logger
 				}(),
 				Sleeper: func() SleeperInterface {
 					sleeper := new(MockSleeperInterface)
-					sleeper.On("Sleep", 100*time.Millisecond).Return()
+					sleeper.On("Sleep", 100*time.Millisecond).Return().Times(4)
 
 					return sleeper
 				}(),
@@ -126,7 +129,8 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 					extractor := new(MockLinkExtractor)
 					extractor.
 						On("ExtractLinks", context.Background(), 23, "http://example.com/").
-						Return(nil, iotest.ErrTimeout)
+						Return(nil, iotest.ErrTimeout).
+						Times(5)
 
 					return extractor
 				}(),
@@ -142,14 +146,15 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 								repeat,
 								iotest.ErrTimeout,
 							).
-							Return()
+							Return().
+							Times(1)
 					}
 
 					return logger
 				}(),
 				Sleeper: func() SleeperInterface {
 					sleeper := new(MockSleeperInterface)
-					sleeper.On("Sleep", 100*time.Millisecond).Return()
+					sleeper.On("Sleep", 100*time.Millisecond).Return().Times(4)
 
 					return sleeper
 				}(),
