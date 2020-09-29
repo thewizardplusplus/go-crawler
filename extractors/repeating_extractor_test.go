@@ -18,7 +18,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		RepeatCount   int
 		RepeatDelay   time.Duration
 		Logger        log.Logger
-		Sleeper       Sleeper
+		Sleeper       SleeperInterface
 	}
 	type args struct {
 		ctx      context.Context
@@ -47,7 +47,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				RepeatCount: 5,
 				RepeatDelay: 100 * time.Millisecond,
 				Logger:      new(MockLogger),
-				Sleeper:     time.Sleep,
+				Sleeper:     new(MockSleeperInterface),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -104,7 +104,12 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					return logger
 				}(),
-				Sleeper: time.Sleep,
+				Sleeper: func() SleeperInterface {
+					sleeper := new(MockSleeperInterface)
+					sleeper.On("Sleep", 100*time.Millisecond).Return()
+
+					return sleeper
+				}(),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -142,7 +147,12 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					return logger
 				}(),
-				Sleeper: time.Sleep,
+				Sleeper: func() SleeperInterface {
+					sleeper := new(MockSleeperInterface)
+					sleeper.On("Sleep", 100*time.Millisecond).Return()
+
+					return sleeper
+				}(),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -159,7 +169,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				RepeatCount:   data.fields.RepeatCount,
 				RepeatDelay:   data.fields.RepeatDelay,
 				Logger:        data.fields.Logger,
-				Sleeper:       data.fields.Sleeper,
+				Sleeper:       data.fields.Sleeper.Sleep,
 			}
 			gotLinks, gotErr := extractor.ExtractLinks(
 				data.args.ctx,
@@ -171,6 +181,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				test,
 				data.fields.LinkExtractor,
 				data.fields.Logger,
+				data.fields.Sleeper,
 			)
 			assert.Equal(test, data.wantLinks, gotLinks)
 			data.wantErr(test, gotErr)
