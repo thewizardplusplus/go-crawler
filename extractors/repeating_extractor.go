@@ -17,6 +17,7 @@ type RepeatingExtractor struct {
 	RepeatCount   int
 	RepeatDelay   time.Duration
 	Logger        log.Logger
+	Sleeper       Sleeper
 }
 
 // ExtractLinks ...
@@ -37,7 +38,7 @@ func (extractor RepeatingExtractor) ExtractLinks(
 		}
 
 		extractor.Logger.Logf("unable to extract links (repeat #%d): %s", repeat, err)
-		time.Sleep(extractor.RepeatDelay)
+		extractor.Sleeper(extractor.RepeatDelay)
 	}
 
 	return links, nil

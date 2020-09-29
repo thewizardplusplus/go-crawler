@@ -18,6 +18,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		RepeatCount   int
 		RepeatDelay   time.Duration
 		Logger        log.Logger
+		Sleeper       Sleeper
 	}
 	type args struct {
 		ctx      context.Context
@@ -46,6 +47,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				RepeatCount: 5,
 				RepeatDelay: 100 * time.Millisecond,
 				Logger:      new(MockLogger),
+				Sleeper:     time.Sleep,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -102,6 +104,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					return logger
 				}(),
+				Sleeper: time.Sleep,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -139,6 +142,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					return logger
 				}(),
+				Sleeper: time.Sleep,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -155,6 +159,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				RepeatCount:   data.fields.RepeatCount,
 				RepeatDelay:   data.fields.RepeatDelay,
 				Logger:        data.fields.Logger,
+				Sleeper:       data.fields.Sleeper,
 			}
 			gotLinks, gotErr := extractor.ExtractLinks(
 				data.args.ctx,
