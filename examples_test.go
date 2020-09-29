@@ -92,9 +92,10 @@ func ExampleCrawl() {
 						"a": {"href"},
 					}),
 				},
-				RepeatCount: 5,
-				RepeatDelay: time.Second,
-				Logger:      wrappedLogger,
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
@@ -158,9 +159,10 @@ func ExampleHandleLinksConcurrently() {
 							"a": {"href"},
 						}),
 					},
-					RepeatCount: 5,
-					RepeatDelay: time.Second,
-					Logger:      wrappedLogger,
+					RepeatCount:  5,
+					RepeatDelay:  time.Second,
+					Logger:       wrappedLogger,
+					SleepHandler: time.Sleep,
 				},
 				LinkChecker: checkers.HostChecker{
 					Logger: wrappedLogger,
@@ -216,9 +218,10 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnExtracting() {
 							"a": {"href"},
 						}),
 					},
-					RepeatCount: 5,
-					RepeatDelay: time.Second,
-					Logger:      wrappedLogger,
+					RepeatCount:  5,
+					RepeatDelay:  time.Second,
+					Logger:       wrappedLogger,
+					SleepHandler: time.Sleep,
 				},
 				LinkChecker: checkers.CheckerGroup{
 					checkers.HostChecker{
@@ -280,9 +283,10 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 							"a": {"href"},
 						}),
 					},
-					RepeatCount: 5,
-					RepeatDelay: time.Second,
-					Logger:      wrappedLogger,
+					RepeatCount:  5,
+					RepeatDelay:  time.Second,
+					Logger:       wrappedLogger,
+					SleepHandler: time.Sleep,
 				},
 				LinkChecker: checkers.CheckerGroup{
 					checkers.HostChecker{
