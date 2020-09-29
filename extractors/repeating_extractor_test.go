@@ -174,7 +174,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				RepeatCount:   data.fields.RepeatCount,
 				RepeatDelay:   data.fields.RepeatDelay,
 				Logger:        data.fields.Logger,
-				Sleeper:       data.fields.Sleeper.Sleep,
+				SleepHandler:  data.fields.Sleeper.Sleep,
 			}
 			gotLinks, gotErr := extractor.ExtractLinks(
 				data.args.ctx,

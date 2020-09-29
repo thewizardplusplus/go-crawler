@@ -8,8 +8,8 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
-// Sleeper ...
-type Sleeper func(duration time.Duration)
+// SleepHandler ...
+type SleepHandler func(duration time.Duration)
 
 // RepeatingExtractor ...
 type RepeatingExtractor struct {
@@ -17,7 +17,7 @@ type RepeatingExtractor struct {
 	RepeatCount   int
 	RepeatDelay   time.Duration
 	Logger        log.Logger
-	Sleeper       Sleeper
+	SleepHandler  SleepHandler
 }
 
 // ExtractLinks ...
@@ -38,7 +38,7 @@ func (extractor RepeatingExtractor) ExtractLinks(
 		}
 
 		extractor.Logger.Logf("unable to extract links (repeat #%d): %s", repeat, err)
-		extractor.Sleeper(extractor.RepeatDelay)
+		extractor.SleepHandler(extractor.RepeatDelay)
 	}
 
 	return links, nil
