@@ -1,6 +1,8 @@
 package extractors
 
 import (
+	"time"
+
 	"github.com/go-log/log"
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
@@ -23,4 +25,14 @@ type LinkExtractor interface {
 //
 type Logger interface {
 	log.Logger
+}
+
+//go:generate mockery -name=SleeperInterface -inpkg -case=underscore -testonly
+
+// SleeperInterface ...
+//
+// It's used only for mock generating.
+//
+type SleeperInterface interface {
+	Sleep(duration time.Duration)
 }
