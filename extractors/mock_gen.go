@@ -27,12 +27,12 @@ type Logger interface {
 	log.Logger
 }
 
-//go:generate mockery -name=SleeperInterface -inpkg -case=underscore -testonly
+//go:generate mockery -name=Sleeper -inpkg -case=underscore -testonly
 
-// SleeperInterface ...
+// Sleeper ...
 //
 // It's used only for mock generating.
 //
-type SleeperInterface interface {
+type Sleeper interface {
 	Sleep(duration time.Duration)
 }

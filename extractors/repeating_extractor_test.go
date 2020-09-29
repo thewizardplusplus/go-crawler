@@ -18,7 +18,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		RepeatCount   int
 		RepeatDelay   time.Duration
 		Logger        log.Logger
-		Sleeper       SleeperInterface
+		Sleeper       Sleeper
 	}
 	type args struct {
 		ctx      context.Context
@@ -48,7 +48,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 				RepeatCount: 5,
 				RepeatDelay: 100 * time.Millisecond,
 				Logger:      new(MockLogger),
-				Sleeper:     new(MockSleeperInterface),
+				Sleeper:     new(MockSleeper),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -107,8 +107,8 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					return logger
 				}(),
-				Sleeper: func() SleeperInterface {
-					sleeper := new(MockSleeperInterface)
+				Sleeper: func() Sleeper {
+					sleeper := new(MockSleeper)
 					sleeper.On("Sleep", 100*time.Millisecond).Return().Times(4)
 
 					return sleeper
@@ -152,8 +152,8 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 
 					return logger
 				}(),
-				Sleeper: func() SleeperInterface {
-					sleeper := new(MockSleeperInterface)
+				Sleeper: func() Sleeper {
+					sleeper := new(MockSleeper)
 					sleeper.On("Sleep", 100*time.Millisecond).Return().Times(4)
 
 					return sleeper
