@@ -8,6 +8,9 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
+// Sleeper ...
+type Sleeper func(duration time.Duration)
+
 // RepeatingExtractor ...
 type RepeatingExtractor struct {
 	LinkExtractor crawler.LinkExtractor
