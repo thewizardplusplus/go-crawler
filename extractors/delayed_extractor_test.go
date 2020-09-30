@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"testing/iotest"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -47,7 +48,86 @@ func TestDelayedExtractor_ExtractLinks(test *testing.T) {
 		wantLinks            []string
 		wantErr              assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success with an unknown thread ID",
+			fields: fields{
+				minimalDelay: 100 * time.Millisecond,
+				sleeper:      new(MockSleeper),
+				linkExtractor: func() LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+
+					return extractor
+				}(),
+			},
+			initializeTimestamps: func(timestamps *sync.Map) {},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with a known thread ID",
+			fields: fields{
+				minimalDelay: 100 * time.Millisecond,
+				sleeper: func() Sleeper {
+					durationChecker := mock.MatchedBy(func(duration time.Duration) bool {
+						return duration <= 100*time.Millisecond
+					})
+
+					sleeper := new(MockSleeper)
+					sleeper.On("Sleep", durationChecker).Return()
+
+					return sleeper
+				}(),
+				linkExtractor: func() LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+
+					return extractor
+				}(),
+			},
+			initializeTimestamps: func(timestamps *sync.Map) {
+				timestamps.Store(23, time.Now())
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "error",
+			fields: fields{
+				minimalDelay: 100 * time.Millisecond,
+				sleeper:      new(MockSleeper),
+				linkExtractor: func() LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return(nil, iotest.ErrTimeout)
+
+					return extractor
+				}(),
+			},
+			initializeTimestamps: func(timestamps *sync.Map) {},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := &DelayedExtractor{
