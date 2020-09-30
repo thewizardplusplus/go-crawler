@@ -116,11 +116,12 @@
   version = "v0.3.0"
 
 [[projects]]
-  digest = "1:e1dec70f3d761a66432fa0c7f2b38a63cbe9d91761a50102def809ecf133cec4"
+  digest = "1:fc44ab3ee6f79e2b4c67ea294f500aa151f7b882a706eb7f3e881aba1de3a729"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
     "mock",
+    "require",
   ]
   pruneopts = "UT"
   revision = "f654a9112bbeac49ca2cd45bfbe11533c4666cf8"
@@ -252,6 +253,7 @@
     "github.com/pkg/errors",
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
+    "github.com/stretchr/testify/require",
     "github.com/thewizardplusplus/go-html-selector",
     "github.com/thewizardplusplus/go-html-selector/builders",
     "github.com/thewizardplusplus/go-sync-utils",
