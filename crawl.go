@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/go-log/log"
+	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
 //go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
@@ -45,11 +46,9 @@ func Crawl(
 	dependencies CrawlDependencies,
 ) {
 	linkChannel := make(chan string, bufferSize)
-	go func() {
-		for _, link := range links {
-			linkChannel <- link
-		}
-	}()
+	for _, link := range links {
+		syncutils.UnboundedSend(linkChannel, link)
+	}
 
 	var waiter sync.WaitGroup
 	waiter.Add(len(links))
