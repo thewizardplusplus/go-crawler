@@ -1,5 +1,18 @@
 # Change Log
 
+## [v1.4](https://github.com/thewizardplusplus/go-crawler/tree/v1.4) (2020-10-02)
+
+- crawling of all relative links for specified ones:
+  - delayed extracting of relative links (optional):
+    - reducing of a delay time by the time elapsed since the last request;
+    - using of individual delays for each thread;
+- refactoring:
+  - extracting utility entities for syncing to the [single](https://github.com/thewizardplusplus/go-sync-utils) package;
+  - passing a thread ID to an extractor;
+  - `extractors.RepeatingExtractor` structure:
+    - passing an abstract sleeper as a parameter;
+    - checking of call count in tests.
+
 ## [v1.3](https://github.com/thewizardplusplus/go-crawler/tree/v1.3) (2020-09-22)
 
 - calling of an outer handler for an each found link:
