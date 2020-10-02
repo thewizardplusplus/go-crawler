@@ -13,6 +13,9 @@ The library that implements crawling of all relative links for specified ones.
   - repeated extracting of relative links on error (optional):
     - only specified repeat count;
     - supporting of delay between repeats;
+  - delayed extracting of relative links (optional):
+    - reducing of a delay time by the time elapsed since the last request;
+    - using of individual delays for each thread;
 - calling of an outer handler for an each found link:
   - it's called directly during crawling;
   - handling of links immediately after they have been extracted;
