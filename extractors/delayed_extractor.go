@@ -8,21 +8,21 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
-// DelayedExtractor ...
-type DelayedExtractor struct {
+// DelayingExtractor ...
+type DelayingExtractor struct {
 	timestamps    sync.Map // map[threadID]time.Time
 	minimalDelay  time.Duration
 	sleeper       SleepHandler
 	linkExtractor crawler.LinkExtractor
 }
 
-// NewDelayedExtractor ...
-func NewDelayedExtractor(
+// NewDelayingExtractor ...
+func NewDelayingExtractor(
 	minimalDelay time.Duration,
 	sleeper SleepHandler,
 	linkExtractor crawler.LinkExtractor,
-) *DelayedExtractor {
-	return &DelayedExtractor{
+) *DelayingExtractor {
+	return &DelayingExtractor{
 		minimalDelay:  minimalDelay,
 		sleeper:       sleeper,
 		linkExtractor: linkExtractor,
@@ -30,7 +30,7 @@ func NewDelayedExtractor(
 }
 
 // ExtractLinks ...
-func (extractor *DelayedExtractor) ExtractLinks(
+func (extractor *DelayingExtractor) ExtractLinks(
 	ctx context.Context,
 	threadID int,
 	link string,

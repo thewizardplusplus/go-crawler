@@ -146,7 +146,7 @@ func main() {
 		[]string{server.URL},
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.NewDelayedExtractor(
+				LinkExtractor: extractors.NewDelayingExtractor(
 					time.Second,
 					time.Sleep,
 					extractors.DefaultExtractor{
@@ -619,7 +619,7 @@ func main() {
 }
 ```
 
-`crawler.HandleLinksConcurrently()` with delayed extracting:
+`crawler.HandleLinksConcurrently()` with delaying extracting:
 
 ```go
 package main
@@ -716,7 +716,7 @@ func main() {
 		crawler.HandleLinkDependencies{
 			CrawlDependencies: crawler.CrawlDependencies{
 				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.NewDelayedExtractor(
+					LinkExtractor: extractors.NewDelayingExtractor(
 						time.Second,
 						time.Sleep,
 						extractors.DefaultExtractor{

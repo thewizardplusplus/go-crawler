@@ -13,10 +13,10 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
-func TestNewDelayedExtractor(test *testing.T) {
+func TestNewDelayingExtractor(test *testing.T) {
 	sleeper := new(MockSleeper)
 	linkExtractor := new(MockLinkExtractor)
-	got := NewDelayedExtractor(100*time.Millisecond, sleeper.Sleep, linkExtractor)
+	got := NewDelayingExtractor(100*time.Millisecond, sleeper.Sleep, linkExtractor)
 
 	mock.AssertExpectationsForObjects(test, sleeper, linkExtractor)
 	require.NotNil(test, got)
@@ -28,7 +28,7 @@ func TestNewDelayedExtractor(test *testing.T) {
 	assert.Equal(test, linkExtractor, got.linkExtractor)
 }
 
-func TestDelayedExtractor_ExtractLinks(test *testing.T) {
+func TestDelayingExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
 		minimalDelay  time.Duration
 		sleeper       Sleeper
@@ -130,7 +130,7 @@ func TestDelayedExtractor_ExtractLinks(test *testing.T) {
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			extractor := &DelayedExtractor{
+			extractor := &DelayingExtractor{
 				minimalDelay:  data.fields.minimalDelay,
 				sleeper:       data.fields.sleeper.Sleep,
 				linkExtractor: data.fields.linkExtractor,

@@ -86,7 +86,7 @@ func ExampleCrawl() {
 		[]string{server.URL},
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.NewDelayedExtractor(
+				LinkExtractor: extractors.NewDelayingExtractor(
 					time.Second,
 					time.Sleep,
 					extractors.DefaultExtractor{
@@ -331,7 +331,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
 
-func ExampleHandleLinksConcurrently_withDelayedExtracting() {
+func ExampleHandleLinksConcurrently_withDelayingExtracting() {
 	server := RunServer()
 	defer server.Close()
 
@@ -352,7 +352,7 @@ func ExampleHandleLinksConcurrently_withDelayedExtracting() {
 		crawler.HandleLinkDependencies{
 			CrawlDependencies: crawler.CrawlDependencies{
 				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.NewDelayedExtractor(
+					LinkExtractor: extractors.NewDelayingExtractor(
 						time.Second,
 						time.Sleep,
 						extractors.DefaultExtractor{
