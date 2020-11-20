@@ -64,10 +64,16 @@ func TestCrawl(test *testing.T) {
 					LinkChecker: func() LinkChecker {
 						checker := new(MockLinkChecker)
 						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/1").
+							On("CheckLink", SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/1",
+							}).
 							Return(true)
 						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/2").
+							On("CheckLink", SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/2",
+							}).
 							Return(true)
 
 						return checker
@@ -131,10 +137,16 @@ func TestCrawl(test *testing.T) {
 					LinkChecker: func() LinkChecker {
 						checker := new(MockLinkChecker)
 						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/1").
+							On("CheckLink", SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/1",
+							}).
 							Return(true)
 						checker.
-							On("CheckLink", "http://example.com/", "http://example.com/2").
+							On("CheckLink", SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/2",
+							}).
 							Return(true)
 
 						return checker

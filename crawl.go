@@ -25,7 +25,7 @@ type LinkExtractor interface {
 
 // LinkChecker ...
 type LinkChecker interface {
-	CheckLink(sourceLink string, link string) bool
+	CheckLink(link SourcedLink) bool
 }
 
 //go:generate mockery -name=LinkHandler -inpkg -case=underscore -testonly

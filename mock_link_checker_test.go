@@ -9,13 +9,13 @@ type MockLinkChecker struct {
 	mock.Mock
 }
 
-// CheckLink provides a mock function with given fields: sourceLink, link
-func (_m *MockLinkChecker) CheckLink(sourceLink string, link string) bool {
-	ret := _m.Called(sourceLink, link)
+// CheckLink provides a mock function with given fields: link
+func (_m *MockLinkChecker) CheckLink(link SourcedLink) bool {
+	ret := _m.Called(link)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
-		r0 = rf(sourceLink, link)
+	if rf, ok := ret.Get(0).(func(SourcedLink) bool); ok {
+		r0 = rf(link)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
