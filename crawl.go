@@ -8,6 +8,12 @@ import (
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
+// SourcedLink ...
+type SourcedLink struct {
+	SourceLink string
+	Link       string
+}
+
 //go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
 
 // LinkExtractor ...
