@@ -8,6 +8,7 @@ import (
 	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
 func TestHostChecker_CheckLink(test *testing.T) {
@@ -15,8 +16,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 		Logger log.Logger
 	}
 	type args struct {
-		sourceLink string
-		link       string
+		link crawler.SourcedLink
 	}
 
 	for _, data := range []struct {
@@ -31,8 +31,10 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
-				sourceLink: "http://example1.com/",
-				link:       "http://example2.com/test",
+				link: crawler.SourcedLink{
+					SourceLink: "http://example1.com/",
+					Link:       "http://example2.com/test",
+				},
 			},
 			want: assert.False,
 		},
@@ -42,8 +44,10 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
-				sourceLink: "http://example.com/",
-				link:       "http://example.com/test",
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
 			},
 			want: assert.True,
 		},
@@ -61,8 +65,10 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
-				sourceLink: ":",
-				link:       "http://example.com/test",
+				link: crawler.SourcedLink{
+					SourceLink: ":",
+					Link:       "http://example.com/test",
+				},
 			},
 			want: assert.False,
 		},
@@ -80,8 +86,10 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
-				sourceLink: "http://example.com/",
-				link:       ":",
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       ":",
+				},
 			},
 			want: assert.False,
 		},
@@ -90,7 +98,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 			checker := HostChecker{
 				Logger: data.fields.Logger,
 			}
-			got := checker.CheckLink(data.args.sourceLink, data.args.link)
+			got := checker.CheckLink(data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.Logger)
 			data.want(test, got)

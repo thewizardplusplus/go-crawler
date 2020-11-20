@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	"github.com/go-log/log"
+	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
 // HostChecker ...
@@ -12,14 +13,14 @@ type HostChecker struct {
 }
 
 // CheckLink ...
-func (checker HostChecker) CheckLink(sourceLink string, link string) bool {
-	parsedSourceLink, err := url.Parse(sourceLink)
+func (checker HostChecker) CheckLink(link crawler.SourcedLink) bool {
+	parsedSourceLink, err := url.Parse(link.SourceLink)
 	if err != nil {
 		checker.Logger.Logf("unable to parse the parent link: %s", err)
 		return false
 	}
 
-	parsedLink, err := url.Parse(link)
+	parsedLink, err := url.Parse(link.Link)
 	if err != nil {
 		checker.Logger.Logf("unable to parse the link: %s", err)
 		return false
