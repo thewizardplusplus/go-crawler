@@ -8,9 +8,9 @@ import (
 type CheckerGroup []crawler.LinkChecker
 
 // CheckLink ...
-func (checkers CheckerGroup) CheckLink(sourceLink string, link string) bool {
+func (checkers CheckerGroup) CheckLink(link crawler.SourcedLink) bool {
 	for _, checker := range checkers {
-		if !checker.CheckLink(sourceLink, link) {
+		if !checker.CheckLink(link) {
 			return false
 		}
 	}
