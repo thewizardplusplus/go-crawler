@@ -1,6 +1,7 @@
 package checkers
 
 import (
+	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/register"
 )
 
@@ -10,9 +11,6 @@ type DuplicateChecker struct {
 }
 
 // CheckLink ...
-func (checker DuplicateChecker) CheckLink(
-	sourceLink string,
-	link string,
-) bool {
-	return checker.LinkRegister.RegisterLink(link)
+func (checker DuplicateChecker) CheckLink(link crawler.SourcedLink) bool {
+	return checker.LinkRegister.RegisterLink(link.Link)
 }

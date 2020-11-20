@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/register"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
@@ -13,8 +14,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		LinkRegister register.LinkRegister
 	}
 	type args struct {
-		sourceLink string
-		link       string
+		link crawler.SourcedLink
 	}
 
 	for _, data := range []struct {
@@ -30,8 +30,10 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				LinkRegister: register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
 			},
 			args: args{
-				sourceLink: "http://example.com/",
-				link:       "http://example.com/test",
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
 			},
 			wantLinkRegister: func() register.LinkRegister {
 				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
@@ -52,8 +54,10 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
-				sourceLink: "http://example.com/",
-				link:       "http://example.com/test",
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
 			},
 			wantLinkRegister: func() register.LinkRegister {
 				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
@@ -68,7 +72,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 			checker := DuplicateChecker{
 				LinkRegister: data.fields.LinkRegister,
 			}
-			got := checker.CheckLink(data.args.sourceLink, data.args.link)
+			got := checker.CheckLink(data.args.link)
 
 			assert.Equal(test, data.wantLinkRegister, checker.LinkRegister)
 			data.wantOk(test, got)
