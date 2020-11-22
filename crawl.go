@@ -53,6 +53,7 @@ func Crawl(
 ) {
 	linkChannel := make(chan string, bufferSize)
 	for _, link := range links {
+		// use unbounded sending to avoid a deadlock
 		syncutils.UnboundedSend(linkChannel, link)
 	}
 
