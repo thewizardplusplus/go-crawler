@@ -32,7 +32,7 @@ type LinkChecker interface {
 
 // LinkHandler ...
 type LinkHandler interface {
-	HandleLink(sourceLink string, link string)
+	HandleLink(link SourcedLink)
 }
 
 // CrawlDependencies ...

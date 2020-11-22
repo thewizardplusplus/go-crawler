@@ -60,9 +60,10 @@ func HandleLink(
 
 	var checkedExtractedLinks []string
 	for _, extractedLink := range extractedLinks {
-		dependencies.LinkHandler.HandleLink(link, extractedLink)
+		sourcedLink := SourcedLink{SourceLink: link, Link: extractedLink}
+		dependencies.LinkHandler.HandleLink(sourcedLink)
 
-		if !dependencies.LinkChecker.CheckLink(SourcedLink{link, extractedLink}) {
+		if !dependencies.LinkChecker.CheckLink(sourcedLink) {
 			continue
 		}
 

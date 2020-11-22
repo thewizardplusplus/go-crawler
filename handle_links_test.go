@@ -89,10 +89,16 @@ func TestHandleLinksConcurrently(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/1").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/1",
+								}).
 								Return()
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/2").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/2",
+								}).
 								Return()
 
 							return handler
@@ -197,10 +203,16 @@ func TestHandleLinks(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/1").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/1",
+								}).
 								Return()
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/2").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/2",
+								}).
 								Return()
 
 							return handler
@@ -296,10 +308,16 @@ func TestHandleLink(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/1").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/1",
+								}).
 								Return()
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/2").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/2",
+								}).
 								Return()
 
 							return handler
@@ -353,10 +371,16 @@ func TestHandleLink(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/1").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/1",
+								}).
 								Return()
 							handler.
-								On("HandleLink", "http://example.com/", "http://example.com/2").
+								On("HandleLink", SourcedLink{
+									SourceLink: "http://example.com/",
+									Link:       "http://example.com/2",
+								}).
 								Return()
 
 							return handler
