@@ -12,11 +12,11 @@ type UniqueHandler struct {
 }
 
 // HandleLink ...
-func (handler UniqueHandler) HandleLink(sourceLink string, link string) {
-	wasRegistered := handler.LinkRegister.RegisterLink(link)
+func (handler UniqueHandler) HandleLink(link crawler.SourcedLink) {
+	wasRegistered := handler.LinkRegister.RegisterLink(link.Link)
 	if !wasRegistered {
 		return
 	}
 
-	handler.LinkHandler.HandleLink(sourceLink, link)
+	handler.LinkHandler.HandleLink(link)
 }

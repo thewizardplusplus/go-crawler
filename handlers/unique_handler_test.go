@@ -16,8 +16,7 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 		LinkHandler  crawler.LinkHandler
 	}
 	type args struct {
-		sourceLink string
-		link       string
+		link crawler.SourcedLink
 	}
 
 	for _, data := range []struct {
@@ -33,15 +32,20 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 				LinkHandler: func() LinkHandler {
 					handler := new(MockLinkHandler)
 					handler.
-						On("HandleLink", "http://example.com/", "http://example.com/test").
+						On("HandleLink", crawler.SourcedLink{
+							SourceLink: "http://example.com/",
+							Link:       "http://example.com/test",
+						}).
 						Return()
 
 					return handler
 				}(),
 			},
 			args: args{
-				sourceLink: "http://example.com/",
-				link:       "http://example.com/test",
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
 			},
 			wantLinkRegister: func() register.LinkRegister {
 				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
@@ -62,8 +66,10 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 				LinkHandler: new(MockLinkHandler),
 			},
 			args: args{
-				sourceLink: "http://example.com/",
-				link:       "http://example.com/test",
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
 			},
 			wantLinkRegister: func() register.LinkRegister {
 				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
@@ -78,7 +84,7 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 				LinkRegister: data.fields.LinkRegister,
 				LinkHandler:  data.fields.LinkHandler,
 			}
-			handler.HandleLink(data.args.sourceLink, data.args.link)
+			handler.HandleLink(data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.LinkHandler)
 			assert.Equal(test, data.wantLinkRegister, handler.LinkRegister)
