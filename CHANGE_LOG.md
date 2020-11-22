@@ -1,5 +1,11 @@
 # Change Log
 
+## [v1.4.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.4.1) (2020-11-22)
+
+- extract model of a sourced link:
+  - use it in the `crawler.LinkChecker` interface;
+  - use it in the `crawler.LinkHandler` interface.
+
 ## [v1.4](https://github.com/thewizardplusplus/go-crawler/tree/v1.4) (2020-10-02)
 
 - crawling of all relative links for specified ones:
