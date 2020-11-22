@@ -27,11 +27,11 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(sourceLink string, link string) {
+func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
-		handler.replaceServerURL(link),
-		handler.replaceServerURL(sourceLink),
+		handler.replaceServerURL(link.Link),
+		handler.replaceServerURL(link.SourceLink),
 	)
 }
 
