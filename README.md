@@ -169,7 +169,7 @@ func main() {
 					Logger: wrappedLogger,
 				},
 				checkers.DuplicateChecker{
-					LinkRegister: register.NewLinkRegister(
+					LinkRegister: registers.NewLinkRegister(
 						sanitizing.SanitizeLink,
 						wrappedLogger,
 					),
@@ -177,7 +177,7 @@ func main() {
 			},
 			LinkHandler: handlers.UniqueHandler{
 				// don't use here the link register from the duplicate checker above
-				LinkRegister: register.NewLinkRegister(
+				LinkRegister: registers.NewLinkRegister(
 					sanitizing.SanitizeLink,
 					wrappedLogger,
 				),
@@ -445,7 +445,7 @@ func main() {
 						Logger: wrappedLogger,
 					},
 					checkers.DuplicateChecker{
-						LinkRegister: register.NewLinkRegister(
+						LinkRegister: registers.NewLinkRegister(
 							sanitizing.SanitizeLink,
 							wrappedLogger,
 						),
@@ -587,7 +587,7 @@ func main() {
 						Logger: wrappedLogger,
 					},
 					checkers.DuplicateChecker{
-						LinkRegister: register.NewLinkRegister(
+						LinkRegister: registers.NewLinkRegister(
 							sanitizing.SanitizeLink,
 							wrappedLogger,
 						),
@@ -595,7 +595,7 @@ func main() {
 				},
 				LinkHandler: handlers.UniqueHandler{
 					// don't use here the link register from the duplicate checker above
-					LinkRegister: register.NewLinkRegister(
+					LinkRegister: registers.NewLinkRegister(
 						sanitizing.SanitizeLink,
 						wrappedLogger,
 					),
@@ -739,7 +739,7 @@ func main() {
 						Logger: wrappedLogger,
 					},
 					checkers.DuplicateChecker{
-						LinkRegister: register.NewLinkRegister(
+						LinkRegister: registers.NewLinkRegister(
 							sanitizing.SanitizeLink,
 							wrappedLogger,
 						),
@@ -747,7 +747,7 @@ func main() {
 				},
 				LinkHandler: handlers.UniqueHandler{
 					// don't use here the link register from the duplicate checker above
-					LinkRegister: register.NewLinkRegister(
+					LinkRegister: registers.NewLinkRegister(
 						sanitizing.SanitizeLink,
 						wrappedLogger,
 					),

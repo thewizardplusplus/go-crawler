@@ -18,7 +18,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/handlers"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
@@ -106,7 +106,7 @@ func ExampleCrawl() {
 					Logger: wrappedLogger,
 				},
 				checkers.DuplicateChecker{
-					LinkRegister: register.NewLinkRegister(
+					LinkRegister: registers.NewLinkRegister(
 						sanitizing.SanitizeLink,
 						wrappedLogger,
 					),
@@ -114,7 +114,7 @@ func ExampleCrawl() {
 			},
 			LinkHandler: handlers.UniqueHandler{
 				// don't use here the link register from the duplicate checker above
-				LinkRegister: register.NewLinkRegister(
+				LinkRegister: registers.NewLinkRegister(
 					sanitizing.SanitizeLink,
 					wrappedLogger,
 				),
@@ -232,7 +232,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnExtracting() {
 						Logger: wrappedLogger,
 					},
 					checkers.DuplicateChecker{
-						LinkRegister: register.NewLinkRegister(
+						LinkRegister: registers.NewLinkRegister(
 							sanitizing.SanitizeLink,
 							wrappedLogger,
 						),
@@ -297,7 +297,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 						Logger: wrappedLogger,
 					},
 					checkers.DuplicateChecker{
-						LinkRegister: register.NewLinkRegister(
+						LinkRegister: registers.NewLinkRegister(
 							sanitizing.SanitizeLink,
 							wrappedLogger,
 						),
@@ -305,7 +305,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 				},
 				LinkHandler: handlers.UniqueHandler{
 					// don't use here the link register from the duplicate checker above
-					LinkRegister: register.NewLinkRegister(
+					LinkRegister: registers.NewLinkRegister(
 						sanitizing.SanitizeLink,
 						wrappedLogger,
 					),
@@ -372,7 +372,7 @@ func ExampleHandleLinksConcurrently_withDelayingExtracting() {
 						Logger: wrappedLogger,
 					},
 					checkers.DuplicateChecker{
-						LinkRegister: register.NewLinkRegister(
+						LinkRegister: registers.NewLinkRegister(
 							sanitizing.SanitizeLink,
 							wrappedLogger,
 						),
@@ -380,7 +380,7 @@ func ExampleHandleLinksConcurrently_withDelayingExtracting() {
 				},
 				LinkHandler: handlers.UniqueHandler{
 					// don't use here the link register from the duplicate checker above
-					LinkRegister: register.NewLinkRegister(
+					LinkRegister: registers.NewLinkRegister(
 						sanitizing.SanitizeLink,
 						wrappedLogger,
 					),

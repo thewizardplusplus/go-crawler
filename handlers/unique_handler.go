@@ -2,12 +2,12 @@ package handlers
 
 import (
 	crawler "github.com/thewizardplusplus/go-crawler"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/registers"
 )
 
 // UniqueHandler ...
 type UniqueHandler struct {
-	LinkRegister register.LinkRegister
+	LinkRegister registers.LinkRegister
 	LinkHandler  crawler.LinkHandler
 }
 

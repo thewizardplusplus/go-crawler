@@ -1,4 +1,4 @@
-package register
+package registers
 
 import (
 	mapset "github.com/deckarep/golang-set"

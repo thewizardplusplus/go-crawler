@@ -2,12 +2,12 @@ package checkers
 
 import (
 	crawler "github.com/thewizardplusplus/go-crawler"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/registers"
 )
 
 // DuplicateChecker ...
 type DuplicateChecker struct {
-	LinkRegister register.LinkRegister
+	LinkRegister registers.LinkRegister
 }
 
 // CheckLink ...

@@ -1,4 +1,4 @@
-package register
+package registers
 
 import (
 	stderrors "errors"

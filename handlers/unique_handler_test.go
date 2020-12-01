@@ -6,13 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	crawler "github.com/thewizardplusplus/go-crawler"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
 
 func TestUniqueHandler_HandleLink(test *testing.T) {
 	type fields struct {
-		LinkRegister register.LinkRegister
+		LinkRegister registers.LinkRegister
 		LinkHandler  crawler.LinkHandler
 	}
 	type args struct {
@@ -23,12 +23,12 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 		name             string
 		fields           fields
 		args             args
-		wantLinkRegister register.LinkRegister
+		wantLinkRegister registers.LinkRegister
 	}{
 		{
 			name: "without a duplicate",
 			fields: fields{
-				LinkRegister: register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
+				LinkRegister: registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
 				LinkHandler: func() LinkHandler {
 					handler := new(MockLinkHandler)
 					handler.
@@ -47,8 +47,8 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 					Link:       "http://example.com/test",
 				},
 			},
-			wantLinkRegister: func() register.LinkRegister {
-				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+			wantLinkRegister: func() registers.LinkRegister {
+				linkRegister := registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
 				linkRegister.RegisterLink("http://example.com/test")
 
 				return linkRegister
@@ -57,8 +57,9 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 		{
 			name: "with a duplicate",
 			fields: fields{
-				LinkRegister: func() register.LinkRegister {
-					linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+				LinkRegister: func() registers.LinkRegister {
+					linkRegister :=
+						registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
 					linkRegister.RegisterLink("http://example.com/test")
 
 					return linkRegister
@@ -71,8 +72,8 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 					Link:       "http://example.com/test",
 				},
 			},
-			wantLinkRegister: func() register.LinkRegister {
-				linkRegister := register.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+			wantLinkRegister: func() registers.LinkRegister {
+				linkRegister := registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
 				linkRegister.RegisterLink("http://example.com/test")
 
 				return linkRegister
