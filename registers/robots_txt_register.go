@@ -1,10 +1,16 @@
 package registers
 
 import (
+	"net/http"
 	"net/url"
 
 	"github.com/pkg/errors"
 )
+
+// HTTPClient ...
+type HTTPClient interface {
+	Do(request *http.Request) (*http.Response, error)
+}
 
 func makeRobotsTXTLink(regularLink string) (robotsTXTLink string, err error) {
 	parsedRegularLink, err := url.Parse(regularLink)
