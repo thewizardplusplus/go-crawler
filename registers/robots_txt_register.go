@@ -7,6 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+//go:generate mockery -name=HTTPClient -inpkg -case=underscore -testonly
+
 // HTTPClient ...
 type HTTPClient interface {
 	Do(request *http.Request) (*http.Response, error)
