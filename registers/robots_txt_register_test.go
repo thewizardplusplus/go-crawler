@@ -2,10 +2,15 @@ package registers
 
 import (
 	"context"
+	"io/ioutil"
+	"net/http"
+	"strings"
 	"testing"
+	"testing/iotest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"github.com/temoto/robotstxt"
 )
 
@@ -91,7 +96,109 @@ func Test_loadRobotsTXTData(test *testing.T) {
 		wantRobotsTXTData *robotstxt.RobotsData
 		wantErr           assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			args: args{
+				ctx: context.Background(),
+				httpClient: func() HTTPClient {
+					request, _ :=
+						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
+					request = request.WithContext(context.Background())
+
+					response := &http.Response{
+						StatusCode: http.StatusOK,
+						Body: ioutil.NopCloser(strings.NewReader(`
+							User-agent: *
+							Disallow: /
+							Allow: /$
+							Allow: /sitemap.xml$
+							Allow: /post/
+							Allow: /storage/app/media/
+						`)),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+				robotsTXTLink: "http://example.com/robots.txt",
+			},
+			wantRobotsTXTData: func() *robotstxt.RobotsData {
+				robotsTXTData, err := robotstxt.FromString(`
+					User-agent: *
+					Disallow: /
+					Allow: /$
+					Allow: /sitemap.xml$
+					Allow: /post/
+					Allow: /storage/app/media/
+				`)
+				require.NoError(test, err)
+
+				return robotsTXTData
+			}(),
+			wantErr: assert.NoError,
+		},
+		{
+			name: "error with request creating",
+			args: args{
+				ctx:           context.Background(),
+				httpClient:    new(MockHTTPClient),
+				robotsTXTLink: ":",
+			},
+			wantRobotsTXTData: nil,
+			wantErr:           assert.Error,
+		},
+		{
+			name: "error with request sending",
+			args: args{
+				ctx: context.Background(),
+				httpClient: func() HTTPClient {
+					request, _ :=
+						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
+					request = request.WithContext(context.Background())
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(nil, iotest.ErrTimeout)
+
+					return httpClient
+				}(),
+				robotsTXTLink: "http://example.com/robots.txt",
+			},
+			wantRobotsTXTData: nil,
+			wantErr:           assert.Error,
+		},
+		{
+			name: "error with response parsing",
+			args: args{
+				ctx: context.Background(),
+				httpClient: func() HTTPClient {
+					request, _ :=
+						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
+					request = request.WithContext(context.Background())
+
+					response := &http.Response{
+						StatusCode: http.StatusOK,
+						Body: ioutil.NopCloser(iotest.TimeoutReader(strings.NewReader(`
+							User-agent: *
+							Disallow: /
+							Allow: /$
+							Allow: /sitemap.xml$
+							Allow: /post/
+							Allow: /storage/app/media/
+						`))),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+				robotsTXTLink: "http://example.com/robots.txt",
+			},
+			wantRobotsTXTData: nil,
+			wantErr:           assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			gotRobotsTXTData, gotErr := loadRobotsTXTData(
