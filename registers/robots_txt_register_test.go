@@ -1,9 +1,12 @@
 package registers
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/temoto/robotstxt"
 )
 
 func Test_makeRobotsTXTLink(test *testing.T) {
@@ -70,6 +73,35 @@ func Test_makeRobotsTXTLink(test *testing.T) {
 			gotRobotsTXTLink, gotErr := makeRobotsTXTLink(data.args.regularLink)
 
 			assert.Equal(test, data.wantRobotsTXTLink, gotRobotsTXTLink)
+			data.wantErr(test, gotErr)
+		})
+	}
+}
+
+func Test_loadRobotsTXTData(test *testing.T) {
+	type args struct {
+		ctx           context.Context
+		httpClient    HTTPClient
+		robotsTXTLink string
+	}
+
+	for _, data := range []struct {
+		name              string
+		args              args
+		wantRobotsTXTData *robotstxt.RobotsData
+		wantErr           assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			gotRobotsTXTData, gotErr := loadRobotsTXTData(
+				data.args.ctx,
+				data.args.httpClient,
+				data.args.robotsTXTLink,
+			)
+
+			mock.AssertExpectationsForObjects(test, data.args.httpClient)
+			assert.Equal(test, data.wantRobotsTXTData, gotRobotsTXTData)
 			data.wantErr(test, gotErr)
 		})
 	}
