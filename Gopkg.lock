@@ -128,6 +128,14 @@
   version = "v1.6.1"
 
 [[projects]]
+  digest = "1:e2933734cc52e2c304ed132ba5a8320ef21bee5022c67302abb3eeef83d6c515"
+  name = "github.com/temoto/robotstxt"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "3f668f68d41cf91350a4148f4fcb6720f1472428"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:c078608aa57118f5a115e8517c89228a5a7539128d30fe1d10cfce541d416379"
   name = "github.com/thewizardplusplus/go-html-selector"
   packages = [
@@ -254,6 +262,7 @@
     "github.com/stretchr/testify/assert",
     "github.com/stretchr/testify/mock",
     "github.com/stretchr/testify/require",
+    "github.com/temoto/robotstxt",
     "github.com/thewizardplusplus/go-html-selector",
     "github.com/thewizardplusplus/go-html-selector/builders",
     "github.com/thewizardplusplus/go-sync-utils",
