@@ -24,6 +24,11 @@ type RobotsTXTRegister struct {
 	registeredRobotsTXT sync.Map
 }
 
+// NewRobotsTXTRegister ...
+func NewRobotsTXTRegister(httpClient HTTPClient) RobotsTXTRegister {
+	return RobotsTXTRegister{httpClient: httpClient}
+}
+
 func makeRobotsTXTLink(regularLink string) (robotsTXTLink string, err error) {
 	parsedRegularLink, err := url.Parse(regularLink)
 	if err != nil {
