@@ -21,7 +21,7 @@ func TestNewLinkRegister(test *testing.T) {
 	mock.AssertExpectationsForObjects(test, logger)
 	assert.Equal(test, sanitizing.SanitizeLink, got.sanitizeLink)
 	assert.Equal(test, logger, got.logger)
-	assert.NotNil(test, got.registeredLinks)
+	assert.Equal(test, mapset.NewSet(), got.registeredLinks)
 }
 
 func TestLinkRegister_RegisterLink(test *testing.T) {
