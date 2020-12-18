@@ -24,6 +24,40 @@ func TestNewRobotsTXTRegister(test *testing.T) {
 	assert.Equal(test, new(sync.Map), got.registeredRobotsTXT)
 }
 
+func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
+	type fields struct {
+		httpClient          HTTPClient
+		registeredRobotsTXT *sync.Map
+	}
+	type args struct {
+		ctx  context.Context
+		link string
+	}
+
+	for _, data := range []struct {
+		name              string
+		fields            fields
+		args              args
+		wantRobotsTXTData *robotstxt.RobotsData
+		wantErr           assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			register := RobotsTXTRegister{
+				httpClient:          data.fields.httpClient,
+				registeredRobotsTXT: data.fields.registeredRobotsTXT,
+			}
+			gotRobotsTXTData, gotErr :=
+				register.RegisterRobotsTXT(data.args.ctx, data.args.link)
+
+			mock.AssertExpectationsForObjects(test, data.fields.httpClient)
+			assert.Equal(test, data.wantRobotsTXTData, gotRobotsTXTData)
+			data.wantErr(test, gotErr)
+		})
+	}
+}
+
 func Test_makeRobotsTXTLink(test *testing.T) {
 	type args struct {
 		regularLink string
