@@ -29,6 +29,34 @@ func NewRobotsTXTRegister(httpClient HTTPClient) RobotsTXTRegister {
 	return RobotsTXTRegister{httpClient: httpClient}
 }
 
+// RegisterRobotsTXT ...
+func (register *RobotsTXTRegister) RegisterRobotsTXT(
+	ctx context.Context,
+	link string,
+) (
+	*robotstxt.RobotsData,
+	error,
+) {
+	robotsTXTLink, err := makeRobotsTXTLink(link)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to make the robots.txt link")
+	}
+
+	robotsTXTData, ok := register.registeredRobotsTXT.Load(robotsTXTLink)
+	if !ok {
+		var err error
+		robotsTXTData, err =
+			loadRobotsTXTData(ctx, register.httpClient, robotsTXTLink)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to load the robots.txt data")
+		}
+
+		register.registeredRobotsTXT.Store(robotsTXTLink, robotsTXTData)
+	}
+
+	return robotsTXTData.(*robotstxt.RobotsData), nil
+}
+
 func makeRobotsTXTLink(regularLink string) (robotsTXTLink string, err error) {
 	parsedRegularLink, err := url.Parse(regularLink)
 	if err != nil {
