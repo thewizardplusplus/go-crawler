@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/temoto/robotstxt"
@@ -14,6 +15,13 @@ import (
 // HTTPClient ...
 type HTTPClient interface {
 	Do(request *http.Request) (*http.Response, error)
+}
+
+// RobotsTXTRegister ...
+type RobotsTXTRegister struct {
+	httpClient HTTPClient
+
+	registeredRobotsTXT sync.Map
 }
 
 func makeRobotsTXTLink(regularLink string) (robotsTXTLink string, err error) {
