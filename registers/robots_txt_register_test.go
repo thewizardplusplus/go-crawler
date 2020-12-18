@@ -14,6 +14,14 @@ import (
 	"github.com/temoto/robotstxt"
 )
 
+func TestNewRobotsTXTRegister(test *testing.T) {
+	httpClient := new(MockHTTPClient)
+	got := NewRobotsTXTRegister(httpClient)
+
+	mock.AssertExpectationsForObjects(test, httpClient)
+	assert.Equal(test, httpClient, got.httpClient)
+}
+
 func Test_makeRobotsTXTLink(test *testing.T) {
 	type args struct {
 		regularLink string
