@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"testing"
 	"testing/iotest"
 
@@ -20,6 +21,7 @@ func TestNewRobotsTXTRegister(test *testing.T) {
 
 	mock.AssertExpectationsForObjects(test, httpClient)
 	assert.Equal(test, httpClient, got.httpClient)
+	assert.Equal(test, new(sync.Map), got.registeredRobotsTXT)
 }
 
 func Test_makeRobotsTXTLink(test *testing.T) {

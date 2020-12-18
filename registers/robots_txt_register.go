@@ -21,16 +21,20 @@ type HTTPClient interface {
 type RobotsTXTRegister struct {
 	httpClient HTTPClient
 
-	registeredRobotsTXT sync.Map
+	registeredRobotsTXT *sync.Map
 }
 
 // NewRobotsTXTRegister ...
 func NewRobotsTXTRegister(httpClient HTTPClient) RobotsTXTRegister {
-	return RobotsTXTRegister{httpClient: httpClient}
+	return RobotsTXTRegister{
+		httpClient: httpClient,
+
+		registeredRobotsTXT: new(sync.Map),
+	}
 }
 
 // RegisterRobotsTXT ...
-func (register *RobotsTXTRegister) RegisterRobotsTXT(
+func (register RobotsTXTRegister) RegisterRobotsTXT(
 	ctx context.Context,
 	link string,
 ) (
