@@ -41,7 +41,127 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 		wantRobotsTXTData *robotstxt.RobotsData
 		wantErr           assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success with an unregistered robots.txt link",
+			fields: fields{
+				httpClient: func() HTTPClient {
+					request, _ :=
+						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
+					request = request.WithContext(context.Background())
+
+					response := &http.Response{
+						StatusCode: http.StatusOK,
+						Body: ioutil.NopCloser(strings.NewReader(`
+							User-agent: *
+							Disallow: /
+							Allow: /$
+							Allow: /sitemap.xml$
+							Allow: /post/
+							Allow: /storage/app/media/
+						`)),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+				registeredRobotsTXT: new(sync.Map),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/test",
+			},
+			wantRobotsTXTData: func() *robotstxt.RobotsData {
+				robotsTXTData, err := robotstxt.FromString(`
+					User-agent: *
+					Disallow: /
+					Allow: /$
+					Allow: /sitemap.xml$
+					Allow: /post/
+					Allow: /storage/app/media/
+				`)
+				require.NoError(test, err)
+
+				return robotsTXTData
+			}(),
+			wantErr: assert.NoError,
+		},
+		{
+			name: "success with a registered robots.txt link",
+			fields: fields{
+				httpClient: new(MockHTTPClient),
+				registeredRobotsTXT: func() *sync.Map {
+					robotsTXTData, err := robotstxt.FromString(`
+						User-agent: *
+						Disallow: /
+						Allow: /$
+						Allow: /sitemap.xml$
+						Allow: /post/
+						Allow: /storage/app/media/
+					`)
+					require.NoError(test, err)
+
+					registeredRobotsTXT := new(sync.Map)
+					registeredRobotsTXT.Store("http://example.com/robots.txt", robotsTXTData)
+
+					return registeredRobotsTXT
+				}(),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/test",
+			},
+			wantRobotsTXTData: func() *robotstxt.RobotsData {
+				robotsTXTData, err := robotstxt.FromString(`
+					User-agent: *
+					Disallow: /
+					Allow: /$
+					Allow: /sitemap.xml$
+					Allow: /post/
+					Allow: /storage/app/media/
+				`)
+				require.NoError(test, err)
+
+				return robotsTXTData
+			}(),
+			wantErr: assert.NoError,
+		},
+		{
+			name: "error with making of a robots.txt link",
+			fields: fields{
+				httpClient:          new(MockHTTPClient),
+				registeredRobotsTXT: new(sync.Map),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: ":",
+			},
+			wantRobotsTXTData: nil,
+			wantErr:           assert.Error,
+		},
+		{
+			name: "error with loading of a robots.txt data",
+			fields: fields{
+				httpClient: func() HTTPClient {
+					request, _ :=
+						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
+					request = request.WithContext(context.Background())
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(nil, iotest.ErrTimeout)
+
+					return httpClient
+				}(),
+				registeredRobotsTXT: new(sync.Map),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/test",
+			},
+			wantRobotsTXTData: nil,
+			wantErr:           assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			register := RobotsTXTRegister{
