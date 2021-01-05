@@ -49,8 +49,7 @@ func (register RobotsTXTRegister) RegisterRobotsTXT(
 	robotsTXTData, ok := register.registeredRobotsTXT.Load(robotsTXTLink)
 	if !ok {
 		var err error
-		robotsTXTData, err =
-			loadRobotsTXTData(ctx, register.httpClient, robotsTXTLink)
+		robotsTXTData, err = register.loadRobotsTXTData(ctx, robotsTXTLink)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to load the robots.txt data")
 		}
@@ -59,6 +58,33 @@ func (register RobotsTXTRegister) RegisterRobotsTXT(
 	}
 
 	return robotsTXTData.(*robotstxt.RobotsData), nil
+}
+
+func (register RobotsTXTRegister) loadRobotsTXTData(
+	ctx context.Context,
+	robotsTXTLink string,
+) (
+	*robotstxt.RobotsData,
+	error,
+) {
+	request, err := http.NewRequest(http.MethodGet, robotsTXTLink, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create the request")
+	}
+	request = request.WithContext(ctx)
+
+	response, err := register.httpClient.Do(request)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to send the request")
+	}
+	defer response.Body.Close() // nolint: errcheck
+
+	robotsTXTData, err := robotstxt.FromResponse(response)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to parse the response")
+	}
+
+	return robotsTXTData, nil
 }
 
 func makeRobotsTXTLink(regularLink string) (robotsTXTLink string, err error) {
@@ -74,32 +100,4 @@ func makeRobotsTXTLink(regularLink string) (robotsTXTLink string, err error) {
 		Path:   "/robots.txt",
 	}
 	return parsedRobotsTXTLink.String(), nil
-}
-
-func loadRobotsTXTData(
-	ctx context.Context,
-	httpClient HTTPClient,
-	robotsTXTLink string,
-) (
-	*robotstxt.RobotsData,
-	error,
-) {
-	request, err := http.NewRequest(http.MethodGet, robotsTXTLink, nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to create the request")
-	}
-	request = request.WithContext(ctx)
-
-	response, err := httpClient.Do(request)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to send the request")
-	}
-	defer response.Body.Close() // nolint: errcheck
-
-	robotsTXTData, err := robotstxt.FromResponse(response)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to parse the response")
-	}
-
-	return robotsTXTData, nil
 }
