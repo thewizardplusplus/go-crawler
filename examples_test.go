@@ -476,3 +476,61 @@ func ExampleHandleLinksConcurrently_withRobotsTXTOnExtracting() {
 	// have got the link "http://example.com/2" from the page "http://example.com"
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
+
+func ExampleHandleLinksConcurrently_withRobotsTXTOnHandling() {
+	server := RunServer()
+	defer server.Close()
+
+	links := make(chan string, 1000)
+	links <- server.URL
+
+	var waiter sync.WaitGroup
+	waiter.Add(1)
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.HandleLinksConcurrently(
+		context.Background(),
+		runtime.NumCPU(),
+		links,
+		crawler.HandleLinkDependencies{
+			CrawlDependencies: crawler.CrawlDependencies{
+				LinkExtractor: extractors.RepeatingExtractor{
+					LinkExtractor: extractors.DefaultExtractor{
+						HTTPClient: http.DefaultClient,
+						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+							"a": {"href"},
+						}),
+					},
+					RepeatCount:  5,
+					RepeatDelay:  time.Second,
+					Logger:       wrappedLogger,
+					SleepHandler: time.Sleep,
+				},
+				LinkChecker: checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				LinkHandler: handlers.RobotsTXTHandler{
+					UserAgent:         "go-crawler",
+					RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
+					LinkHandler: LinkHandler{
+						ServerURL: server.URL,
+					},
+					Logger: wrappedLogger,
+				},
+				Logger: wrappedLogger,
+			},
+			Waiter: &waiter,
+		},
+	)
+
+	waiter.Wait()
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
