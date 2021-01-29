@@ -1,5 +1,14 @@
 # Change Log
 
+## [v1.5](https://github.com/thewizardplusplus/go-crawler/tree/v1.5) (2021-01-29)
+
+- calling of an outer handler for an each found link:
+  - handling only of links allowed by a `robots.txt` file (optional):
+    - customized user agent;
+- custom filtering of considered links:
+  - by a `robots.txt` file (optional):
+    - customized user agent.
+
 ## [v1.4.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.4.1) (2020-11-22)
 
 - extract model of a sourced link:
