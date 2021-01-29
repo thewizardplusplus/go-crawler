@@ -22,10 +22,14 @@ The library that implements crawling of all relative links for specified ones.
   - passing of the source link in the outer handler;
   - handling only of unique links (optional):
     - supporting of sanitizing of a link before checking of uniqueness (optional);
+  - handling only of links allowed by a `robots.txt` file (optional):
+    - customized user agent;
 - custom filtering of considered links:
   - by relativity of a link (optional);
   - by uniqueness of an extracted link (optional):
     - supporting of sanitizing of a link before checking of uniqueness (optional);
+  - by a `robots.txt` file (optional):
+    - customized user agent;
   - supporting of grouping of link filters:
     - result of group filtering is successful only when all filters are successful;
 - parallelization possibilities:
