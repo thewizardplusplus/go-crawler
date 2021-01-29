@@ -45,6 +45,15 @@ func RunServer() *httptest.Server {
 		writer http.ResponseWriter,
 		request *http.Request,
 	) {
+		if request.URL.Path == "/robots.txt" {
+			fmt.Fprint(writer, `
+				User-agent: go-crawler
+				Disallow: /2
+			`)
+
+			return
+		}
+
 		var links []string
 		switch request.URL.Path {
 		case "/":
