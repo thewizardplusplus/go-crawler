@@ -2,6 +2,7 @@
 
 package checkers
 
+import context "context"
 import crawler "github.com/thewizardplusplus/go-crawler"
 import mock "github.com/stretchr/testify/mock"
 
@@ -10,13 +11,13 @@ type MockLinkChecker struct {
 	mock.Mock
 }
 
-// CheckLink provides a mock function with given fields: link
-func (_m *MockLinkChecker) CheckLink(link crawler.SourcedLink) bool {
-	ret := _m.Called(link)
+// CheckLink provides a mock function with given fields: ctx, link
+func (_m *MockLinkChecker) CheckLink(ctx context.Context, link crawler.SourcedLink) bool {
+	ret := _m.Called(ctx, link)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(crawler.SourcedLink) bool); ok {
-		r0 = rf(link)
+	if rf, ok := ret.Get(0).(func(context.Context, crawler.SourcedLink) bool); ok {
+		r0 = rf(ctx, link)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}

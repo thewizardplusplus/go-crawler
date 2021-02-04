@@ -1,6 +1,8 @@
 package checkers
 
 import (
+	"context"
+
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
@@ -8,9 +10,12 @@ import (
 type CheckerGroup []crawler.LinkChecker
 
 // CheckLink ...
-func (checkers CheckerGroup) CheckLink(link crawler.SourcedLink) bool {
+func (checkers CheckerGroup) CheckLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) bool {
 	for _, checker := range checkers {
-		if !checker.CheckLink(link) {
+		if !checker.CheckLink(ctx, link) {
 			return false
 		}
 	}

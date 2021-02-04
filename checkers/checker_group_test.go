@@ -1,6 +1,7 @@
 package checkers
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,6 +11,7 @@ import (
 
 func TestCheckerGroup_CheckLink(test *testing.T) {
 	type args struct {
+		ctx  context.Context
 		link crawler.SourcedLink
 	}
 
@@ -23,6 +25,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 			name:     "empty",
 			checkers: nil,
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -36,7 +39,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				func() LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
-						On("CheckLink", crawler.SourcedLink{
+						On("CheckLink", context.Background(), crawler.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/test",
 						}).
@@ -47,7 +50,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				func() LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
-						On("CheckLink", crawler.SourcedLink{
+						On("CheckLink", context.Background(), crawler.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/test",
 						}).
@@ -57,6 +60,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -70,7 +74,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				func() LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
-						On("CheckLink", crawler.SourcedLink{
+						On("CheckLink", context.Background(), crawler.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/test",
 						}).
@@ -81,6 +85,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 				new(MockLinkChecker),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -90,7 +95,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			got := data.checkers.CheckLink(data.args.link)
+			got := data.checkers.CheckLink(data.args.ctx, data.args.link)
 
 			for _, checker := range data.checkers {
 				mock.AssertExpectationsForObjects(test, checker)
