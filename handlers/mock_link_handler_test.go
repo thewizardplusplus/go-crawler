@@ -2,6 +2,7 @@
 
 package handlers
 
+import context "context"
 import crawler "github.com/thewizardplusplus/go-crawler"
 import mock "github.com/stretchr/testify/mock"
 
@@ -10,7 +11,7 @@ type MockLinkHandler struct {
 	mock.Mock
 }
 
-// HandleLink provides a mock function with given fields: link
-func (_m *MockLinkHandler) HandleLink(link crawler.SourcedLink) {
-	_m.Called(link)
+// HandleLink provides a mock function with given fields: ctx, link
+func (_m *MockLinkHandler) HandleLink(ctx context.Context, link crawler.SourcedLink) {
+	_m.Called(ctx, link)
 }

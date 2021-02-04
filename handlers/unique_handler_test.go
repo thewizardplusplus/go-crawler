@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +17,7 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 		LinkHandler  crawler.LinkHandler
 	}
 	type args struct {
+		ctx  context.Context
 		link crawler.SourcedLink
 	}
 
@@ -32,7 +34,7 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 				LinkHandler: func() LinkHandler {
 					handler := new(MockLinkHandler)
 					handler.
-						On("HandleLink", crawler.SourcedLink{
+						On("HandleLink", context.Background(), crawler.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/test",
 						}).
@@ -42,6 +44,7 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -67,6 +70,7 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 				LinkHandler: new(MockLinkHandler),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -85,7 +89,7 @@ func TestUniqueHandler_HandleLink(test *testing.T) {
 				LinkRegister: data.fields.LinkRegister,
 				LinkHandler:  data.fields.LinkHandler,
 			}
-			handler.HandleLink(data.args.link)
+			handler.HandleLink(data.args.ctx, data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.LinkHandler)
 			assert.Equal(test, data.wantLinkRegister, handler.LinkRegister)
