@@ -1,6 +1,7 @@
 package checkers
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,6 +15,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		LinkRegister registers.LinkRegister
 	}
 	type args struct {
+		ctx  context.Context
 		link crawler.SourcedLink
 	}
 
@@ -30,6 +32,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				LinkRegister: registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -55,6 +58,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -73,7 +77,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 			checker := DuplicateChecker{
 				LinkRegister: data.fields.LinkRegister,
 			}
-			got := checker.CheckLink(data.args.link)
+			got := checker.CheckLink(data.args.ctx, data.args.link)
 
 			assert.Equal(test, data.wantLinkRegister, checker.LinkRegister)
 			data.wantOk(test, got)
