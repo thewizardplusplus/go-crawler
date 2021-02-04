@@ -23,7 +23,64 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 		fields fields
 		args   args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "with a passed checking",
+			fields: fields{
+				LinkChecker: func() crawler.LinkChecker {
+					checker := new(MockLinkChecker)
+					checker.
+						On("CheckLink", context.Background(), crawler.SourcedLink{
+							SourceLink: "http://example.com/",
+							Link:       "http://example.com/test",
+						}).
+						Return(true)
+
+					return checker
+				}(),
+				LinkHandler: func() crawler.LinkHandler {
+					handler := new(MockLinkHandler)
+					handler.
+						On("HandleLink", context.Background(), crawler.SourcedLink{
+							SourceLink: "http://example.com/",
+							Link:       "http://example.com/test",
+						}).
+						Return()
+
+					return handler
+				}(),
+			},
+			args: args{
+				ctx: context.Background(),
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
+			},
+		},
+		{
+			name: "with a not passed checking",
+			fields: fields{
+				LinkChecker: func() crawler.LinkChecker {
+					checker := new(MockLinkChecker)
+					checker.
+						On("CheckLink", context.Background(), crawler.SourcedLink{
+							SourceLink: "http://example.com/",
+							Link:       "http://example.com/test",
+						}).
+						Return(false)
+
+					return checker
+				}(),
+				LinkHandler: new(MockLinkHandler),
+			},
+			args: args{
+				ctx: context.Background(),
+				link: crawler.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
+			},
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			handler := CheckedHandler{
