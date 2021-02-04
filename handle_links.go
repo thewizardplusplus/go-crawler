@@ -63,7 +63,7 @@ func HandleLink(
 		sourcedLink := SourcedLink{SourceLink: link, Link: extractedLink}
 		dependencies.LinkHandler.HandleLink(sourcedLink)
 
-		if !dependencies.LinkChecker.CheckLink(sourcedLink) {
+		if !dependencies.LinkChecker.CheckLink(ctx, sourcedLink) {
 			continue
 		}
 
