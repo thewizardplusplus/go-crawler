@@ -1,6 +1,7 @@
 package checkers
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"testing"
@@ -16,6 +17,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 		Logger log.Logger
 	}
 	type args struct {
+		ctx  context.Context
 		link crawler.SourcedLink
 	}
 
@@ -31,6 +33,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example1.com/",
 					Link:       "http://example2.com/test",
@@ -44,6 +47,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -65,6 +69,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: ":",
 					Link:       "http://example.com/test",
@@ -86,6 +91,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       ":",
@@ -98,7 +104,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 			checker := HostChecker{
 				Logger: data.fields.Logger,
 			}
-			got := checker.CheckLink(data.args.link)
+			got := checker.CheckLink(data.args.ctx, data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.Logger)
 			data.want(test, got)
