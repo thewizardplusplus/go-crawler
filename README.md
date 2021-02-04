@@ -1070,13 +1070,15 @@ func main() {
 				LinkChecker: checkers.HostChecker{
 					Logger: wrappedLogger,
 				},
-				LinkHandler: handlers.RobotsTXTHandler{
-					UserAgent:         "go-crawler",
-					RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
+				LinkHandler: handlers.CheckedHandler{
+					LinkChecker: checkers.RobotsTXTChecker{
+						UserAgent:         "go-crawler",
+						RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
+						Logger:            wrappedLogger,
+					},
 					LinkHandler: LinkHandler{
 						ServerURL: server.URL,
 					},
-					Logger: wrappedLogger,
 				},
 				Logger: wrappedLogger,
 			},
