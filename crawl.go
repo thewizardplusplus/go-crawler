@@ -32,7 +32,7 @@ type LinkChecker interface {
 
 // LinkHandler ...
 type LinkHandler interface {
-	HandleLink(link SourcedLink)
+	HandleLink(ctx context.Context, link SourcedLink)
 }
 
 // CrawlDependencies ...

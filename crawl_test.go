@@ -81,13 +81,13 @@ func TestCrawl(test *testing.T) {
 					LinkHandler: func() LinkHandler {
 						handler := new(MockLinkHandler)
 						handler.
-							On("HandleLink", SourcedLink{
+							On("HandleLink", context.Background(), SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/1",
 							}).
 							Return()
 						handler.
-							On("HandleLink", SourcedLink{
+							On("HandleLink", context.Background(), SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/2",
 							}).
@@ -160,13 +160,13 @@ func TestCrawl(test *testing.T) {
 					LinkHandler: func() LinkHandler {
 						handler := new(MockLinkHandler)
 						handler.
-							On("HandleLink", SourcedLink{
+							On("HandleLink", context.Background(), SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/1",
 							}).
 							Return()
 						handler.
-							On("HandleLink", SourcedLink{
+							On("HandleLink", context.Background(), SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/2",
 							}).
