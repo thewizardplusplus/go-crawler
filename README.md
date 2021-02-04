@@ -182,12 +182,14 @@ func main() {
 					),
 				},
 			},
-			LinkHandler: handlers.UniqueHandler{
-				// don't use here the link register from the duplicate checker above
-				LinkRegister: registers.NewLinkRegister(
-					sanitizing.SanitizeLink,
-					wrappedLogger,
-				),
+			LinkHandler: handlers.CheckedHandler{
+				LinkChecker: checkers.DuplicateChecker{
+					// don't use here the link register from the duplicate checker above
+					LinkRegister: registers.NewLinkRegister(
+						sanitizing.SanitizeLink,
+						wrappedLogger,
+					),
+				},
 				LinkHandler: LinkHandler{
 					ServerURL: server.URL,
 				},
@@ -609,12 +611,14 @@ func main() {
 						),
 					},
 				},
-				LinkHandler: handlers.UniqueHandler{
-					// don't use here the link register from the duplicate checker above
-					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
-						wrappedLogger,
-					),
+				LinkHandler: handlers.CheckedHandler{
+					LinkChecker: checkers.DuplicateChecker{
+						// don't use here the link register from the duplicate checker above
+						LinkRegister: registers.NewLinkRegister(
+							sanitizing.SanitizeLink,
+							wrappedLogger,
+						),
+					},
 					LinkHandler: LinkHandler{
 						ServerURL: server.URL,
 					},
@@ -764,12 +768,14 @@ func main() {
 						),
 					},
 				},
-				LinkHandler: handlers.UniqueHandler{
-					// don't use here the link register from the duplicate checker above
-					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
-						wrappedLogger,
-					),
+				LinkHandler: handlers.CheckedHandler{
+					LinkChecker: checkers.DuplicateChecker{
+						// don't use here the link register from the duplicate checker above
+						LinkRegister: registers.NewLinkRegister(
+							sanitizing.SanitizeLink,
+							wrappedLogger,
+						),
+					},
 					LinkHandler: LinkHandler{
 						ServerURL: server.URL,
 					},
