@@ -94,7 +94,10 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link.Link),
@@ -233,7 +236,10 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link.Link),
@@ -368,7 +374,10 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link.Link),
@@ -510,7 +519,10 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link.Link),
@@ -658,7 +670,10 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link.Link),
@@ -808,7 +823,10 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link.Link),
@@ -955,7 +973,10 @@ type LinkHandler struct {
 	ServerURL string
 }
 
-func (handler LinkHandler) HandleLink(link crawler.SourcedLink) {
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
 		handler.replaceServerURL(link.Link),
