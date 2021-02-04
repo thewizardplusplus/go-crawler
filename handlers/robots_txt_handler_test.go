@@ -24,6 +24,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 		Logger            log.Logger
 	}
 	type args struct {
+		ctx  context.Context
 		link crawler.SourcedLink
 	}
 
@@ -65,7 +66,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 				LinkHandler: func() LinkHandler {
 					handler := new(MockLinkHandler)
 					handler.
-						On("HandleLink", crawler.SourcedLink{
+						On("HandleLink", context.Background(), crawler.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/post/23",
 						}).
@@ -76,6 +77,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
@@ -116,6 +118,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 				Logger:      new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
@@ -156,6 +159,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 				Logger:      new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -183,6 +187,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       ":",
@@ -222,6 +227,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
@@ -236,7 +242,7 @@ func TestRobotsTXTHandler_HandleLink(test *testing.T) {
 				LinkHandler:       data.fields.LinkHandler,
 				Logger:            data.fields.Logger,
 			}
-			handler.HandleLink(data.args.link)
+			handler.HandleLink(data.args.ctx, data.args.link)
 
 			mock.AssertExpectationsForObjects(
 				test,

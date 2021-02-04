@@ -18,7 +18,10 @@ type RobotsTXTHandler struct {
 }
 
 // HandleLink ...
-func (handler RobotsTXTHandler) HandleLink(link crawler.SourcedLink) {
+func (handler RobotsTXTHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
 	parsedLink, err := url.Parse(link.Link)
 	if err != nil {
 		handler.Logger.Logf("unable to parse the link: %s", err)
@@ -26,7 +29,7 @@ func (handler RobotsTXTHandler) HandleLink(link crawler.SourcedLink) {
 	}
 
 	robotsTXTData, err :=
-		handler.RobotsTXTRegister.RegisterRobotsTXT(context.Background(), link.Link)
+		handler.RobotsTXTRegister.RegisterRobotsTXT(ctx, link.Link)
 	if err != nil {
 		handler.Logger.Logf("unable to register the robots.txt link: %s", err)
 		return
@@ -37,5 +40,5 @@ func (handler RobotsTXTHandler) HandleLink(link crawler.SourcedLink) {
 		return
 	}
 
-	handler.LinkHandler.HandleLink(link)
+	handler.LinkHandler.HandleLink(ctx, link)
 }
