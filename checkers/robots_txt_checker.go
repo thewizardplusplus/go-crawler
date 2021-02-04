@@ -17,7 +17,10 @@ type RobotsTXTChecker struct {
 }
 
 // CheckLink ...
-func (checker RobotsTXTChecker) CheckLink(link crawler.SourcedLink) bool {
+func (checker RobotsTXTChecker) CheckLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) bool {
 	parsedLink, err := url.Parse(link.Link)
 	if err != nil {
 		checker.Logger.Logf("unable to parse the link: %s", err)
@@ -25,7 +28,7 @@ func (checker RobotsTXTChecker) CheckLink(link crawler.SourcedLink) bool {
 	}
 
 	robotsTXTData, err :=
-		checker.RobotsTXTRegister.RegisterRobotsTXT(context.Background(), link.Link)
+		checker.RobotsTXTRegister.RegisterRobotsTXT(ctx, link.Link)
 	if err != nil {
 		checker.Logger.Logf("unable to register the robots.txt link: %s", err)
 		return false

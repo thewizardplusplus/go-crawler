@@ -24,6 +24,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 		Logger            log.Logger
 	}
 	type args struct {
+		ctx  context.Context
 		link crawler.SourcedLink
 	}
 
@@ -66,6 +67,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
@@ -106,6 +108,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
@@ -146,6 +149,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 				Logger: new(MockLogger),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
@@ -173,6 +177,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       ":",
@@ -212,6 +217,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 				}(),
 			},
 			args: args{
+				ctx: context.Background(),
 				link: crawler.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
@@ -226,7 +232,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 				RobotsTXTRegister: data.fields.RobotsTXTRegister,
 				Logger:            data.fields.Logger,
 			}
-			got := checker.CheckLink(data.args.link)
+			got := checker.CheckLink(data.args.ctx, data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.Logger)
 			data.wantOk(test, got)
