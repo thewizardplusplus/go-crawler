@@ -1,10 +1,9 @@
 package checkers
 
 import (
-	"net/http"
-
 	"github.com/go-log/log"
 	crawler "github.com/thewizardplusplus/go-crawler"
+	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
 //go:generate mockery -name=LinkChecker -inpkg -case=underscore -testonly
@@ -34,5 +33,5 @@ type Logger interface {
 // It's used only for mock generating.
 //
 type HTTPClient interface {
-	Do(request *http.Request) (*http.Response, error)
+	httputils.HTTPClient
 }
