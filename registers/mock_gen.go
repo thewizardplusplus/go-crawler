@@ -2,6 +2,7 @@ package registers
 
 import (
 	"github.com/go-log/log"
+	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
 //go:generate mockery -name=Logger -inpkg -case=underscore -testonly
@@ -12,4 +13,14 @@ import (
 //
 type Logger interface {
 	log.Logger
+}
+
+//go:generate mockery -name=HTTPClient -inpkg -case=underscore -testonly
+
+// HTTPClient ...
+//
+// It's used only for mock generating.
+//
+type HTTPClient interface {
+	httputils.HTTPClient
 }

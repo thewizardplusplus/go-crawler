@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/temoto/robotstxt"
+	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
 func TestNewRobotsTXTRegister(test *testing.T) {
@@ -26,7 +27,7 @@ func TestNewRobotsTXTRegister(test *testing.T) {
 
 func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 	type fields struct {
-		httpClient          HTTPClient
+		httpClient          httputils.HTTPClient
 		registeredRobotsTXT *sync.Map
 	}
 	type args struct {
@@ -44,7 +45,7 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 		{
 			name: "success with an unregistered robots.txt link",
 			fields: fields{
-				httpClient: func() HTTPClient {
+				httpClient: func() httputils.HTTPClient {
 					request, _ :=
 						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
 					request = request.WithContext(context.Background())
@@ -143,7 +144,7 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 		{
 			name: "error with loading of a robots.txt data",
 			fields: fields{
-				httpClient: func() HTTPClient {
+				httpClient: func() httputils.HTTPClient {
 					request, _ :=
 						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
 					request = request.WithContext(context.Background())
@@ -180,7 +181,7 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 
 func TestRobotsTXTRegister_loadRobotsTXTData(test *testing.T) {
 	type fields struct {
-		httpClient HTTPClient
+		httpClient httputils.HTTPClient
 	}
 	type args struct {
 		ctx           context.Context
@@ -197,7 +198,7 @@ func TestRobotsTXTRegister_loadRobotsTXTData(test *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				httpClient: func() HTTPClient {
+				httpClient: func() httputils.HTTPClient {
 					request, _ :=
 						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
 					request = request.WithContext(context.Background())
@@ -254,7 +255,7 @@ func TestRobotsTXTRegister_loadRobotsTXTData(test *testing.T) {
 		{
 			name: "error with request sending",
 			fields: fields{
-				httpClient: func() HTTPClient {
+				httpClient: func() httputils.HTTPClient {
 					request, _ :=
 						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
 					request = request.WithContext(context.Background())
@@ -275,7 +276,7 @@ func TestRobotsTXTRegister_loadRobotsTXTData(test *testing.T) {
 		{
 			name: "error with response parsing",
 			fields: fields{
-				httpClient: func() HTTPClient {
+				httpClient: func() httputils.HTTPClient {
 					request, _ :=
 						http.NewRequest(http.MethodGet, "http://example.com/robots.txt", nil)
 					request = request.WithContext(context.Background())

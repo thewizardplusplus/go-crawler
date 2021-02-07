@@ -8,24 +8,18 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/temoto/robotstxt"
+	httputils "github.com/thewizardplusplus/go-http-utils"
 )
-
-//go:generate mockery -name=HTTPClient -inpkg -case=underscore -testonly
-
-// HTTPClient ...
-type HTTPClient interface {
-	Do(request *http.Request) (*http.Response, error)
-}
 
 // RobotsTXTRegister ...
 type RobotsTXTRegister struct {
-	httpClient HTTPClient
+	httpClient httputils.HTTPClient
 
 	registeredRobotsTXT *sync.Map
 }
 
 // NewRobotsTXTRegister ...
-func NewRobotsTXTRegister(httpClient HTTPClient) RobotsTXTRegister {
+func NewRobotsTXTRegister(httpClient httputils.HTTPClient) RobotsTXTRegister {
 	return RobotsTXTRegister{
 		httpClient: httpClient,
 
