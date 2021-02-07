@@ -63,12 +63,27 @@
   version = "v0.2.0"
 
 [[projects]]
+  digest = "1:01745416ed734d0dbd8f2a25344536e399ee60319654873da12b107e9e3cb309"
+  name = "github.com/golang/gddo"
+  packages = ["httputil/header"]
+  pruneopts = "UT"
+  revision = "3c2cc9a6329d9842b3bbdaf307a8110d740cf94c"
+
+[[projects]]
   branch = "master"
   digest = "1:ae4407ca7731ceb7b54b059fced30f335d32486a2148e262b19067261f959b42"
   name = "github.com/google/shlex"
   packages = ["."]
   pruneopts = "UT"
   revision = "e7afc7fbc51079733e9468cdfd1efcd7d196cd1d"
+
+[[projects]]
+  digest = "1:6078383dbb7405bfa3ce16957f37564e3b716afa29b6eb45ffdb6674624d1e0d"
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "98cb6bf42e086f6af920b965c38cacc07402d51b"
+  version = "v1.8.0"
 
 [[projects]]
   digest = "1:7157fd3f337f20f9058789e47f3341ae5cb77081fa01c1d678af5a03afea6f3e"
@@ -146,6 +161,14 @@
   pruneopts = "UT"
   revision = "f13a4ff946605c93aceee71676bd678bd70eb1a7"
   version = "v1.4"
+
+[[projects]]
+  digest = "1:9dc4b31de2509ce8025bfec4659b6f26cd07ac4bb0b39fe71fb8dca2f4894472"
+  name = "github.com/thewizardplusplus/go-http-utils"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a6478a072eba52b44e3d2ca8a1e04e163f9299b3"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:17bdda8989d1457dd9822247c7d7790c51deb396449507e6531a4906c6d68a03"
@@ -265,6 +288,7 @@
     "github.com/temoto/robotstxt",
     "github.com/thewizardplusplus/go-html-selector",
     "github.com/thewizardplusplus/go-html-selector/builders",
+    "github.com/thewizardplusplus/go-http-utils",
     "github.com/thewizardplusplus/go-sync-utils",
     "github.com/vektra/mockery/cmd/mockery",
   ]
