@@ -5,7 +5,18 @@ import (
 
 	"github.com/go-log/log"
 	crawler "github.com/thewizardplusplus/go-crawler"
+	httputils "github.com/thewizardplusplus/go-http-utils"
 )
+
+//go:generate mockery -name=HTTPClient -inpkg -case=underscore -testonly
+
+// HTTPClient ...
+//
+// It's used only for mock generating.
+//
+type HTTPClient interface {
+	httputils.HTTPClient
+}
 
 //go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
 

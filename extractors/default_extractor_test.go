@@ -11,11 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
 func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
-		HTTPClient HTTPClient
+		HTTPClient httputils.HTTPClient
 		Filters    htmlselector.OptimizedFilterGroup
 	}
 	type args struct {
@@ -34,7 +35,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "success without links",
 			fields: fields{
-				HTTPClient: func() HTTPClient {
+				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
 
@@ -62,7 +63,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "success with links",
 			fields: fields{
-				HTTPClient: func() HTTPClient {
+				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
 
@@ -111,7 +112,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "error with request sending",
 			fields: fields{
-				HTTPClient: func() HTTPClient {
+				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
 
@@ -135,7 +136,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "error with tags selecting",
 			fields: fields{
-				HTTPClient: func() HTTPClient {
+				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
 

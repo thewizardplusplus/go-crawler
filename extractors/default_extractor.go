@@ -7,18 +7,12 @@ import (
 	"github.com/pkg/errors"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	"github.com/thewizardplusplus/go-html-selector/builders"
+	httputils "github.com/thewizardplusplus/go-http-utils"
 )
-
-//go:generate mockery -name=HTTPClient -inpkg -case=underscore -testonly
-
-// HTTPClient ...
-type HTTPClient interface {
-	Do(request *http.Request) (*http.Response, error)
-}
 
 // DefaultExtractor ...
 type DefaultExtractor struct {
-	HTTPClient HTTPClient
+	HTTPClient httputils.HTTPClient
 	Filters    htmlselector.OptimizedFilterGroup
 }
 
