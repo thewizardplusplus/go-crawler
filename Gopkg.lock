@@ -18,7 +18,7 @@
   revision = "f65c72e2690dc4b403c8bd637baf4611cd4c069b"
 
 [[projects]]
-  digest = "1:7bd8b69b834619ba2748ae570f4b08acdc5b0f735d99f8b2fd52443908bc436a"
+  digest = "1:b1dae1363a13d809e69d35fdd9ec2626e6d11fde1ee4b3ae8774f198e8f153bc"
   name = "github.com/cweill/gotests"
   packages = [
     ".",
@@ -30,10 +30,11 @@
     "internal/output",
     "internal/render",
     "internal/render/bindata",
+    "templates",
   ]
   pruneopts = "UT"
-  revision = "893b5761d2ad1af5776fcb09e7faff817becb1d8"
-  version = "v1.5.3"
+  revision = "aec97ecab1789f1396be98a74eaf4339564a565c"
+  version = "v1.6.0"
 
 [[projects]]
   digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
