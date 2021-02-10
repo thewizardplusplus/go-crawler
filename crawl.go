@@ -14,21 +14,21 @@ type SourcedLink struct {
 	Link       string
 }
 
-//go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
+//go:generate mockery --name=LinkExtractor --inpackage --case=underscore --testonly
 
 // LinkExtractor ...
 type LinkExtractor interface {
 	ExtractLinks(ctx context.Context, threadID int, link string) ([]string, error)
 }
 
-//go:generate mockery -name=LinkChecker -inpkg -case=underscore -testonly
+//go:generate mockery --name=LinkChecker --inpackage --case=underscore --testonly
 
 // LinkChecker ...
 type LinkChecker interface {
 	CheckLink(ctx context.Context, link SourcedLink) bool
 }
 
-//go:generate mockery -name=LinkHandler -inpkg -case=underscore -testonly
+//go:generate mockery --name=LinkHandler --inpackage --case=underscore --testonly
 
 // LinkHandler ...
 type LinkHandler interface {

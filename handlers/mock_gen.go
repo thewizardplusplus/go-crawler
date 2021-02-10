@@ -4,7 +4,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
-//go:generate mockery -name=LinkChecker -inpkg -case=underscore -testonly
+//go:generate mockery --name=LinkChecker --inpackage --case=underscore --testonly
 
 // LinkChecker ...
 //
@@ -14,7 +14,7 @@ type LinkChecker interface {
 	crawler.LinkChecker
 }
 
-//go:generate mockery -name=LinkHandler -inpkg -case=underscore -testonly
+//go:generate mockery --name=LinkHandler --inpackage --case=underscore --testonly
 
 // LinkHandler ...
 //

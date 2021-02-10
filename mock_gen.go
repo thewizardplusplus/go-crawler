@@ -5,7 +5,7 @@ import (
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
-//go:generate mockery -name=Waiter -inpkg -case=underscore -testonly
+//go:generate mockery --name=Waiter --inpackage --case=underscore --testonly
 
 // Waiter ...
 //
@@ -15,7 +15,7 @@ type Waiter interface {
 	syncutils.WaitGroup
 }
 
-//go:generate mockery -name=Logger -inpkg -case=underscore -testonly
+//go:generate mockery --name=Logger --inpackage --case=underscore --testonly
 
 // Logger ...
 //

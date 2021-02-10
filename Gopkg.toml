@@ -1,6 +1,6 @@
 required = [
   "github.com/alecthomas/gometalinter",
-  "github.com/vektra/mockery/cmd/mockery",
+  "github.com/vektra/mockery/cmd",
   "github.com/cweill/gotests/gotests",
 ]
 

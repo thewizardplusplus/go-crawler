@@ -8,7 +8,7 @@ import (
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
-//go:generate mockery -name=HTTPClient -inpkg -case=underscore -testonly
+//go:generate mockery --name=HTTPClient --inpackage --case=underscore --testonly
 
 // HTTPClient ...
 //
@@ -18,7 +18,7 @@ type HTTPClient interface {
 	httputils.HTTPClient
 }
 
-//go:generate mockery -name=LinkExtractor -inpkg -case=underscore -testonly
+//go:generate mockery --name=LinkExtractor --inpackage --case=underscore --testonly
 
 // LinkExtractor ...
 //
@@ -28,7 +28,7 @@ type LinkExtractor interface {
 	crawler.LinkExtractor
 }
 
-//go:generate mockery -name=Logger -inpkg -case=underscore -testonly
+//go:generate mockery --name=Logger --inpackage --case=underscore --testonly
 
 // Logger ...
 //
@@ -38,7 +38,7 @@ type Logger interface {
 	log.Logger
 }
 
-//go:generate mockery -name=Sleeper -inpkg -case=underscore -testonly
+//go:generate mockery --name=Sleeper --inpackage --case=underscore --testonly
 
 // Sleeper ...
 //
