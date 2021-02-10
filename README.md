@@ -20,10 +20,7 @@ The library that implements crawling of all relative links for specified ones.
   - it's called directly during crawling;
   - handling of links immediately after they have been extracted;
   - passing of the source link in the outer handler;
-  - handling only of unique links (optional):
-    - supporting of sanitizing of a link before checking of uniqueness (optional);
-  - handling only of links allowed by a `robots.txt` file (optional):
-    - customized user agent;
+  - handling links filtered by a custom link filter (optional);
 - custom filtering of considered links:
   - by relativity of a link (optional);
   - by uniqueness of an extracted link (optional):
