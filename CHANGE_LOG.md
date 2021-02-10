@@ -1,5 +1,19 @@
 # Change Log
 
+## [v1.5.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.5.1) (2021-02-10)
+
+- crawling of all relative links for specified ones:
+  - use the `httputils.HTTPClient` interface from the [github.com/thewizardplusplus/go-http-utils](https://github.com/thewizardplusplus/go-http-utils) package;
+- calling of an outer handler for an each found link:
+  - passing a context to the `crawler.LinkHandler` interface;
+  - handling links filtered by a custom link filter (optional):
+    - removing the `handlers.UniqueHandler` structure;
+    - removing the `handlers.RobotsTXTHandler` structure;
+- custom filtering of considered links:
+  - passing a context to the `crawler.LinkChecker` interface;
+  - by a `robots.txt` file (optional):
+    - use the `httputils.HTTPClient` interface from the [github.com/thewizardplusplus/go-http-utils](https://github.com/thewizardplusplus/go-http-utils) package.
+
 ## [v1.5](https://github.com/thewizardplusplus/go-crawler/tree/v1.5) (2021-01-29)
 
 - calling of an outer handler for an each found link:
