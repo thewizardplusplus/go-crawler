@@ -49,6 +49,7 @@ func RunServer() *httptest.Server {
 		request *http.Request,
 	) {
 		if request.URL.Path == "/robots.txt" {
+			// nolint: errcheck
 			fmt.Fprint(writer, `
 				User-agent: go-crawler
 				Disallow: /2
