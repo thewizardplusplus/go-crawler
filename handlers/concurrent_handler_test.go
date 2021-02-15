@@ -33,3 +33,32 @@ func TestConcurrentHandler_HandleLink(test *testing.T) {
 	gotLink := <-handler.links
 	assert.Equal(test, link, gotLink)
 }
+
+func TestConcurrentHandler_Run(test *testing.T) {
+	links := []crawler.SourcedLink{
+		{
+			SourceLink: "http://example.com/",
+			Link:       "http://example.com/1",
+		},
+		{
+			SourceLink: "http://example.com/",
+			Link:       "http://example.com/2",
+		},
+	}
+
+	innerHandler := new(MockLinkHandler)
+	for _, link := range links {
+		innerHandler.On("HandleLink", context.Background(), link).Return()
+	}
+
+	linkChannel := make(chan crawler.SourcedLink, len(links))
+	for _, link := range links {
+		linkChannel <- link
+	}
+	close(linkChannel)
+
+	handler := ConcurrentHandler{linkHandler: innerHandler, links: linkChannel}
+	handler.Run(context.Background())
+
+	mock.AssertExpectationsForObjects(test, innerHandler)
+}
