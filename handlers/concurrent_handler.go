@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"context"
+
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
 
@@ -21,4 +23,12 @@ func NewConcurrentHandler(
 
 		links: make(chan crawler.SourcedLink, bufferSize),
 	}
+}
+
+// HandleLink ...
+func (handler ConcurrentHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
+	handler.links <- link
 }
