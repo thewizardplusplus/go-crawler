@@ -40,7 +40,38 @@ func TestConcurrentHandler_running(test *testing.T) {
 		links      []crawler.SourcedLink
 		runHandler func(ctx context.Context, handler ConcurrentHandler)
 	}{
-		// TODO: Add test cases.
+		{
+			name: "with the Run() method",
+			links: []crawler.SourcedLink{
+				{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/1",
+				},
+				{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/2",
+				},
+			},
+			runHandler: func(ctx context.Context, handler ConcurrentHandler) {
+				handler.Run(ctx)
+			},
+		},
+		{
+			name: "with the RunConcurrently() method",
+			links: []crawler.SourcedLink{
+				{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/1",
+				},
+				{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/2",
+				},
+			},
+			runHandler: func(ctx context.Context, handler ConcurrentHandler) {
+				handler.RunConcurrently(ctx, 10)
+			},
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			innerHandler := new(MockLinkHandler)
