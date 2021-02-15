@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"sync"
 
 	crawler "github.com/thewizardplusplus/go-crawler"
 )
@@ -38,4 +39,23 @@ func (handler ConcurrentHandler) Run(ctx context.Context) {
 	for link := range handler.links {
 		handler.linkHandler.HandleLink(ctx, link)
 	}
+}
+
+// RunConcurrently ...
+func (handler ConcurrentHandler) RunConcurrently(
+	ctx context.Context,
+	concurrencyFactor int,
+) {
+	var waiter sync.WaitGroup
+	waiter.Add(concurrencyFactor)
+
+	for i := 0; i < concurrencyFactor; i++ {
+		go func() {
+			defer waiter.Done()
+
+			handler.Run(ctx)
+		}()
+	}
+
+	waiter.Wait()
 }
