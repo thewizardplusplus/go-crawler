@@ -34,62 +34,32 @@ func TestConcurrentHandler_HandleLink(test *testing.T) {
 	assert.Equal(test, link, gotLink)
 }
 
-func TestConcurrentHandler_Run(test *testing.T) {
-	links := []crawler.SourcedLink{
-		{
-			SourceLink: "http://example.com/",
-			Link:       "http://example.com/1",
-		},
-		{
-			SourceLink: "http://example.com/",
-			Link:       "http://example.com/2",
-		},
+func TestConcurrentHandler_running(test *testing.T) {
+	for _, data := range []struct {
+		name       string
+		links      []crawler.SourcedLink
+		runHandler func(ctx context.Context, handler ConcurrentHandler)
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			innerHandler := new(MockLinkHandler)
+			for _, link := range data.links {
+				innerHandler.On("HandleLink", context.Background(), link).Return()
+			}
+
+			linkChannel := make(chan crawler.SourcedLink, len(data.links))
+			for _, link := range data.links {
+				linkChannel <- link
+			}
+			close(linkChannel)
+
+			handler := ConcurrentHandler{linkHandler: innerHandler, links: linkChannel}
+			data.runHandler(context.Background(), handler)
+
+			mock.AssertExpectationsForObjects(test, innerHandler)
+		})
 	}
-
-	innerHandler := new(MockLinkHandler)
-	for _, link := range links {
-		innerHandler.On("HandleLink", context.Background(), link).Return()
-	}
-
-	linkChannel := make(chan crawler.SourcedLink, len(links))
-	for _, link := range links {
-		linkChannel <- link
-	}
-	close(linkChannel)
-
-	handler := ConcurrentHandler{linkHandler: innerHandler, links: linkChannel}
-	handler.Run(context.Background())
-
-	mock.AssertExpectationsForObjects(test, innerHandler)
-}
-
-func TestConcurrentHandler_RunConcurrently(test *testing.T) {
-	links := []crawler.SourcedLink{
-		{
-			SourceLink: "http://example.com/",
-			Link:       "http://example.com/1",
-		},
-		{
-			SourceLink: "http://example.com/",
-			Link:       "http://example.com/2",
-		},
-	}
-
-	innerHandler := new(MockLinkHandler)
-	for _, link := range links {
-		innerHandler.On("HandleLink", context.Background(), link).Return()
-	}
-
-	linkChannel := make(chan crawler.SourcedLink, len(links))
-	for _, link := range links {
-		linkChannel <- link
-	}
-	close(linkChannel)
-
-	handler := ConcurrentHandler{linkHandler: innerHandler, links: linkChannel}
-	handler.RunConcurrently(context.Background(), 10)
-
-	mock.AssertExpectationsForObjects(test, innerHandler)
 }
 
 func TestConcurrentHandler_Stop(test *testing.T) {
