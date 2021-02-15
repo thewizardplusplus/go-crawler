@@ -71,4 +71,6 @@ func Crawl(
 	)
 
 	waiter.Wait()
+	// it should be called after the waiter.Wait() call
+	close(linkChannel)
 }
