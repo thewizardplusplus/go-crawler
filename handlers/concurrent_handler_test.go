@@ -91,3 +91,17 @@ func TestConcurrentHandler_RunConcurrently(test *testing.T) {
 
 	mock.AssertExpectationsForObjects(test, innerHandler)
 }
+
+func TestConcurrentHandler_Stop(test *testing.T) {
+	links := make(chan crawler.SourcedLink)
+	handler := ConcurrentHandler{links: links}
+	handler.Stop()
+
+	isNotClosed := true
+	select {
+	case _, isNotClosed = <-handler.links:
+	default: // to prevent blocking
+	}
+
+	assert.False(test, isNotClosed)
+}
