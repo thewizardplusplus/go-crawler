@@ -59,3 +59,8 @@ func (handler ConcurrentHandler) RunConcurrently(
 
 	waiter.Wait()
 }
+
+// Stop ...
+func (handler ConcurrentHandler) Stop() {
+	close(handler.links)
+}
