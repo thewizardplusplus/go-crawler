@@ -206,6 +206,170 @@ func main() {
 }
 ```
 
+`crawler.Crawl()` with concurrent handling:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"html/template"
+	stdlog "log"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"runtime"
+	"strings"
+	"time"
+
+	"github.com/go-log/log/print"
+	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/checkers"
+	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/handlers"
+	"github.com/thewizardplusplus/go-crawler/registers"
+	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	htmlselector "github.com/thewizardplusplus/go-html-selector"
+)
+
+type LinkHandler struct {
+	ServerURL string
+}
+
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link crawler.SourcedLink,
+) {
+	fmt.Printf(
+		"have got the link %q from the page %q\n",
+		handler.replaceServerURL(link.Link),
+		handler.replaceServerURL(link.SourceLink),
+	)
+}
+
+// replace the test server URL for reproducibility of the example
+func (handler LinkHandler) replaceServerURL(link string) string {
+	return strings.Replace(link, handler.ServerURL, "http://example.com", -1)
+}
+
+func RunServer() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(
+		writer http.ResponseWriter,
+		request *http.Request,
+	) {
+		if request.URL.Path == "/robots.txt" {
+			// nolint: errcheck
+			fmt.Fprint(writer, `
+				User-agent: go-crawler
+				Disallow: /2
+			`)
+
+			return
+		}
+
+		var links []string
+		switch request.URL.Path {
+		case "/":
+			links = []string{"/1", "/2", "/2", "https://golang.org/"}
+		case "/1":
+			links = []string{"/1/1", "/1/2"}
+		case "/2":
+			links = []string{"/2/1", "/2/2"}
+		}
+		for index := range links {
+			if strings.HasPrefix(links[index], "/") {
+				links[index] = "http://" + request.Host + links[index]
+			}
+		}
+
+		template, _ := template.New("").Parse( // nolint: errcheck
+			`<ul>
+				{{ range $link := . }}
+					<li><a href="{{ $link }}">{{ $link }}</a></li>
+				{{ end }}
+			</ul>`,
+		)
+		template.Execute(writer, links) // nolint: errcheck
+	}))
+}
+
+func main() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	// this context should be shared between the handler
+	// and the crawler.Crawl() call
+	ctx := context.Background()
+	handler := handlers.NewConcurrentHandler(1000, handlers.CheckedHandler{
+		LinkChecker: checkers.DuplicateChecker{
+			LinkRegister: registers.NewLinkRegister(
+				sanitizing.SanitizeLink,
+				wrappedLogger,
+			),
+		},
+		LinkHandler: LinkHandler{
+			ServerURL: server.URL,
+		},
+	})
+	go handler.RunConcurrently(ctx, runtime.NumCPU())
+	// it can be called immediately after the crawler.Crawl() call
+	defer handler.Stop()
+
+	crawler.Crawl(
+		ctx,
+		runtime.NumCPU(),
+		1000,
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.NewDelayingExtractor(
+					time.Second,
+					time.Sleep,
+					extractors.DefaultExtractor{
+						HTTPClient: http.DefaultClient,
+						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+							"a": {"href"},
+						}),
+					},
+				),
+				RepeatCount:  5,
+				RepeatDelay:  0,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.CheckerGroup{
+				checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				checkers.DuplicateChecker{
+					// don't use here the link register from the handler above
+					LinkRegister: registers.NewLinkRegister(
+						sanitizing.SanitizeLink,
+						wrappedLogger,
+					),
+				},
+			},
+			LinkHandler: handler,
+			Logger:      wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+```
+
 `crawler.HandleLinksConcurrently()`:
 
 ```go

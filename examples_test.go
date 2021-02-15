@@ -151,6 +151,81 @@ func ExampleCrawl() {
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
 
+func ExampleCrawl_withConcurrentHandling() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	// this context should be shared between the handler
+	// and the crawler.Crawl() call
+	ctx := context.Background()
+	handler := handlers.NewConcurrentHandler(1000, handlers.CheckedHandler{
+		LinkChecker: checkers.DuplicateChecker{
+			LinkRegister: registers.NewLinkRegister(
+				sanitizing.SanitizeLink,
+				wrappedLogger,
+			),
+		},
+		LinkHandler: LinkHandler{
+			ServerURL: server.URL,
+		},
+	})
+	go handler.RunConcurrently(ctx, runtime.NumCPU())
+	// it can be called immediately after the crawler.Crawl() call
+	defer handler.Stop()
+
+	crawler.Crawl(
+		ctx,
+		runtime.NumCPU(),
+		1000,
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.NewDelayingExtractor(
+					time.Second,
+					time.Sleep,
+					extractors.DefaultExtractor{
+						HTTPClient: http.DefaultClient,
+						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+							"a": {"href"},
+						}),
+					},
+				),
+				RepeatCount:  5,
+				RepeatDelay:  0,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.CheckerGroup{
+				checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				checkers.DuplicateChecker{
+					// don't use here the link register from the handler above
+					LinkRegister: registers.NewLinkRegister(
+						sanitizing.SanitizeLink,
+						wrappedLogger,
+					),
+				},
+			},
+			LinkHandler: handler,
+			Logger:      wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
 func ExampleHandleLinksConcurrently() {
 	server := RunServer()
 	defer server.Close()
