@@ -32,3 +32,10 @@ func (handler ConcurrentHandler) HandleLink(
 ) {
 	handler.links <- link
 }
+
+// Run ...
+func (handler ConcurrentHandler) Run(ctx context.Context) {
+	for link := range handler.links {
+		handler.linkHandler.HandleLink(ctx, link)
+	}
+}
