@@ -10,3 +10,15 @@ type ConcurrentHandler struct {
 
 	links chan crawler.SourcedLink
 }
+
+// NewConcurrentHandler ...
+func NewConcurrentHandler(
+	bufferSize int,
+	linkHandler crawler.LinkHandler,
+) ConcurrentHandler {
+	return ConcurrentHandler{
+		linkHandler: linkHandler,
+
+		links: make(chan crawler.SourcedLink, bufferSize),
+	}
+}
