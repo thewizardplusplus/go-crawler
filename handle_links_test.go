@@ -87,7 +87,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 
 							return checker
 						}(),
-						LinkHandler: func() LinkHandler {
+						LinkHandler: func() models.LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
 								On("HandleLink", context.Background(), models.SourcedLink{
@@ -201,7 +201,7 @@ func TestHandleLinks(test *testing.T) {
 
 							return checker
 						}(),
-						LinkHandler: func() LinkHandler {
+						LinkHandler: func() models.LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
 								On("HandleLink", context.Background(), models.SourcedLink{
@@ -306,7 +306,7 @@ func TestHandleLink(test *testing.T) {
 
 							return checker
 						}(),
-						LinkHandler: func() LinkHandler {
+						LinkHandler: func() models.LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
 								On("HandleLink", context.Background(), models.SourcedLink{
@@ -369,7 +369,7 @@ func TestHandleLink(test *testing.T) {
 
 							return checker
 						}(),
-						LinkHandler: func() LinkHandler {
+						LinkHandler: func() models.LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
 								On("HandleLink", context.Background(), models.SourcedLink{

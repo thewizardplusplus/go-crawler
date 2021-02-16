@@ -4,13 +4,12 @@ import (
 	"context"
 	"sync"
 
-	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // ConcurrentHandler ...
 type ConcurrentHandler struct {
-	linkHandler crawler.LinkHandler
+	linkHandler models.LinkHandler
 
 	links chan models.SourcedLink
 }
@@ -18,7 +17,7 @@ type ConcurrentHandler struct {
 // NewConcurrentHandler ...
 func NewConcurrentHandler(
 	bufferSize int,
-	linkHandler crawler.LinkHandler,
+	linkHandler models.LinkHandler,
 ) ConcurrentHandler {
 	return ConcurrentHandler{
 		linkHandler: linkHandler,

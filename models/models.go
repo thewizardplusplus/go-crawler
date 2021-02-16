@@ -19,3 +19,8 @@ type LinkExtractor interface {
 type LinkChecker interface {
 	CheckLink(ctx context.Context, link SourcedLink) bool
 }
+
+// LinkHandler ...
+type LinkHandler interface {
+	HandleLink(ctx context.Context, link SourcedLink)
+}

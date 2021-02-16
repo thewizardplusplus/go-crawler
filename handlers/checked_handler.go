@@ -3,14 +3,13 @@ package handlers
 import (
 	"context"
 
-	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // CheckedHandler ...
 type CheckedHandler struct {
 	LinkChecker models.LinkChecker
-	LinkHandler crawler.LinkHandler
+	LinkHandler models.LinkHandler
 }
 
 // HandleLink ...

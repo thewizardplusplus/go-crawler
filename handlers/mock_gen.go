@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/models"
 )
 
@@ -22,5 +21,5 @@ type LinkChecker interface {
 // It's used only for mock generating.
 //
 type LinkHandler interface {
-	crawler.LinkHandler
+	models.LinkHandler
 }

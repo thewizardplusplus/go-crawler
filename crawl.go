@@ -9,18 +9,11 @@ import (
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
-//go:generate mockery --name=LinkHandler --inpackage --case=underscore --testonly
-
-// LinkHandler ...
-type LinkHandler interface {
-	HandleLink(ctx context.Context, link models.SourcedLink)
-}
-
 // CrawlDependencies ...
 type CrawlDependencies struct {
 	LinkExtractor models.LinkExtractor
 	LinkChecker   models.LinkChecker
-	LinkHandler   LinkHandler
+	LinkHandler   models.LinkHandler
 	Logger        log.Logger
 }
 

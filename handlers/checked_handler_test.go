@@ -5,14 +5,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
-	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestCheckedHandler_HandleLink(test *testing.T) {
 	type fields struct {
 		LinkChecker models.LinkChecker
-		LinkHandler crawler.LinkHandler
+		LinkHandler models.LinkHandler
 	}
 	type args struct {
 		ctx  context.Context
@@ -38,7 +37,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 
 					return checker
 				}(),
-				LinkHandler: func() crawler.LinkHandler {
+				LinkHandler: func() models.LinkHandler {
 					handler := new(MockLinkHandler)
 					handler.
 						On("HandleLink", context.Background(), models.SourcedLink{
