@@ -36,7 +36,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 		{
 			name: "without failed checkings",
 			checkers: CheckerGroup{
-				func() LinkChecker {
+				func() models.LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
 						On("CheckLink", context.Background(), models.SourcedLink{
@@ -47,7 +47,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 
 					return checker
 				}(),
-				func() LinkChecker {
+				func() models.LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
 						On("CheckLink", context.Background(), models.SourcedLink{
@@ -71,7 +71,7 @@ func TestCheckerGroup_CheckLink(test *testing.T) {
 		{
 			name: "with a failed checking",
 			checkers: CheckerGroup{
-				func() LinkChecker {
+				func() models.LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
 						On("CheckLink", context.Background(), models.SourcedLink{

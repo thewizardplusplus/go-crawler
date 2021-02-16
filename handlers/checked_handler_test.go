@@ -11,7 +11,7 @@ import (
 
 func TestCheckedHandler_HandleLink(test *testing.T) {
 	type fields struct {
-		LinkChecker crawler.LinkChecker
+		LinkChecker models.LinkChecker
 		LinkHandler crawler.LinkHandler
 	}
 	type args struct {
@@ -27,7 +27,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 		{
 			name: "with a passed checking",
 			fields: fields{
-				LinkChecker: func() crawler.LinkChecker {
+				LinkChecker: func() models.LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
 						On("CheckLink", context.Background(), models.SourcedLink{
@@ -61,7 +61,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 		{
 			name: "with a not passed checking",
 			fields: fields{
-				LinkChecker: func() crawler.LinkChecker {
+				LinkChecker: func() models.LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
 						On("CheckLink", context.Background(), models.SourcedLink{

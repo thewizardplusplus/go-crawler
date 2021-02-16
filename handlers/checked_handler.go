@@ -9,7 +9,7 @@ import (
 
 // CheckedHandler ...
 type CheckedHandler struct {
-	LinkChecker crawler.LinkChecker
+	LinkChecker models.LinkChecker
 	LinkHandler crawler.LinkHandler
 }
 

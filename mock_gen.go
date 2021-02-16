@@ -16,6 +16,16 @@ type LinkExtractor interface {
 	models.LinkExtractor
 }
 
+//go:generate mockery --name=LinkChecker --inpackage --case=underscore --testonly
+
+// LinkChecker ...
+//
+// It's used only for mock generating.
+//
+type LinkChecker interface {
+	models.LinkChecker
+}
+
 //go:generate mockery --name=Waiter --inpackage --case=underscore --testonly
 
 // Waiter ...

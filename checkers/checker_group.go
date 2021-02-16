@@ -3,12 +3,11 @@ package checkers
 import (
 	"context"
 
-	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // CheckerGroup ...
-type CheckerGroup []crawler.LinkChecker
+type CheckerGroup []models.LinkChecker
 
 // CheckLink ...
 func (checkers CheckerGroup) CheckLink(

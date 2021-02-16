@@ -2,6 +2,7 @@ package handlers
 
 import (
 	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 //go:generate mockery --name=LinkChecker --inpackage --case=underscore --testonly
@@ -11,7 +12,7 @@ import (
 // It's used only for mock generating.
 //
 type LinkChecker interface {
-	crawler.LinkChecker
+	models.LinkChecker
 }
 
 //go:generate mockery --name=LinkHandler --inpackage --case=underscore --testonly

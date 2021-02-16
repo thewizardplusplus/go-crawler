@@ -62,7 +62,7 @@ func TestCrawl(test *testing.T) {
 
 						return extractor
 					}(),
-					LinkChecker: func() LinkChecker {
+					LinkChecker: func() models.LinkChecker {
 						checker := new(MockLinkChecker)
 						checker.
 							On("CheckLink", context.Background(), models.SourcedLink{
@@ -141,7 +141,7 @@ func TestCrawl(test *testing.T) {
 
 						return extractor
 					}(),
-					LinkChecker: func() LinkChecker {
+					LinkChecker: func() models.LinkChecker {
 						checker := new(MockLinkChecker)
 						checker.
 							On("CheckLink", context.Background(), models.SourcedLink{

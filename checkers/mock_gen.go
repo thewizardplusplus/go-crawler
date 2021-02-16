@@ -2,7 +2,7 @@ package checkers
 
 import (
 	"github.com/go-log/log"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
@@ -13,7 +13,7 @@ import (
 // It's used only for mock generating.
 //
 type LinkChecker interface {
-	crawler.LinkChecker
+	models.LinkChecker
 }
 
 //go:generate mockery --name=Logger --inpackage --case=underscore --testonly

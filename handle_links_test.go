@@ -70,7 +70,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 
 							return extractor
 						}(),
-						LinkChecker: func() LinkChecker {
+						LinkChecker: func() models.LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
 								On("CheckLink", context.Background(), models.SourcedLink{
@@ -184,7 +184,7 @@ func TestHandleLinks(test *testing.T) {
 
 							return extractor
 						}(),
-						LinkChecker: func() LinkChecker {
+						LinkChecker: func() models.LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
 								On("CheckLink", context.Background(), models.SourcedLink{
@@ -289,7 +289,7 @@ func TestHandleLink(test *testing.T) {
 
 							return extractor
 						}(),
-						LinkChecker: func() LinkChecker {
+						LinkChecker: func() models.LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
 								On("CheckLink", context.Background(), models.SourcedLink{
@@ -352,7 +352,7 @@ func TestHandleLink(test *testing.T) {
 
 							return extractor
 						}(),
-						LinkChecker: func() LinkChecker {
+						LinkChecker: func() models.LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
 								On("CheckLink", context.Background(), models.SourcedLink{
