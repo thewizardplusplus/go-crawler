@@ -9,12 +9,12 @@ import (
 	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
-		LinkExtractor crawler.LinkExtractor
+		LinkExtractor models.LinkExtractor
 		RepeatCount   int
 		RepeatDelay   time.Duration
 		Logger        log.Logger
@@ -36,7 +36,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "success on the first repeat",
 			fields: fields{
-				LinkExtractor: func() LinkExtractor {
+				LinkExtractor: func() models.LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
 						On("ExtractLinks", context.Background(), 23, "http://example.com/").
@@ -61,7 +61,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "success on the last repeat",
 			fields: fields{
-				LinkExtractor: func() LinkExtractor {
+				LinkExtractor: func() models.LinkExtractor {
 					var repeat int
 
 					extractor := new(MockLinkExtractor)
@@ -125,7 +125,7 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "error",
 			fields: fields{
-				LinkExtractor: func() LinkExtractor {
+				LinkExtractor: func() models.LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
 						On("ExtractLinks", context.Background(), 23, "http://example.com/").

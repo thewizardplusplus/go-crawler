@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/go-log/log"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
@@ -25,7 +25,7 @@ type HTTPClient interface {
 // It's used only for mock generating.
 //
 type LinkExtractor interface {
-	crawler.LinkExtractor
+	models.LinkExtractor
 }
 
 //go:generate mockery --name=Logger --inpackage --case=underscore --testonly

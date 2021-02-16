@@ -29,7 +29,7 @@ func TestCrawl(test *testing.T) {
 				bufferSize:        1000,
 				links:             []string{"http://example.com/"},
 				dependencies: CrawlDependencies{
-					LinkExtractor: func() LinkExtractor {
+					LinkExtractor: func() models.LinkExtractor {
 						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
 							return threadID >= 0 && threadID < 10
 						})
@@ -108,7 +108,7 @@ func TestCrawl(test *testing.T) {
 				bufferSize:        0,
 				links:             []string{"http://example.com/"},
 				dependencies: CrawlDependencies{
-					LinkExtractor: func() LinkExtractor {
+					LinkExtractor: func() models.LinkExtractor {
 						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
 							return threadID >= 0 && threadID < 10
 						})

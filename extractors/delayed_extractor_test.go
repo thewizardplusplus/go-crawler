@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestNewDelayingExtractor(test *testing.T) {
@@ -32,7 +32,7 @@ func TestDelayingExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
 		minimalDelay  time.Duration
 		sleeper       Sleeper
-		linkExtractor crawler.LinkExtractor
+		linkExtractor models.LinkExtractor
 	}
 	type args struct {
 		ctx      context.Context
@@ -53,7 +53,7 @@ func TestDelayingExtractor_ExtractLinks(test *testing.T) {
 			fields: fields{
 				minimalDelay: 100 * time.Millisecond,
 				sleeper:      new(MockSleeper),
-				linkExtractor: func() LinkExtractor {
+				linkExtractor: func() models.LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
 						On("ExtractLinks", context.Background(), 23, "http://example.com/").
@@ -85,7 +85,7 @@ func TestDelayingExtractor_ExtractLinks(test *testing.T) {
 
 					return sleeper
 				}(),
-				linkExtractor: func() LinkExtractor {
+				linkExtractor: func() models.LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
 						On("ExtractLinks", context.Background(), 23, "http://example.com/").
@@ -110,7 +110,7 @@ func TestDelayingExtractor_ExtractLinks(test *testing.T) {
 			fields: fields{
 				minimalDelay: 100 * time.Millisecond,
 				sleeper:      new(MockSleeper),
-				linkExtractor: func() LinkExtractor {
+				linkExtractor: func() models.LinkExtractor {
 					extractor := new(MockLinkExtractor)
 					extractor.
 						On("ExtractLinks", context.Background(), 23, "http://example.com/").

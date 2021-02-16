@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-log/log"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // SleepHandler ...
@@ -13,7 +13,7 @@ type SleepHandler func(duration time.Duration)
 
 // RepeatingExtractor ...
 type RepeatingExtractor struct {
-	LinkExtractor crawler.LinkExtractor
+	LinkExtractor models.LinkExtractor
 	RepeatCount   int
 	RepeatDelay   time.Duration
 	Logger        log.Logger

@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // DelayingExtractor ...
@@ -13,14 +13,14 @@ type DelayingExtractor struct {
 	timestamps    sync.Map // map[threadID]time.Time
 	minimalDelay  time.Duration
 	sleeper       SleepHandler
-	linkExtractor crawler.LinkExtractor
+	linkExtractor models.LinkExtractor
 }
 
 // NewDelayingExtractor ...
 func NewDelayingExtractor(
 	minimalDelay time.Duration,
 	sleeper SleepHandler,
-	linkExtractor crawler.LinkExtractor,
+	linkExtractor models.LinkExtractor,
 ) *DelayingExtractor {
 	return &DelayingExtractor{
 		minimalDelay:  minimalDelay,

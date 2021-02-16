@@ -9,13 +9,6 @@ import (
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
-//go:generate mockery --name=LinkExtractor --inpackage --case=underscore --testonly
-
-// LinkExtractor ...
-type LinkExtractor interface {
-	ExtractLinks(ctx context.Context, threadID int, link string) ([]string, error)
-}
-
 //go:generate mockery --name=LinkChecker --inpackage --case=underscore --testonly
 
 // LinkChecker ...
@@ -32,7 +25,7 @@ type LinkHandler interface {
 
 // CrawlDependencies ...
 type CrawlDependencies struct {
-	LinkExtractor LinkExtractor
+	LinkExtractor models.LinkExtractor
 	LinkChecker   LinkChecker
 	LinkHandler   LinkHandler
 	Logger        log.Logger

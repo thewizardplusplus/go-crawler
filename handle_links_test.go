@@ -37,7 +37,7 @@ func TestHandleLinksConcurrently(test *testing.T) {
 				}(),
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
-						LinkExtractor: func() LinkExtractor {
+						LinkExtractor: func() models.LinkExtractor {
 							threadIDChecker := mock.MatchedBy(func(threadID int) bool {
 								return threadID >= 0 && threadID < 10
 							})
@@ -170,7 +170,7 @@ func TestHandleLinks(test *testing.T) {
 				}(),
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
-						LinkExtractor: func() LinkExtractor {
+						LinkExtractor: func() models.LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
 								On("ExtractLinks", context.Background(), 23, "http://example.com/").
@@ -281,7 +281,7 @@ func TestHandleLink(test *testing.T) {
 				link:     "http://example.com/",
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
-						LinkExtractor: func() LinkExtractor {
+						LinkExtractor: func() models.LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
 								On("ExtractLinks", context.Background(), 23, "http://example.com/").
@@ -344,7 +344,7 @@ func TestHandleLink(test *testing.T) {
 				link:     "http://example.com/",
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
-						LinkExtractor: func() LinkExtractor {
+						LinkExtractor: func() models.LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
 								On("ExtractLinks", context.Background(), 23, "http://example.com/").
@@ -407,7 +407,7 @@ func TestHandleLink(test *testing.T) {
 				link:     "http://example.com/",
 				dependencies: HandleLinkDependencies{
 					CrawlDependencies: CrawlDependencies{
-						LinkExtractor: func() LinkExtractor {
+						LinkExtractor: func() models.LinkExtractor {
 							extractor := new(MockLinkExtractor)
 							extractor.
 								On("ExtractLinks", context.Background(), 23, "http://example.com/").
