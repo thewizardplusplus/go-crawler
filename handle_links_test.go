@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/thewizardplusplus/go-crawler/models"
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
@@ -72,13 +73,13 @@ func TestHandleLinksConcurrently(test *testing.T) {
 						LinkChecker: func() LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return(true)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).
@@ -89,13 +90,13 @@ func TestHandleLinksConcurrently(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return()
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).
@@ -186,13 +187,13 @@ func TestHandleLinks(test *testing.T) {
 						LinkChecker: func() LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return(true)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).
@@ -203,13 +204,13 @@ func TestHandleLinks(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return()
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).
@@ -291,13 +292,13 @@ func TestHandleLink(test *testing.T) {
 						LinkChecker: func() LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return(true)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).
@@ -308,13 +309,13 @@ func TestHandleLink(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return()
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).
@@ -354,13 +355,13 @@ func TestHandleLink(test *testing.T) {
 						LinkChecker: func() LinkChecker {
 							checker := new(MockLinkChecker)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return(false)
 							checker.
-								On("CheckLink", context.Background(), SourcedLink{
+								On("CheckLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).
@@ -371,13 +372,13 @@ func TestHandleLink(test *testing.T) {
 						LinkHandler: func() LinkHandler {
 							handler := new(MockLinkHandler)
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/1",
 								}).
 								Return()
 							handler.
-								On("HandleLink", context.Background(), SourcedLink{
+								On("HandleLink", context.Background(), models.SourcedLink{
 									SourceLink: "http://example.com/",
 									Link:       "http://example.com/2",
 								}).

@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestCheckedHandler_HandleLink(test *testing.T) {
@@ -15,7 +16,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		link crawler.SourcedLink
+		link models.SourcedLink
 	}
 
 	for _, data := range []struct {
@@ -29,7 +30,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 				LinkChecker: func() crawler.LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
-						On("CheckLink", context.Background(), crawler.SourcedLink{
+						On("CheckLink", context.Background(), models.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/test",
 						}).
@@ -40,7 +41,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 				LinkHandler: func() crawler.LinkHandler {
 					handler := new(MockLinkHandler)
 					handler.
-						On("HandleLink", context.Background(), crawler.SourcedLink{
+						On("HandleLink", context.Background(), models.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/test",
 						}).
@@ -51,7 +52,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				link: crawler.SourcedLink{
+				link: models.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
 				},
@@ -63,7 +64,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 				LinkChecker: func() crawler.LinkChecker {
 					checker := new(MockLinkChecker)
 					checker.
-						On("CheckLink", context.Background(), crawler.SourcedLink{
+						On("CheckLink", context.Background(), models.SourcedLink{
 							SourceLink: "http://example.com/",
 							Link:       "http://example.com/test",
 						}).
@@ -75,7 +76,7 @@ func TestCheckedHandler_HandleLink(test *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				link: crawler.SourcedLink{
+				link: models.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
 				},

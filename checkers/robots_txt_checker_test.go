@@ -13,7 +13,7 @@ import (
 	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 )
 
@@ -25,7 +25,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		link crawler.SourcedLink
+		link models.SourcedLink
 	}
 
 	for _, data := range []struct {
@@ -68,7 +68,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				link: crawler.SourcedLink{
+				link: models.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
 				},
@@ -109,7 +109,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				link: crawler.SourcedLink{
+				link: models.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
 				},
@@ -150,7 +150,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				link: crawler.SourcedLink{
+				link: models.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/test",
 				},
@@ -178,7 +178,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				link: crawler.SourcedLink{
+				link: models.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       ":",
 				},
@@ -218,7 +218,7 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				link: crawler.SourcedLink{
+				link: models.SourcedLink{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/post/23",
 				},

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // CheckedHandler ...
@@ -15,7 +16,7 @@ type CheckedHandler struct {
 // HandleLink ...
 func (handler CheckedHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	if !handler.LinkChecker.CheckLink(ctx, link) {
 		return

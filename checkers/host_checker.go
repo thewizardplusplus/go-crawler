@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/go-log/log"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // HostChecker ...
@@ -16,7 +16,7 @@ type HostChecker struct {
 // CheckLink ...
 func (checker HostChecker) CheckLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) bool {
 	parsedSourceLink, err := url.Parse(link.SourceLink)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/go-log/log"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 )
 
@@ -19,7 +19,7 @@ type RobotsTXTChecker struct {
 // CheckLink ...
 func (checker RobotsTXTChecker) CheckLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) bool {
 	parsedLink, err := url.Parse(link.Link)
 	if err != nil {

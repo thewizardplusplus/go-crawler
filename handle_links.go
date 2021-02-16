@@ -3,6 +3,7 @@ package crawler
 import (
 	"context"
 
+	"github.com/thewizardplusplus/go-crawler/models"
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
@@ -60,7 +61,7 @@ func HandleLink(
 
 	var checkedExtractedLinks []string
 	for _, extractedLink := range extractedLinks {
-		sourcedLink := SourcedLink{SourceLink: link, Link: extractedLink}
+		sourcedLink := models.SourcedLink{SourceLink: link, Link: extractedLink}
 		dependencies.LinkHandler.HandleLink(ctx, sourcedLink)
 
 		if !dependencies.LinkChecker.CheckLink(ctx, sourcedLink) {

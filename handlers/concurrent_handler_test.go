@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestNewConcurrentHandler(test *testing.T) {
@@ -21,12 +21,12 @@ func TestNewConcurrentHandler(test *testing.T) {
 }
 
 func TestConcurrentHandler_HandleLink(test *testing.T) {
-	link := crawler.SourcedLink{
+	link := models.SourcedLink{
 		SourceLink: "http://example.com/",
 		Link:       "http://example.com/test",
 	}
 
-	links := make(chan crawler.SourcedLink, 1)
+	links := make(chan models.SourcedLink, 1)
 	handler := ConcurrentHandler{links: links}
 	handler.HandleLink(context.Background(), link)
 
@@ -37,12 +37,12 @@ func TestConcurrentHandler_HandleLink(test *testing.T) {
 func TestConcurrentHandler_running(test *testing.T) {
 	for _, data := range []struct {
 		name       string
-		links      []crawler.SourcedLink
+		links      []models.SourcedLink
 		runHandler func(ctx context.Context, handler ConcurrentHandler)
 	}{
 		{
 			name: "with the Run() method",
-			links: []crawler.SourcedLink{
+			links: []models.SourcedLink{
 				{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/1",
@@ -58,7 +58,7 @@ func TestConcurrentHandler_running(test *testing.T) {
 		},
 		{
 			name: "with the RunConcurrently() method",
-			links: []crawler.SourcedLink{
+			links: []models.SourcedLink{
 				{
 					SourceLink: "http://example.com/",
 					Link:       "http://example.com/1",
@@ -79,7 +79,7 @@ func TestConcurrentHandler_running(test *testing.T) {
 				innerHandler.On("HandleLink", context.Background(), link).Return()
 			}
 
-			linkChannel := make(chan crawler.SourcedLink, len(data.links))
+			linkChannel := make(chan models.SourcedLink, len(data.links))
 			for _, link := range data.links {
 				linkChannel <- link
 			}
@@ -94,7 +94,7 @@ func TestConcurrentHandler_running(test *testing.T) {
 }
 
 func TestConcurrentHandler_Stop(test *testing.T) {
-	links := make(chan crawler.SourcedLink)
+	links := make(chan models.SourcedLink)
 	handler := ConcurrentHandler{links: links}
 	handler.Stop()
 

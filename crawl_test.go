@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestCrawl(test *testing.T) {
@@ -64,13 +65,13 @@ func TestCrawl(test *testing.T) {
 					LinkChecker: func() LinkChecker {
 						checker := new(MockLinkChecker)
 						checker.
-							On("CheckLink", context.Background(), SourcedLink{
+							On("CheckLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/1",
 							}).
 							Return(true)
 						checker.
-							On("CheckLink", context.Background(), SourcedLink{
+							On("CheckLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/2",
 							}).
@@ -81,13 +82,13 @@ func TestCrawl(test *testing.T) {
 					LinkHandler: func() LinkHandler {
 						handler := new(MockLinkHandler)
 						handler.
-							On("HandleLink", context.Background(), SourcedLink{
+							On("HandleLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/1",
 							}).
 							Return()
 						handler.
-							On("HandleLink", context.Background(), SourcedLink{
+							On("HandleLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/2",
 							}).
@@ -143,13 +144,13 @@ func TestCrawl(test *testing.T) {
 					LinkChecker: func() LinkChecker {
 						checker := new(MockLinkChecker)
 						checker.
-							On("CheckLink", context.Background(), SourcedLink{
+							On("CheckLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/1",
 							}).
 							Return(true)
 						checker.
-							On("CheckLink", context.Background(), SourcedLink{
+							On("CheckLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/2",
 							}).
@@ -160,13 +161,13 @@ func TestCrawl(test *testing.T) {
 					LinkHandler: func() LinkHandler {
 						handler := new(MockLinkHandler)
 						handler.
-							On("HandleLink", context.Background(), SourcedLink{
+							On("HandleLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/1",
 							}).
 							Return()
 						handler.
-							On("HandleLink", context.Background(), SourcedLink{
+							On("HandleLink", context.Background(), models.SourcedLink{
 								SourceLink: "http://example.com/",
 								Link:       "http://example.com/2",
 							}).

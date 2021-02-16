@@ -85,6 +85,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/register"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -93,7 +94,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
@@ -231,6 +232,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -239,7 +241,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
@@ -393,6 +395,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -401,7 +404,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
@@ -531,6 +534,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/register"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -539,7 +543,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
@@ -676,6 +680,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/register"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -684,7 +689,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
@@ -829,6 +834,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/register"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -837,7 +843,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
@@ -984,6 +990,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -992,7 +999,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",
@@ -1134,6 +1141,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -1142,7 +1150,7 @@ type LinkHandler struct {
 
 func (handler LinkHandler) HandleLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) {
 	fmt.Printf(
 		"have got the link %q from the page %q\n",

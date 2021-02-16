@@ -4,6 +4,7 @@ import (
 	"context"
 
 	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // CheckerGroup ...
@@ -12,7 +13,7 @@ type CheckerGroup []crawler.LinkChecker
 // CheckLink ...
 func (checkers CheckerGroup) CheckLink(
 	ctx context.Context,
-	link crawler.SourcedLink,
+	link models.SourcedLink,
 ) bool {
 	for _, checker := range checkers {
 		if !checker.CheckLink(ctx, link) {

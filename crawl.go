@@ -5,14 +5,9 @@ import (
 	"sync"
 
 	"github.com/go-log/log"
+	"github.com/thewizardplusplus/go-crawler/models"
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
-
-// SourcedLink ...
-type SourcedLink struct {
-	SourceLink string
-	Link       string
-}
 
 //go:generate mockery --name=LinkExtractor --inpackage --case=underscore --testonly
 
@@ -25,14 +20,14 @@ type LinkExtractor interface {
 
 // LinkChecker ...
 type LinkChecker interface {
-	CheckLink(ctx context.Context, link SourcedLink) bool
+	CheckLink(ctx context.Context, link models.SourcedLink) bool
 }
 
 //go:generate mockery --name=LinkHandler --inpackage --case=underscore --testonly
 
 // LinkHandler ...
 type LinkHandler interface {
-	HandleLink(ctx context.Context, link SourcedLink)
+	HandleLink(ctx context.Context, link models.SourcedLink)
 }
 
 // CrawlDependencies ...
