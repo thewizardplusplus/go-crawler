@@ -27,12 +27,11 @@ type CrawlDependencies struct {
 // Crawl ...
 func Crawl(
 	ctx context.Context,
-	concurrencyFactor int,
-	bufferSize int,
+	concurrencyConfig ConcurrencyConfig,
 	links []string,
 	dependencies CrawlDependencies,
 ) {
-	linkChannel := make(chan string, bufferSize)
+	linkChannel := make(chan string, concurrencyConfig.BufferSize)
 	for _, link := range links {
 		// use unbounded sending to avoid a deadlock
 		syncutils.UnboundedSend(linkChannel, link)
@@ -43,7 +42,7 @@ func Crawl(
 
 	HandleLinksConcurrently(
 		ctx,
-		concurrencyFactor,
+		concurrencyConfig.ConcurrencyFactor,
 		linkChannel,
 		HandleLinkDependencies{
 			CrawlDependencies: dependencies,
@@ -71,7 +70,11 @@ func CrawlByConcurrentHandler(
 	go concurrentHandler.RunConcurrently(ctx, handlerConcurrencyFactor)
 	defer concurrentHandler.Stop()
 
-	Crawl(ctx, concurrencyFactor, bufferSize, links, CrawlDependencies{
+	concurrencyConfig := ConcurrencyConfig{
+		ConcurrencyFactor: concurrencyFactor,
+		BufferSize:        bufferSize,
+	}
+	Crawl(ctx, concurrencyConfig, links, CrawlDependencies{
 		LinkExtractor: dependencies.LinkExtractor,
 		LinkChecker:   dependencies.LinkChecker,
 		LinkHandler:   concurrentHandler,

@@ -11,8 +11,7 @@ import (
 func TestCrawl(test *testing.T) {
 	type args struct {
 		ctx               context.Context
-		concurrencyFactor int
-		bufferSize        int
+		concurrencyConfig ConcurrencyConfig
 		links             []string
 		dependencies      CrawlDependencies
 	}
@@ -24,10 +23,12 @@ func TestCrawl(test *testing.T) {
 		{
 			name: "success with fewer links than the buffer size",
 			args: args{
-				ctx:               context.Background(),
-				concurrencyFactor: 10,
-				bufferSize:        1000,
-				links:             []string{"http://example.com/"},
+				ctx: context.Background(),
+				concurrencyConfig: ConcurrencyConfig{
+					ConcurrencyFactor: 10,
+					BufferSize:        1000,
+				},
+				links: []string{"http://example.com/"},
 				dependencies: CrawlDependencies{
 					LinkExtractor: func() models.LinkExtractor {
 						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
@@ -103,10 +104,12 @@ func TestCrawl(test *testing.T) {
 		{
 			name: "success without a buffer",
 			args: args{
-				ctx:               context.Background(),
-				concurrencyFactor: 10,
-				bufferSize:        0,
-				links:             []string{"http://example.com/"},
+				ctx: context.Background(),
+				concurrencyConfig: ConcurrencyConfig{
+					ConcurrencyFactor: 10,
+					BufferSize:        0,
+				},
+				links: []string{"http://example.com/"},
 				dependencies: CrawlDependencies{
 					LinkExtractor: func() models.LinkExtractor {
 						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
@@ -183,8 +186,7 @@ func TestCrawl(test *testing.T) {
 		test.Run(data.name, func(t *testing.T) {
 			Crawl(
 				data.args.ctx,
-				data.args.concurrencyFactor,
-				data.args.bufferSize,
+				data.args.concurrencyConfig,
 				data.args.links,
 				data.args.dependencies,
 			)
