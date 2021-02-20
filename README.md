@@ -21,6 +21,7 @@ The library that implements crawling of all relative links for specified ones.
   - handling of links immediately after they have been extracted;
   - passing of the source link in the outer handler;
   - handling links filtered by a custom link filter (optional);
+  - handling links concurrently (optional);
 - custom filtering of considered links:
   - by relativity of a link (optional);
   - by uniqueness of an extracted link (optional):
