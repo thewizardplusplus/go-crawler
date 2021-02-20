@@ -308,10 +308,14 @@ func main() {
 
 	crawler.CrawlByConcurrentHandler(
 		context.Background(),
-		runtime.NumCPU(),
-		1000,
-		runtime.NumCPU(),
-		1000,
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
 		[]string{server.URL},
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{

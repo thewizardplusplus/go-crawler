@@ -205,10 +205,8 @@ func TestCrawl(test *testing.T) {
 func TestCrawlByConcurrentHandler(test *testing.T) {
 	type args struct {
 		ctx                      context.Context
-		concurrencyFactor        int
-		bufferSize               int
-		handlerConcurrencyFactor int
-		handlerBufferSize        int
+		concurrencyConfig        ConcurrencyConfig
+		handlerConcurrencyConfig ConcurrencyConfig
 		links                    []string
 		dependencies             CrawlDependencies
 	}
@@ -220,12 +218,16 @@ func TestCrawlByConcurrentHandler(test *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx:                      context.Background(),
-				concurrencyFactor:        10,
-				bufferSize:               1000,
-				handlerConcurrencyFactor: 10,
-				handlerBufferSize:        1000,
-				links:                    []string{"http://example.com/"},
+				ctx: context.Background(),
+				concurrencyConfig: ConcurrencyConfig{
+					ConcurrencyFactor: 10,
+					BufferSize:        1000,
+				},
+				handlerConcurrencyConfig: ConcurrencyConfig{
+					ConcurrencyFactor: 10,
+					BufferSize:        1000,
+				},
+				links: []string{"http://example.com/"},
 				dependencies: CrawlDependencies{
 					LinkExtractor: func() models.LinkExtractor {
 						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
@@ -302,10 +304,8 @@ func TestCrawlByConcurrentHandler(test *testing.T) {
 		test.Run(data.name, func(test *testing.T) {
 			CrawlByConcurrentHandler(
 				data.args.ctx,
-				data.args.concurrencyFactor,
-				data.args.bufferSize,
-				data.args.handlerConcurrencyFactor,
-				data.args.handlerBufferSize,
+				data.args.concurrencyConfig,
+				data.args.handlerConcurrencyConfig,
 				data.args.links,
 				data.args.dependencies,
 			)

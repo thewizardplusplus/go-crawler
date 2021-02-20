@@ -58,22 +58,19 @@ func Crawl(
 // CrawlByConcurrentHandler ...
 func CrawlByConcurrentHandler(
 	ctx context.Context,
-	concurrencyFactor int,
-	bufferSize int,
-	handlerConcurrencyFactor int,
-	handlerBufferSize int,
+	concurrencyConfig ConcurrencyConfig,
+	handlerConcurrencyConfig ConcurrencyConfig,
 	links []string,
 	dependencies CrawlDependencies,
 ) {
+	handlerConcurrencyFactor, handlerBufferSize :=
+		handlerConcurrencyConfig.ConcurrencyFactor,
+		handlerConcurrencyConfig.BufferSize
 	concurrentHandler :=
 		handlers.NewConcurrentHandler(handlerBufferSize, dependencies.LinkHandler)
 	go concurrentHandler.RunConcurrently(ctx, handlerConcurrencyFactor)
 	defer concurrentHandler.Stop()
 
-	concurrencyConfig := ConcurrencyConfig{
-		ConcurrencyFactor: concurrencyFactor,
-		BufferSize:        bufferSize,
-	}
 	Crawl(ctx, concurrencyConfig, links, CrawlDependencies{
 		LinkExtractor: dependencies.LinkExtractor,
 		LinkChecker:   dependencies.LinkChecker,
