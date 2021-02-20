@@ -215,7 +215,87 @@ func TestCrawlByConcurrentHandler(test *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			args: args{
+				ctx:                      context.Background(),
+				concurrencyFactor:        10,
+				bufferSize:               1000,
+				handlerConcurrencyFactor: 10,
+				handlerBufferSize:        1000,
+				links:                    []string{"http://example.com/"},
+				dependencies: CrawlDependencies{
+					LinkExtractor: func() models.LinkExtractor {
+						threadIDChecker := mock.MatchedBy(func(threadID int) bool {
+							return threadID >= 0 && threadID < 10
+						})
+
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/",
+							).
+							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+						extractor.
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/1",
+							).
+							Return(nil, nil)
+						extractor.
+							On(
+								"ExtractLinks",
+								context.Background(),
+								threadIDChecker,
+								"http://example.com/2",
+							).
+							Return(nil, nil)
+
+						return extractor
+					}(),
+					LinkChecker: func() models.LinkChecker {
+						checker := new(MockLinkChecker)
+						checker.
+							On("CheckLink", context.Background(), models.SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/1",
+							}).
+							Return(true)
+						checker.
+							On("CheckLink", context.Background(), models.SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/2",
+							}).
+							Return(true)
+
+						return checker
+					}(),
+					LinkHandler: func() models.LinkHandler {
+						handler := new(MockLinkHandler)
+						handler.
+							On("HandleLink", context.Background(), models.SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/1",
+							}).
+							Return()
+						handler.
+							On("HandleLink", context.Background(), models.SourcedLink{
+								SourceLink: "http://example.com/",
+								Link:       "http://example.com/2",
+							}).
+							Return()
+
+						return handler
+					}(),
+					Logger: new(MockLogger),
+				},
+			},
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			CrawlByConcurrentHandler(
