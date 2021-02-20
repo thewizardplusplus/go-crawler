@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/go-log/log"
+	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
@@ -47,4 +48,27 @@ func Crawl(
 	waiter.Wait()
 	// it should be called after the waiter.Wait() call
 	close(linkChannel)
+}
+
+// CrawlByConcurrentHandler ...
+func CrawlByConcurrentHandler(
+	ctx context.Context,
+	concurrencyFactor int,
+	bufferSize int,
+	handlerConcurrencyFactor int,
+	handlerBufferSize int,
+	links []string,
+	dependencies CrawlDependencies,
+) {
+	concurrentHandler :=
+		handlers.NewConcurrentHandler(handlerBufferSize, dependencies.LinkHandler)
+	go concurrentHandler.RunConcurrently(ctx, handlerConcurrencyFactor)
+	defer concurrentHandler.Stop()
+
+	Crawl(ctx, concurrencyFactor, bufferSize, links, CrawlDependencies{
+		LinkExtractor: dependencies.LinkExtractor,
+		LinkChecker:   dependencies.LinkChecker,
+		LinkHandler:   concurrentHandler,
+		Logger:        dependencies.Logger,
+	})
 }
