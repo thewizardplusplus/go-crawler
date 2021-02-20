@@ -199,3 +199,42 @@ func TestCrawl(test *testing.T) {
 		})
 	}
 }
+
+func TestCrawlByConcurrentHandler(test *testing.T) {
+	type args struct {
+		ctx                      context.Context
+		concurrencyFactor        int
+		bufferSize               int
+		handlerConcurrencyFactor int
+		handlerBufferSize        int
+		links                    []string
+		dependencies             CrawlDependencies
+	}
+
+	for _, data := range []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			CrawlByConcurrentHandler(
+				data.args.ctx,
+				data.args.concurrencyFactor,
+				data.args.bufferSize,
+				data.args.handlerConcurrencyFactor,
+				data.args.handlerBufferSize,
+				data.args.links,
+				data.args.dependencies,
+			)
+
+			mock.AssertExpectationsForObjects(
+				test,
+				data.args.dependencies.LinkExtractor,
+				data.args.dependencies.LinkChecker,
+				data.args.dependencies.LinkHandler,
+				data.args.dependencies.Logger,
+			)
+		})
+	}
+}
