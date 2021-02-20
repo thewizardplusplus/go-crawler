@@ -10,6 +10,12 @@ import (
 	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
 
+// ConcurrencyConfig ...
+type ConcurrencyConfig struct {
+	ConcurrencyFactor int
+	BufferSize        int
+}
+
 // CrawlDependencies ...
 type CrawlDependencies struct {
 	LinkExtractor models.LinkExtractor
