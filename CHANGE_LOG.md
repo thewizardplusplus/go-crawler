@@ -1,5 +1,20 @@
 # Change Log
 
+## [v1.6](https://github.com/thewizardplusplus/go-crawler/tree/v1.6) (2021-02-20)
+
+- calling of an outer handler for an each found link:
+  - handling links concurrently (optional);
+- refactoring:
+  - extracting the `models` package:
+    - `SourcedLink` structure;
+    - `LinkExtractor` interface;
+    - `LinkChecker` interface;
+    - `LinkHandler` interface;
+  - crawling of all relative links for specified ones:
+    - unioning concurrency parameters in the `crawler.ConcurrencyConfig` structure;
+    - removing a leak of goroutines from the `crawler.Crawl()` function;
+    - adding the `crawler.CrawlByConcurrentHandler()` function that triggers crawling using a concurrent handler.
+
 ## [v1.5.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.5.1) (2021-02-10)
 
 - crawling of all relative links for specified ones:
