@@ -160,26 +160,10 @@ func ExampleCrawl_withConcurrentHandling() {
 	// wrap the standard logger via the github.com/go-log/log package
 	wrappedLogger := print.New(logger)
 
-	// this context should be shared between the handler
-	// and the crawler.Crawl() call
-	ctx := context.Background()
-	handler := handlers.NewConcurrentHandler(1000, handlers.CheckedHandler{
-		LinkChecker: checkers.DuplicateChecker{
-			LinkRegister: registers.NewLinkRegister(
-				sanitizing.SanitizeLink,
-				wrappedLogger,
-			),
-		},
-		LinkHandler: LinkHandler{
-			ServerURL: server.URL,
-		},
-	})
-	go handler.RunConcurrently(ctx, runtime.NumCPU())
-	// it can be called immediately after the crawler.Crawl() call
-	defer handler.Stop()
-
-	crawler.Crawl(
-		ctx,
+	crawler.CrawlByConcurrentHandler(
+		context.Background(),
+		runtime.NumCPU(),
+		1000,
 		runtime.NumCPU(),
 		1000,
 		[]string{server.URL},
@@ -205,15 +189,25 @@ func ExampleCrawl_withConcurrentHandling() {
 					Logger: wrappedLogger,
 				},
 				checkers.DuplicateChecker{
-					// don't use here the link register from the handler above
 					LinkRegister: registers.NewLinkRegister(
 						sanitizing.SanitizeLink,
 						wrappedLogger,
 					),
 				},
 			},
-			LinkHandler: handler,
-			Logger:      wrappedLogger,
+			LinkHandler: handlers.CheckedHandler{
+				LinkChecker: checkers.DuplicateChecker{
+					// don't use here the link register from the duplicate checker above
+					LinkRegister: registers.NewLinkRegister(
+						sanitizing.SanitizeLink,
+						wrappedLogger,
+					),
+				},
+				LinkHandler: LinkHandler{
+					ServerURL: server.URL,
+				},
+			},
+			Logger: wrappedLogger,
 		},
 	)
 
