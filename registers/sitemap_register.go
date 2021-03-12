@@ -20,6 +20,32 @@ type SitemapRegister struct {
 	registeredSitemaps *sync.Map
 }
 
+// RegisterSitemap ...
+func (register SitemapRegister) RegisterSitemap(
+	ctx context.Context,
+	link string,
+) (
+	sitemap.Sitemap,
+	error,
+) {
+	sitemapLinks, err := register.linkGenerator.GenerateLinks(link)
+	if err != nil {
+		return sitemap.Sitemap{}, errors.Wrap(err, "unable to generate Sitemap links")
+	}
+
+	var totalSitemapData sitemap.Sitemap
+	for _, sitemapLink := range sitemapLinks {
+		sitemapData, err := register.loadSitemapData(ctx, sitemapLink)
+		if err != nil {
+			return sitemap.Sitemap{}, err
+		}
+
+		totalSitemapData.URL = append(totalSitemapData.URL, sitemapData.URL...)
+	}
+
+	return totalSitemapData, nil
+}
+
 func (register SitemapRegister) loadSitemapData(
 	ctx context.Context,
 	sitemapLink string,
