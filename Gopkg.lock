@@ -324,6 +324,14 @@
   version = "v2.0.2"
 
 [[projects]]
+  digest = "1:7f46141877bbaeb901fef0fc21b5ce66c4b51293dad5adca6f714bd26b476bd0"
+  name = "github.com/yterajima/go-sitemap"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2eb384a3d049da294e409b7cab88bc9313c7b078"
+  version = "v0.2.2"
+
+[[projects]]
   branch = "master"
   digest = "1:c9d0c7346c55bc13efdb3dbf13938e909d22a7a7bf115af69a79e25553513bd0"
   name = "golang.org/x/crypto"
@@ -477,6 +485,7 @@
     "github.com/thewizardplusplus/go-http-utils",
     "github.com/thewizardplusplus/go-sync-utils",
     "github.com/vektra/mockery/cmd",
+    "github.com/yterajima/go-sitemap",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
