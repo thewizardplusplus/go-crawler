@@ -2,8 +2,10 @@ package registers
 
 import (
 	"context"
+	"encoding/xml"
 	"sync"
 	"testing"
+	"testing/iotest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -27,7 +29,105 @@ func TestSitemapRegister_loadSitemapData(test *testing.T) {
 		wantSitemapData sitemap.Sitemap
 		wantErr         assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success with an unregistered Sitemap link",
+			fields: fields{
+				linkLoader: func() LinkLoader {
+					const response = `
+						<?xml version="1.0" encoding="UTF-8" ?>
+						<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+							<url>
+								<loc>http://example.com/1</loc>
+							</url>
+							<url>
+								<loc>http://example.com/2</loc>
+							</url>
+						</urlset>
+					`
+
+					linkLoader := new(MockLinkLoader)
+					linkLoader.
+						On("LoadLink", "http://example.com/sitemap.xml", context.Background()).
+						Return([]byte(response), nil)
+
+					return linkLoader
+				}(),
+				registeredSitemaps: new(sync.Map),
+			},
+			args: args{
+				ctx:         context.Background(),
+				sitemapLink: "http://example.com/sitemap.xml",
+			},
+			wantSitemapData: sitemap.Sitemap{
+				XMLName: xml.Name{
+					Space: "http://www.sitemaps.org/schemas/sitemap/0.9",
+					Local: "urlset",
+				},
+				URL: []sitemap.URL{
+					{Loc: "http://example.com/1"},
+					{Loc: "http://example.com/2"},
+				},
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "success with a registered Sitemap link",
+			fields: fields{
+				linkLoader: new(MockLinkLoader),
+				registeredSitemaps: func() *sync.Map {
+					sitemapData := sitemap.Sitemap{
+						XMLName: xml.Name{
+							Space: "http://www.sitemaps.org/schemas/sitemap/0.9",
+							Local: "urlset",
+						},
+						URL: []sitemap.URL{
+							{Loc: "http://example.com/1"},
+							{Loc: "http://example.com/2"},
+						},
+					}
+
+					registeredSitemaps := new(sync.Map)
+					registeredSitemaps.Store("http://example.com/sitemap.xml", sitemapData)
+
+					return registeredSitemaps
+				}(),
+			},
+			args: args{
+				ctx:         context.Background(),
+				sitemapLink: "http://example.com/sitemap.xml",
+			},
+			wantSitemapData: sitemap.Sitemap{
+				XMLName: xml.Name{
+					Space: "http://www.sitemaps.org/schemas/sitemap/0.9",
+					Local: "urlset",
+				},
+				URL: []sitemap.URL{
+					{Loc: "http://example.com/1"},
+					{Loc: "http://example.com/2"},
+				},
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "error",
+			fields: fields{
+				linkLoader: func() LinkLoader {
+					linkLoader := new(MockLinkLoader)
+					linkLoader.
+						On("LoadLink", "http://example.com/sitemap.xml", context.Background()).
+						Return(nil, iotest.ErrTimeout)
+
+					return linkLoader
+				}(),
+				registeredSitemaps: new(sync.Map),
+			},
+			args: args{
+				ctx:         context.Background(),
+				sitemapLink: "http://example.com/sitemap.xml",
+			},
+			wantSitemapData: sitemap.Sitemap{},
+			wantErr:         assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			sitemap.SetFetch(data.fields.linkLoader.LoadLink)
