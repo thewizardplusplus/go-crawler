@@ -9,6 +9,8 @@ import (
 	"github.com/yterajima/go-sitemap"
 )
 
+//go:generate mockery --name=LinkGenerator --inpackage --case=underscore --testonly
+
 // LinkGenerator ...
 type LinkGenerator interface {
 	GenerateLinks(baseLink string) ([]string, error)
