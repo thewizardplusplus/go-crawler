@@ -24,3 +24,13 @@ type Logger interface {
 type HTTPClient interface {
 	httputils.HTTPClient
 }
+
+//go:generate mockery --name=LinkLoader --inpackage --case=underscore --testonly
+
+// LinkLoader ...
+//
+// It's used only for mock generating.
+//
+type LinkLoader interface {
+	LoadLink(link string, options interface{}) ([]byte, error)
+}
