@@ -7,10 +7,55 @@ import (
 	"testing"
 	"testing/iotest"
 
+	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/yterajima/go-sitemap"
 )
+
+func TestSitemapRegister_RegisterSitemap(test *testing.T) {
+	type fields struct {
+		linkGenerator      LinkGenerator
+		linkLoader         LinkLoader
+		logger             log.Logger
+		registeredSitemaps *sync.Map
+	}
+	type args struct {
+		ctx  context.Context
+		link string
+	}
+
+	for _, data := range []struct {
+		name            string
+		fields          fields
+		args            args
+		wantSitemapData sitemap.Sitemap
+		wantErr         assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			sitemap.SetFetch(data.fields.linkLoader.LoadLink)
+
+			register := SitemapRegister{
+				linkGenerator:      data.fields.linkGenerator,
+				logger:             data.fields.logger,
+				registeredSitemaps: data.fields.registeredSitemaps,
+			}
+			gotSitemapData, gotErr :=
+				register.RegisterSitemap(data.args.ctx, data.args.link)
+
+			mock.AssertExpectationsForObjects(
+				test,
+				data.fields.linkGenerator,
+				data.fields.linkLoader,
+				data.fields.logger,
+			)
+			assert.Equal(test, data.wantSitemapData, gotSitemapData)
+			data.wantErr(test, gotErr)
+		})
+	}
+}
 
 func TestSitemapRegister_loadSitemapData(test *testing.T) {
 	type fields struct {
