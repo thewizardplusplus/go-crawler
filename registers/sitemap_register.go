@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/go-log/log"
 	"github.com/pkg/errors"
 	"github.com/yterajima/go-sitemap"
 )
@@ -16,6 +17,7 @@ type LinkGenerator interface {
 // SitemapRegister ...
 type SitemapRegister struct {
 	linkGenerator LinkGenerator
+	logger        log.Logger
 
 	registeredSitemaps *sync.Map
 }
@@ -37,7 +39,10 @@ func (register SitemapRegister) RegisterSitemap(
 	for _, sitemapLink := range sitemapLinks {
 		sitemapData, err := register.loadSitemapData(ctx, sitemapLink)
 		if err != nil {
-			return sitemap.Sitemap{}, err
+			register.logger.
+				Logf("unable to process the Sitemap link %q: %s", sitemapLink, err)
+
+			continue
 		}
 
 		totalSitemapData.URL = append(totalSitemapData.URL, sitemapData.URL...)
