@@ -26,9 +26,8 @@ func TestNewLinkRegister(test *testing.T) {
 
 func TestLinkRegister_RegisterLink(test *testing.T) {
 	type fields struct {
-		sanitizeLink sanitizing.LinkSanitizing
-		logger       log.Logger
-
+		sanitizeLink    sanitizing.LinkSanitizing
+		logger          log.Logger
 		registeredLinks mapset.Set
 	}
 	type args struct {
@@ -46,7 +45,6 @@ func TestLinkRegister_RegisterLink(test *testing.T) {
 			fields: fields{
 				sanitizeLink: sanitizing.DoNotSanitizeLink,
 				logger:       new(MockLogger),
-
 				registeredLinks: mapset.NewSet(
 					"http://example.com/1",
 					"http://example.com/2",
@@ -62,7 +60,6 @@ func TestLinkRegister_RegisterLink(test *testing.T) {
 			fields: fields{
 				sanitizeLink: sanitizing.DoNotSanitizeLink,
 				logger:       new(MockLogger),
-
 				registeredLinks: mapset.NewSet(
 					"http://example.com/1",
 					"http://example.com/2",
@@ -78,7 +75,6 @@ func TestLinkRegister_RegisterLink(test *testing.T) {
 			fields: fields{
 				sanitizeLink: sanitizing.SanitizeLink,
 				logger:       new(MockLogger),
-
 				registeredLinks: mapset.NewSet(
 					"http://example.com/1",
 					"http://example.com/2",
@@ -111,7 +107,6 @@ func TestLinkRegister_RegisterLink(test *testing.T) {
 
 					return logger
 				}(),
-
 				registeredLinks: mapset.NewSet(
 					"http://example.com/1",
 					"http://example.com/2",
@@ -125,9 +120,8 @@ func TestLinkRegister_RegisterLink(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			register := LinkRegister{
-				sanitizeLink: data.fields.sanitizeLink,
-				logger:       data.fields.logger,
-
+				sanitizeLink:    data.fields.sanitizeLink,
+				logger:          data.fields.logger,
 				registeredLinks: data.fields.registeredLinks,
 			}
 			got := register.RegisterLink(data.args.link)
