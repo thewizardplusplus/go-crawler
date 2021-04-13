@@ -33,7 +33,9 @@ func NewSitemapRegister(
 	linkLoader func(link string, options interface{}) ([]byte, error),
 ) SitemapRegister {
 	sitemap.SetInterval(loadingInterval)
-	sitemap.SetFetch(linkLoader)
+	if linkLoader != nil {
+		sitemap.SetFetch(linkLoader)
+	}
 
 	return SitemapRegister{
 		linkGenerator: linkGenerator,
