@@ -3,6 +3,7 @@ package registers
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/go-log/log"
 	"github.com/pkg/errors"
@@ -22,6 +23,24 @@ type SitemapRegister struct {
 	logger        log.Logger
 
 	registeredSitemaps *sync.Map
+}
+
+// NewSitemapRegister ...
+func NewSitemapRegister(
+	loadingInterval time.Duration,
+	linkGenerator LinkGenerator,
+	logger log.Logger,
+	linkLoader func(link string, options interface{}) ([]byte, error),
+) SitemapRegister {
+	sitemap.SetInterval(loadingInterval)
+	sitemap.SetFetch(linkLoader)
+
+	return SitemapRegister{
+		linkGenerator: linkGenerator,
+		logger:        logger,
+
+		registeredSitemaps: new(sync.Map),
+	}
 }
 
 // RegisterSitemap ...
