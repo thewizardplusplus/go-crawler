@@ -31,7 +31,30 @@ func TestNewSitemapRegister(test *testing.T) {
 		wantLogger             log.Logger
 		wantRegisteredSitemaps *sync.Map
 	}{
-		// TODO: Add test cases.
+		{
+			name: "with a link loader",
+			args: args{
+				loadingInterval: 5 * time.Second,
+				linkGenerator:   new(MockLinkGenerator),
+				logger:          new(MockLogger),
+				linkLoader:      new(MockLinkLoader),
+			},
+			wantLinkGenerator:      new(MockLinkGenerator),
+			wantLogger:             new(MockLogger),
+			wantRegisteredSitemaps: new(sync.Map),
+		},
+		{
+			name: "without a link loader",
+			args: args{
+				loadingInterval: 5 * time.Second,
+				linkGenerator:   new(MockLinkGenerator),
+				logger:          new(MockLogger),
+				linkLoader:      nil,
+			},
+			wantLinkGenerator:      new(MockLinkGenerator),
+			wantLogger:             new(MockLogger),
+			wantRegisteredSitemaps: new(sync.Map),
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			var linkLoader func(link string, options interface{}) ([]byte, error)
