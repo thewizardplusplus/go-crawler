@@ -17,16 +17,47 @@ import (
 )
 
 func TestNewSitemapRegister(test *testing.T) {
-	linkGenerator := new(MockLinkGenerator)
-	linkLoader := new(MockLinkLoader)
-	logger := new(MockLogger)
-	got :=
-		NewSitemapRegister(5*time.Second, linkGenerator, logger, linkLoader.LoadLink)
+	type args struct {
+		loadingInterval time.Duration
+		linkGenerator   LinkGenerator
+		logger          log.Logger
+		linkLoader      LinkLoader
+	}
 
-	mock.AssertExpectationsForObjects(test, linkGenerator, linkLoader, logger)
-	assert.Equal(test, linkGenerator, got.linkGenerator)
-	assert.Equal(test, logger, got.logger)
-	assert.Equal(test, new(sync.Map), got.registeredSitemaps)
+	for _, data := range []struct {
+		name                   string
+		args                   args
+		wantLinkGenerator      LinkGenerator
+		wantLogger             log.Logger
+		wantRegisteredSitemaps *sync.Map
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			var linkLoader func(link string, options interface{}) ([]byte, error)
+			if data.args.linkLoader != nil {
+				linkLoader = data.args.linkLoader.LoadLink
+			}
+			register := NewSitemapRegister(
+				data.args.loadingInterval,
+				data.args.linkGenerator,
+				data.args.logger,
+				linkLoader,
+			)
+
+			mock.AssertExpectationsForObjects(
+				test,
+				data.args.linkGenerator,
+				data.args.logger,
+			)
+			if data.args.linkLoader != nil {
+				mock.AssertExpectationsForObjects(test, data.args.linkLoader)
+			}
+			assert.Equal(test, data.wantLinkGenerator, register.linkGenerator)
+			assert.Equal(test, data.wantLogger, register.logger)
+			assert.Equal(test, data.wantRegisteredSitemaps, register.registeredSitemaps)
+		})
+	}
 }
 
 func TestSitemapRegister_RegisterSitemap(test *testing.T) {
