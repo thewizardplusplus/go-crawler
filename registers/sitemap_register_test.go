@@ -7,6 +7,7 @@ import (
 	"sync"
 	"testing"
 	"testing/iotest"
+	"time"
 
 	"github.com/go-log/log"
 	"github.com/pkg/errors"
@@ -14,6 +15,19 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/yterajima/go-sitemap"
 )
+
+func TestNewSitemapRegister(test *testing.T) {
+	linkGenerator := new(MockLinkGenerator)
+	linkLoader := new(MockLinkLoader)
+	logger := new(MockLogger)
+	got :=
+		NewSitemapRegister(5*time.Second, linkGenerator, logger, linkLoader.LoadLink)
+
+	mock.AssertExpectationsForObjects(test, linkGenerator, linkLoader, logger)
+	assert.Equal(test, linkGenerator, got.linkGenerator)
+	assert.Equal(test, logger, got.logger)
+	assert.Equal(test, new(sync.Map), got.registeredSitemaps)
+}
 
 func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 	type fields struct {
