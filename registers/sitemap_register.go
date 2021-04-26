@@ -22,8 +22,10 @@ type SleepHandler func(duration time.Duration)
 
 // SitemapRegister ...
 type SitemapRegister struct {
-	linkGenerator LinkGenerator
-	logger        log.Logger
+	loadingInterval time.Duration
+	linkGenerator   LinkGenerator
+	logger          log.Logger
+	sleeper         SleepHandler
 
 	registeredSitemaps *sync.Map
 }
