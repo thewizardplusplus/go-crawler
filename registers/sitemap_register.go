@@ -17,6 +17,9 @@ type LinkGenerator interface {
 	GenerateLinks(baseLink string) ([]string, error)
 }
 
+// SleepHandler ...
+type SleepHandler func(duration time.Duration)
+
 // SitemapRegister ...
 type SitemapRegister struct {
 	linkGenerator LinkGenerator
