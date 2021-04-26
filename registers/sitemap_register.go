@@ -35,6 +35,7 @@ func NewSitemapRegister(
 	loadingInterval time.Duration,
 	linkGenerator LinkGenerator,
 	logger log.Logger,
+	sleeper SleepHandler,
 	linkLoader func(link string, options interface{}) ([]byte, error),
 ) SitemapRegister {
 	sitemap.SetInterval(loadingInterval)
@@ -43,8 +44,10 @@ func NewSitemapRegister(
 	}
 
 	return SitemapRegister{
-		linkGenerator: linkGenerator,
-		logger:        logger,
+		loadingInterval: loadingInterval,
+		linkGenerator:   linkGenerator,
+		logger:          logger,
+		sleeper:         sleeper,
 
 		registeredSitemaps: new(sync.Map),
 	}

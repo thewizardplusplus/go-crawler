@@ -21,6 +21,7 @@ func TestNewSitemapRegister(test *testing.T) {
 		loadingInterval time.Duration
 		linkGenerator   LinkGenerator
 		logger          log.Logger
+		sleeper         Sleeper
 		linkLoader      LinkLoader
 	}
 
@@ -37,6 +38,7 @@ func TestNewSitemapRegister(test *testing.T) {
 				loadingInterval: 5 * time.Second,
 				linkGenerator:   new(MockLinkGenerator),
 				logger:          new(MockLogger),
+				sleeper:         new(MockSleeper),
 				linkLoader:      new(MockLinkLoader),
 			},
 			wantLinkGenerator:      new(MockLinkGenerator),
@@ -49,6 +51,7 @@ func TestNewSitemapRegister(test *testing.T) {
 				loadingInterval: 5 * time.Second,
 				linkGenerator:   new(MockLinkGenerator),
 				logger:          new(MockLogger),
+				sleeper:         new(MockSleeper),
 				linkLoader:      nil,
 			},
 			wantLinkGenerator:      new(MockLinkGenerator),
@@ -65,6 +68,7 @@ func TestNewSitemapRegister(test *testing.T) {
 				data.args.loadingInterval,
 				data.args.linkGenerator,
 				data.args.logger,
+				data.args.sleeper.Sleep,
 				linkLoader,
 			)
 
@@ -72,6 +76,7 @@ func TestNewSitemapRegister(test *testing.T) {
 				test,
 				data.args.linkGenerator,
 				data.args.logger,
+				data.args.sleeper,
 			)
 			if data.args.linkLoader != nil {
 				mock.AssertExpectationsForObjects(test, data.args.linkLoader)
