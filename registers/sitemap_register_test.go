@@ -90,9 +90,11 @@ func TestNewSitemapRegister(test *testing.T) {
 
 func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 	type fields struct {
+		loadingInterval    time.Duration
 		linkGenerator      LinkGenerator
 		linkLoader         LinkLoader
 		logger             log.Logger
+		sleeper            Sleeper
 		registeredSitemaps *sync.Map
 	}
 	type args struct {
@@ -110,6 +112,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 		{
 			name: "success with all successful links",
 			fields: fields{
+				loadingInterval: 5 * time.Second,
 				linkGenerator: func() LinkGenerator {
 					sitemapLinks := []string{
 						"http://example.com/sitemap_1.xml",
@@ -157,7 +160,13 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 
 					return linkLoader
 				}(),
-				logger:             new(MockLogger),
+				logger: new(MockLogger),
+				sleeper: func() Sleeper {
+					sleeper := new(MockSleeper)
+					sleeper.On("Sleep", 5*time.Second).Return()
+
+					return sleeper
+				}(),
 				registeredSitemaps: new(sync.Map),
 			},
 			args: args{
@@ -177,6 +186,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 		{
 			name: "success with some failed links",
 			fields: fields{
+				loadingInterval: 5 * time.Second,
 				linkGenerator: func() LinkGenerator {
 					sitemapLinks := []string{
 						"http://example.com/sitemap_1.xml",
@@ -229,6 +239,12 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 
 					return logger
 				}(),
+				sleeper: func() Sleeper {
+					sleeper := new(MockSleeper)
+					sleeper.On("Sleep", 5*time.Second).Return()
+
+					return sleeper
+				}(),
 				registeredSitemaps: new(sync.Map),
 			},
 			args: args{
@@ -246,6 +262,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 		{
 			name: "error",
 			fields: fields{
+				loadingInterval: 5 * time.Second,
 				linkGenerator: func() LinkGenerator {
 					linkGenerator := new(MockLinkGenerator)
 					linkGenerator.
@@ -256,6 +273,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 				}(),
 				linkLoader:         new(MockLinkLoader),
 				logger:             new(MockLogger),
+				sleeper:            new(MockSleeper),
 				registeredSitemaps: new(sync.Map),
 			},
 			args: args{
@@ -270,8 +288,10 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 			sitemap.SetFetch(data.fields.linkLoader.LoadLink)
 
 			register := SitemapRegister{
+				loadingInterval:    data.fields.loadingInterval,
 				linkGenerator:      data.fields.linkGenerator,
 				logger:             data.fields.logger,
+				sleeper:            data.fields.sleeper.Sleep,
 				registeredSitemaps: data.fields.registeredSitemaps,
 			}
 			gotSitemapData, gotErr :=
@@ -282,6 +302,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 				data.fields.linkGenerator,
 				data.fields.linkLoader,
 				data.fields.logger,
+				data.fields.sleeper,
 			)
 			assert.Equal(test, data.wantSitemapData, gotSitemapData)
 			data.wantErr(test, gotErr)

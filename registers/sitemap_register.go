@@ -77,6 +77,7 @@ func (register SitemapRegister) RegisterSitemap(
 		}
 
 		totalSitemapData.URL = append(totalSitemapData.URL, sitemapData.URL...)
+		register.sleeper(register.loadingInterval)
 	}
 
 	return totalSitemapData, nil
