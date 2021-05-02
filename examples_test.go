@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path"
 	"runtime"
 	"strings"
 	"sync"
@@ -62,11 +63,7 @@ func RunServer() *httptest.Server {
 
 		if request.URL.Path == "/sitemap.xml" {
 			links := []string{"/1", "/2", "/hidden/1", "/hidden/2"}
-			for index := range links {
-				if strings.HasPrefix(links[index], "/") {
-					links[index] = "http://" + request.Host + links[index]
-				}
-			}
+			completeLinksWithHost(links, request.Host)
 
 			template, _ := template.New("").Parse( // nolint: errcheck
 				`<?xml version="1.0" encoding="UTF-8" ?>
@@ -92,11 +89,7 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
+		completeLinksWithHost(links, request.Host)
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -107,6 +100,14 @@ func RunServer() *httptest.Server {
 		)
 		template.Execute(writer, links) // nolint: errcheck
 	}))
+}
+
+func completeLinksWithHost(links []string, host string) {
+	for index := range links {
+		if strings.HasPrefix(links[index], "/") {
+			links[index] = "http://" + path.Join(host, links[index])
+		}
+	}
 }
 
 func ExampleCrawl() {
