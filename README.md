@@ -16,6 +16,12 @@ The library that implements crawling of all relative links for specified ones.
   - delayed extracting of relative links (optional):
     - reducing of a delay time by the time elapsed since the last request;
     - using of individual delays for each thread;
+  - extracting links from a `sitemap.xml` file (optional):
+    - supporting of few `sitemap.xml` files for a single link;
+    - supporting of a Sitemap index file;
+    - supporting of a delay before loading of a specific `sitemap.xml` file;
+  - supporting of grouping of link extractors:
+    - result of group extracting is merged results of each extractor in the group;
 - calling of an outer handler for an each found link:
   - it's called directly during crawling;
   - handling of links immediately after they have been extracted;
