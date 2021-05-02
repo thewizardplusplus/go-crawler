@@ -1274,6 +1274,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	stdlog "log"
 	"net/http"
 	"net/http/httptest"
@@ -1336,17 +1337,17 @@ func RunServer() *httptest.Server {
 			links := []string{"/1", "/2", "/hidden/1", "/hidden/2"}
 			completeLinksWithHost(links, request.Host)
 
-			template, _ := template.New("").Parse( // nolint: errcheck
-				`<?xml version="1.0" encoding="UTF-8" ?>
+			// nolint: errcheck
+			renderTemplate(writer, links, `
+				<?xml version="1.0" encoding="UTF-8" ?>
 				<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 					{{ range $link := . }}
 						<url>
 							<loc>{{ $link }}</loc>
 						</url>
 					{{ end }}
-				</urlset>`,
-			)
-			template.Execute(writer, links) // nolint: errcheck
+				</urlset>
+			`)
 
 			return
 		}
@@ -1362,14 +1363,16 @@ func RunServer() *httptest.Server {
 		}
 		completeLinksWithHost(links, request.Host)
 
-		template, _ := template.New("").Parse( // nolint: errcheck
-			`<ul>
+		// nolint: errcheck
+		renderTemplate(writer, links, `
+			<ul>
 				{{ range $link := . }}
-					<li><a href="{{ $link }}">{{ $link }}</a></li>
+					<li>
+						<a href="{{ $link }}">{{ $link }}</a>
+					</li>
 				{{ end }}
-			</ul>`,
-		)
-		template.Execute(writer, links) // nolint: errcheck
+			</ul>
+		`)
 	}))
 }
 
@@ -1379,6 +1382,15 @@ func completeLinksWithHost(links []string, host string) {
 			links[index] = "http://" + path.Join(host, links[index])
 		}
 	}
+}
+
+func renderTemplate(writer io.Writer, data interface{}, text string) error {
+	template, err := template.New("").Parse(text)
+	if err != nil {
+		return err
+	}
+
+	return template.Execute(writer, data)
 }
 
 func main() {
