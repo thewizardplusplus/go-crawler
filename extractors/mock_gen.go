@@ -58,3 +58,13 @@ type LinkGenerator interface {
 type Sleeper interface {
 	Sleep(duration time.Duration)
 }
+
+//go:generate mockery --name=LinkLoader --inpackage --case=underscore --testonly
+
+// LinkLoader ...
+//
+// It's used only for mock generating.
+//
+type LinkLoader interface {
+	LoadLink(link string, options interface{}) ([]byte, error)
+}
