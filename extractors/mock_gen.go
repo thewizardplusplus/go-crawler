@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-log/log"
 	"github.com/thewizardplusplus/go-crawler/models"
+	"github.com/thewizardplusplus/go-crawler/registers"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
@@ -36,6 +37,16 @@ type LinkExtractor interface {
 //
 type Logger interface {
 	log.Logger
+}
+
+//go:generate mockery --name=LinkGenerator --inpackage --case=underscore --testonly
+
+// LinkGenerator ...
+//
+// It's used only for mock generating.
+//
+type LinkGenerator interface {
+	registers.LinkGenerator
 }
 
 //go:generate mockery --name=Sleeper --inpackage --case=underscore --testonly
