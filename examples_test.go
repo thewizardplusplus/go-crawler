@@ -113,6 +113,7 @@ func completeLinksWithHost(links []string, host string) {
 	}
 }
 
+// nolint: unparam
 func renderTemplate(writer io.Writer, data interface{}, text string) error {
 	template, err := template.New("").Parse(text)
 	if err != nil {
