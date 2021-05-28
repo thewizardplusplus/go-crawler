@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/thewizardplusplus/go-crawler/models"
+	"golang.org/x/sync/errgroup"
 )
 
 // ExtractorGroup ...
@@ -16,14 +17,30 @@ func (extractors ExtractorGroup) ExtractLinks(
 	threadID int,
 	link string,
 ) ([]string, error) {
-	var totalLinks []string
-	for _, extractor := range extractors {
-		links, err := extractor.ExtractLinks(ctx, threadID, link)
-		if err != nil {
-			return nil, errors.Wrap(err, "unable to extract links")
-		}
+	waiter, ctx := errgroup.WithContext(ctx)
 
-		totalLinks = append(totalLinks, links...)
+	linkGroups := make([][]string, len(extractors))
+	for index, extractor := range extractors {
+		index, extractor := index, extractor
+
+		waiter.Go(func() error {
+			links, err := extractor.ExtractLinks(ctx, threadID, link)
+			if err != nil {
+				return errors.Wrapf(err, "error with extractor #%d", index)
+			}
+
+			linkGroups[index] = links
+			return nil
+		})
+	}
+
+	if err := waiter.Wait(); err != nil {
+		return nil, errors.Wrap(err, "unable to extract links")
+	}
+
+	var totalLinks []string
+	for _, linkGroup := range linkGroups {
+		totalLinks = append(totalLinks, linkGroup...)
 	}
 
 	return totalLinks, nil
