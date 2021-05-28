@@ -1,8 +1,6 @@
 package registers
 
 import (
-	"time"
-
 	"github.com/go-log/log"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
@@ -35,14 +33,4 @@ type HTTPClient interface {
 //
 type LinkLoader interface {
 	LoadLink(link string, options interface{}) ([]byte, error)
-}
-
-//go:generate mockery --name=Sleeper --inpackage --case=underscore --testonly
-
-// Sleeper ...
-//
-// It's used only for mock generating.
-//
-type Sleeper interface {
-	Sleep(duration time.Duration)
 }

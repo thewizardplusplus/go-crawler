@@ -694,7 +694,6 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 								time.Second,
 								sitemap.SimpleLinkGenerator{},
 								wrappedLogger,
-								time.Sleep,
 								nil,
 							),
 							Logger: wrappedLogger,

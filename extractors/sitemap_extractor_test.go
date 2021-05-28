@@ -18,7 +18,6 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 		loadingInterval time.Duration
 		linkGenerator   registers.LinkGenerator
 		logger          log.Logger
-		sleeper         Sleeper
 		linkLoader      LinkLoader
 	}
 	type args struct {
@@ -45,7 +44,6 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 					return linkGenerator
 				}(),
 				logger:     new(MockLogger),
-				sleeper:    new(MockSleeper),
 				linkLoader: new(MockLinkLoader),
 			},
 			args: args{
@@ -74,12 +72,6 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 					return linkGenerator
 				}(),
 				logger: new(MockLogger),
-				sleeper: func() Sleeper {
-					sleeper := new(MockSleeper)
-					sleeper.On("Sleep", 5*time.Second).Return()
-
-					return sleeper
-				}(),
 				linkLoader: func() LinkLoader {
 					const responseOne = `
 						<?xml version="1.0" encoding="UTF-8" ?>
@@ -129,12 +121,6 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 					return linkGenerator
 				}(),
 				logger: new(MockLogger),
-				sleeper: func() Sleeper {
-					sleeper := new(MockSleeper)
-					sleeper.On("Sleep", 5*time.Second).Return()
-
-					return sleeper
-				}(),
 				linkLoader: func() LinkLoader {
 					const responseOne = `
 						<?xml version="1.0" encoding="UTF-8" ?>
@@ -210,7 +196,6 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 
 					return logger
 				}(),
-				sleeper:    new(MockSleeper),
 				linkLoader: new(MockLinkLoader),
 			},
 			args: args{
@@ -239,13 +224,12 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 					return linkGenerator
 				}(),
 				logger: func() Logger {
-					wantErr :=
-						errors.Wrap(iotest.ErrTimeout, "unable to load the Sitemap data")
+					wantErr := iotest.ErrTimeout
 
 					logger := new(MockLogger)
 					logger.On(
 						"Logf",
-						"unable to process the Sitemap link %q: %s",
+						"unable to load the Sitemap link %q: %s",
 						"http://example.com/sitemap_1.xml",
 						mock.MatchedBy(func(gotErr error) bool {
 							return gotErr.Error() == wantErr.Error()
@@ -253,12 +237,6 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 					).Return()
 
 					return logger
-				}(),
-				sleeper: func() Sleeper {
-					sleeper := new(MockSleeper)
-					sleeper.On("Sleep", 5*time.Second).Return()
-
-					return sleeper
 				}(),
 				linkLoader: func() LinkLoader {
 					const responseTwo = `
@@ -301,7 +279,6 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 				data.fields.loadingInterval,
 				data.fields.linkGenerator,
 				data.fields.logger,
-				data.fields.sleeper.Sleep,
 				data.fields.linkLoader.LoadLink,
 			)
 			extractor := SitemapExtractor{
@@ -318,10 +295,9 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 				test,
 				data.fields.linkGenerator,
 				data.fields.logger,
-				data.fields.sleeper,
 				data.fields.linkLoader,
 			)
-			assert.Equal(test, data.wantLinks, gotLinks)
+			assert.ElementsMatch(test, data.wantLinks, gotLinks)
 			data.wantErr(test, gotErr)
 		})
 	}

@@ -17,15 +17,10 @@ type LinkGenerator interface {
 	GenerateLinks(baseLink string) ([]string, error)
 }
 
-// SleepHandler ...
-type SleepHandler func(duration time.Duration)
-
 // SitemapRegister ...
 type SitemapRegister struct {
-	loadingInterval time.Duration
-	linkGenerator   LinkGenerator
-	logger          log.Logger
-	sleeper         SleepHandler
+	linkGenerator LinkGenerator
+	logger        log.Logger
 
 	registeredSitemaps *sync.Map
 }
@@ -35,7 +30,6 @@ func NewSitemapRegister(
 	loadingInterval time.Duration,
 	linkGenerator LinkGenerator,
 	logger log.Logger,
-	sleeper SleepHandler,
 	linkLoader func(link string, options interface{}) ([]byte, error),
 ) SitemapRegister {
 	sitemap.SetInterval(loadingInterval)
@@ -44,10 +38,8 @@ func NewSitemapRegister(
 	}
 
 	return SitemapRegister{
-		loadingInterval: loadingInterval,
-		linkGenerator:   linkGenerator,
-		logger:          logger,
-		sleeper:         sleeper,
+		linkGenerator: linkGenerator,
+		logger:        logger,
 
 		registeredSitemaps: new(sync.Map),
 	}
@@ -66,11 +58,24 @@ func (register SitemapRegister) RegisterSitemap(
 		return sitemap.Sitemap{}, errors.Wrap(err, "unable to generate Sitemap links")
 	}
 
+	var waiter sync.WaitGroup
+	waiter.Add(len(sitemapLinks))
+
+	sitemapDataGroup := make([]sitemap.Sitemap, len(sitemapLinks))
+	for index, sitemapLink := range sitemapLinks {
+		go func(index int, sitemapLink string) {
+			defer waiter.Done()
+
+			sitemapData := register.loadSitemapData(ctx, sitemapLink)
+			sitemapDataGroup[index] = sitemapData
+		}(index, sitemapLink)
+	}
+
+	waiter.Wait()
+
 	var totalSitemapData sitemap.Sitemap
-	for _, sitemapLink := range sitemapLinks {
-		sitemapData := register.loadSitemapData(ctx, sitemapLink)
+	for _, sitemapData := range sitemapDataGroup {
 		totalSitemapData.URL = append(totalSitemapData.URL, sitemapData.URL...)
-		register.sleeper(register.loadingInterval)
 	}
 
 	return totalSitemapData, nil

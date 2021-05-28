@@ -1432,7 +1432,6 @@ func main() {
 								time.Second,
 								sitemap.SimpleLinkGenerator{},
 								wrappedLogger,
-								time.Sleep,
 								nil,
 							),
 							Logger: wrappedLogger,
