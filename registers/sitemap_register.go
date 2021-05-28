@@ -68,14 +68,7 @@ func (register SitemapRegister) RegisterSitemap(
 
 	var totalSitemapData sitemap.Sitemap
 	for _, sitemapLink := range sitemapLinks {
-		sitemapData, err := register.loadSitemapData(ctx, sitemapLink)
-		if err != nil {
-			register.logger.
-				Logf("unable to process the Sitemap link %q: %s", sitemapLink, err)
-
-			continue
-		}
-
+		sitemapData := register.loadSitemapData(ctx, sitemapLink)
 		totalSitemapData.URL = append(totalSitemapData.URL, sitemapData.URL...)
 		register.sleeper(register.loadingInterval)
 	}
@@ -86,20 +79,18 @@ func (register SitemapRegister) RegisterSitemap(
 func (register SitemapRegister) loadSitemapData(
 	ctx context.Context,
 	sitemapLink string,
-) (
-	sitemap.Sitemap,
-	error,
-) {
+) sitemap.Sitemap {
 	sitemapData, ok := register.registeredSitemaps.Load(sitemapLink)
 	if !ok {
 		var err error
 		sitemapData, err = sitemap.Get(sitemapLink, ctx)
 		if err != nil {
-			return sitemap.Sitemap{}, errors.Wrap(err, "unable to load the Sitemap data")
+			register.logger.
+				Logf("unable to load the Sitemap link %q: %s", sitemapLink, err)
 		}
 
 		register.registeredSitemaps.Store(sitemapLink, sitemapData)
 	}
 
-	return sitemapData.(sitemap.Sitemap), nil
+	return sitemapData.(sitemap.Sitemap)
 }
