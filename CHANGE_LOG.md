@@ -1,5 +1,18 @@
 # Change Log
 
+## [v1.7.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.7.1) (2021-05-28)
+
+- crawling of all relative links for specified ones:
+  - extracting links from a `sitemap.xml` file (optional):
+    - ignoring of the error on loading of the `sitemap.xml` file:
+      - logging of the received error;
+      - returning of an empty Sitemap instead;
+    - supporting of few `sitemap.xml` files for a single link:
+      - processing of each `sitemap.xml` file is done in a separate goroutine;
+  - supporting of grouping of link extractors:
+    - extracting links concurrently:
+      - processing of each link extractor is done in a separate goroutine.
+
 ## [v1.7](https://github.com/thewizardplusplus/go-crawler/tree/v1.7) (2021-05-02)
 
 - crawling of all relative links for specified ones:
