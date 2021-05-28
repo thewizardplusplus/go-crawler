@@ -17,11 +17,17 @@ The library that implements crawling of all relative links for specified ones.
     - reducing of a delay time by the time elapsed since the last request;
     - using of individual delays for each thread;
   - extracting links from a `sitemap.xml` file (optional):
-    - supporting of few `sitemap.xml` files for a single link;
-    - supporting of a Sitemap index file;
-    - supporting of a delay before loading of a specific `sitemap.xml` file;
+    - ignoring of the error on loading of the `sitemap.xml` file:
+      - logging of the received error;
+      - returning of an empty Sitemap instead;
+    - supporting of few `sitemap.xml` files for a single link:
+      - processing of each `sitemap.xml` file is done in a separate goroutine;
+    - supporting of a Sitemap index file:
+      - supporting of a delay before loading of each `sitemap.xml` file listed in the index;
   - supporting of grouping of link extractors:
     - result of group extracting is merged results of each extractor in the group;
+    - extracting links concurrently:
+      - processing of each link extractor is done in a separate goroutine;
 - calling of an outer handler for an each found link:
   - it's called directly during crawling;
   - handling of links immediately after they have been extracted;
