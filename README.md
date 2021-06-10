@@ -1336,17 +1336,44 @@ func RunServer() *httptest.Server {
 		request *http.Request,
 	) {
 		if request.URL.Path == "/robots.txt" {
+			links := []string{"/sitemap_from_robots_txt.xml"}
+			completeLinksWithHost(links, request.Host)
+
 			// nolint: errcheck
-			fmt.Fprint(writer, `
-				User-agent: go-crawler
-				Disallow: /2
-			`)
+			fmt.Fprintf(
+				writer,
+				`
+					User-agent: go-crawler
+					Disallow: /2
+
+					Sitemap: %s
+				`,
+				links[0],
+			)
 
 			return
 		}
 
 		if request.URL.Path == "/sitemap.xml" {
 			links := []string{"/1", "/2", "/hidden/1", "/hidden/2"}
+			completeLinksWithHost(links, request.Host)
+
+			// nolint: errcheck
+			renderTemplate(writer, links, `
+				<?xml version="1.0" encoding="UTF-8" ?>
+				<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+					{{ range $link := . }}
+						<url>
+							<loc>{{ $link }}</loc>
+						</url>
+					{{ end }}
+				</urlset>
+			`)
+
+			return
+		}
+		if request.URL.Path == "/sitemap_from_robots_txt.xml" {
+			links := []string{"/hidden/3", "/hidden/4"}
 			completeLinksWithHost(links, request.Host)
 
 			// nolint: errcheck
@@ -1436,7 +1463,12 @@ func main() {
 						extractors.SitemapExtractor{
 							SitemapRegister: registers.NewSitemapRegister(
 								time.Second,
-								sitemap.SimpleLinkGenerator{},
+								sitemap.GeneratorGroup{
+									sitemap.SimpleLinkGenerator{},
+									sitemap.RobotsTXTGenerator{
+										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
+									},
+								},
 								wrappedLogger,
 								nil,
 							),
@@ -1488,6 +1520,8 @@ func main() {
 	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "http://example.com/hidden/1" from the page "http://example.com"
 	// have got the link "http://example.com/hidden/2" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/3" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/4" from the page "http://example.com"
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
 ```
