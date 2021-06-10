@@ -74,36 +74,14 @@ func RunServer() *httptest.Server {
 		if request.URL.Path == "/sitemap.xml" {
 			links := []string{"/1", "/2", "/hidden/1", "/hidden/2"}
 			completeLinksWithHost(links, request.Host)
-
-			// nolint: errcheck
-			renderTemplate(writer, links, `
-				<?xml version="1.0" encoding="UTF-8" ?>
-				<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-					{{ range $link := . }}
-						<url>
-							<loc>{{ $link }}</loc>
-						</url>
-					{{ end }}
-				</urlset>
-			`)
+			renderSitemap(writer, links) // nolint: errcheck
 
 			return
 		}
 		if request.URL.Path == "/sitemap_from_robots_txt.xml" {
 			links := []string{"/hidden/3", "/hidden/4"}
 			completeLinksWithHost(links, request.Host)
-
-			// nolint: errcheck
-			renderTemplate(writer, links, `
-				<?xml version="1.0" encoding="UTF-8" ?>
-				<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-					{{ range $link := . }}
-						<url>
-							<loc>{{ $link }}</loc>
-						</url>
-					{{ end }}
-				</urlset>
-			`)
+			renderSitemap(writer, links) // nolint: errcheck
 
 			return
 		}
@@ -140,7 +118,6 @@ func completeLinksWithHost(links []string, host string) {
 	}
 }
 
-// nolint: unparam
 func renderTemplate(writer io.Writer, data interface{}, text string) error {
 	template, err := template.New("").Parse(text)
 	if err != nil {
@@ -148,6 +125,20 @@ func renderTemplate(writer io.Writer, data interface{}, text string) error {
 	}
 
 	return template.Execute(writer, data)
+}
+
+// nolint: unparam
+func renderSitemap(writer io.Writer, links []string) error {
+	return renderTemplate(writer, links, `
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+			{{ range $link := . }}
+				<url>
+					<loc>{{ $link }}</loc>
+				</url>
+			{{ end }}
+		</urlset>
+	`)
 }
 
 func ExampleCrawl() {
