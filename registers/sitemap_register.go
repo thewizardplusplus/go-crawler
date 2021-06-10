@@ -14,7 +14,7 @@ import (
 
 // LinkGenerator ...
 type LinkGenerator interface {
-	GenerateLinks(baseLink string) ([]string, error)
+	GenerateLinks(ctx context.Context, baseLink string) ([]string, error)
 }
 
 // SitemapRegister ...
@@ -53,7 +53,7 @@ func (register SitemapRegister) RegisterSitemap(
 	sitemap.Sitemap,
 	error,
 ) {
-	sitemapLinks, err := register.linkGenerator.GenerateLinks(link)
+	sitemapLinks, err := register.linkGenerator.GenerateLinks(ctx, link)
 	if err != nil {
 		return sitemap.Sitemap{}, errors.Wrap(err, "unable to generate Sitemap links")
 	}

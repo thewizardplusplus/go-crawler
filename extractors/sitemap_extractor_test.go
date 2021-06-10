@@ -39,7 +39,9 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 				loadingInterval: 5 * time.Second,
 				linkGenerator: func() LinkGenerator {
 					linkGenerator := new(MockLinkGenerator)
-					linkGenerator.On("GenerateLinks", "http://example.com/").Return(nil, nil)
+					linkGenerator.
+						On("GenerateLinks", context.Background(), "http://example.com/").
+						Return(nil, nil)
 
 					return linkGenerator
 				}(),
@@ -66,7 +68,7 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 
 					linkGenerator := new(MockLinkGenerator)
 					linkGenerator.
-						On("GenerateLinks", "http://example.com/").
+						On("GenerateLinks", context.Background(), "http://example.com/").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
@@ -115,7 +117,7 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 
 					linkGenerator := new(MockLinkGenerator)
 					linkGenerator.
-						On("GenerateLinks", "http://example.com/").
+						On("GenerateLinks", context.Background(), "http://example.com/").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
@@ -176,7 +178,7 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 				linkGenerator: func() LinkGenerator {
 					linkGenerator := new(MockLinkGenerator)
 					linkGenerator.
-						On("GenerateLinks", "http://example.com/").
+						On("GenerateLinks", context.Background(), "http://example.com/").
 						Return(nil, iotest.ErrTimeout)
 
 					return linkGenerator
@@ -218,7 +220,7 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 
 					linkGenerator := new(MockLinkGenerator)
 					linkGenerator.
-						On("GenerateLinks", "http://example.com/").
+						On("GenerateLinks", context.Background(), "http://example.com/").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator

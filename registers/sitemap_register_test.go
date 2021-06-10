@@ -112,7 +112,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 
 					linkGenerator := new(MockLinkGenerator)
 					linkGenerator.
-						On("GenerateLinks", "http://example.com/test").
+						On("GenerateLinks", context.Background(), "http://example.com/test").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
@@ -173,7 +173,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 				linkGenerator: func() LinkGenerator {
 					linkGenerator := new(MockLinkGenerator)
 					linkGenerator.
-						On("GenerateLinks", "http://example.com/test").
+						On("GenerateLinks", context.Background(), "http://example.com/test").
 						Return(nil, iotest.ErrTimeout)
 
 					return linkGenerator

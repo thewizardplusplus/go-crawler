@@ -1,6 +1,7 @@
 package sitemap
 
 import (
+	"context"
 	"net/url"
 
 	"github.com/pkg/errors"
@@ -10,7 +11,10 @@ import (
 type SimpleLinkGenerator struct{}
 
 // GenerateLinks ...
-func (generator SimpleLinkGenerator) GenerateLinks(baseLink string) (
+func (generator SimpleLinkGenerator) GenerateLinks(
+	ctx context.Context,
+	baseLink string,
+) (
 	[]string,
 	error,
 ) {
