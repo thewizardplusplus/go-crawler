@@ -53,9 +53,6 @@ func RunServer() *httptest.Server {
 		request *http.Request,
 	) {
 		if request.URL.Path == "/robots.txt" {
-			links := []string{"/sitemap_from_robots_txt.xml"}
-			completeLinksWithHost(links, request.Host)
-
 			// nolint: errcheck
 			fmt.Fprintf(
 				writer,
@@ -65,7 +62,7 @@ func RunServer() *httptest.Server {
 
 					Sitemap: %s
 				`,
-				links[0],
+				completeLinkWithHost("/sitemap_from_robots_txt.xml", request.Host),
 			)
 
 			return
@@ -110,10 +107,14 @@ func RunServer() *httptest.Server {
 	}))
 }
 
+func completeLinkWithHost(link string, host string) string {
+	return "http://" + path.Join(host, link)
+}
+
 func completeLinksWithHost(links []string, host string) {
 	for index := range links {
 		if strings.HasPrefix(links[index], "/") {
-			links[index] = "http://" + path.Join(host, links[index])
+			links[index] = completeLinkWithHost(links[index], host)
 		}
 	}
 }
