@@ -87,7 +87,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-log/log/print"
@@ -95,10 +94,10 @@ import (
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/handlers"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/models"
+	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -244,10 +243,10 @@ import (
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/handlers"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -407,8 +406,8 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
-	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	"github.com/thewizardplusplus/go-crawler/models"
+	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
 type LinkHandler struct {
@@ -544,10 +543,10 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/models"
+	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -690,10 +689,10 @@ import (
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/handlers"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/models"
+	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -844,10 +843,10 @@ import (
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/handlers"
-	"github.com/thewizardplusplus/go-crawler/register"
+	"github.com/thewizardplusplus/go-crawler/models"
+	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -1001,9 +1000,9 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
@@ -1152,9 +1151,9 @@ import (
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/handlers"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 type LinkHandler struct {
