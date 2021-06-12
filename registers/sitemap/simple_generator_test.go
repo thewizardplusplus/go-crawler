@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSimpleLinkGenerator_GenerateLinks(test *testing.T) {
+func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 	type args struct {
 		ctx      context.Context
 		baseLink string
@@ -77,7 +77,7 @@ func TestSimpleLinkGenerator_GenerateLinks(test *testing.T) {
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			var generator SimpleLinkGenerator
+			var generator SimpleGenerator
 			gotSitemapLinks, gotErr :=
 				generator.GenerateLinks(data.args.ctx, data.args.baseLink)
 

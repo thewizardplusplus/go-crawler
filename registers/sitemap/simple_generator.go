@@ -7,11 +7,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-// SimpleLinkGenerator ...
-type SimpleLinkGenerator struct{}
+// SimpleGenerator ...
+type SimpleGenerator struct{}
 
 // GenerateLinks ...
-func (generator SimpleLinkGenerator) GenerateLinks(
+func (generator SimpleGenerator) GenerateLinks(
 	ctx context.Context,
 	baseLink string,
 ) (

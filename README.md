@@ -1456,7 +1456,7 @@ func main() {
 							SitemapRegister: registers.NewSitemapRegister(
 								time.Second,
 								sitemap.GeneratorGroup{
-									sitemap.SimpleLinkGenerator{},
+									sitemap.SimpleGenerator{},
 									sitemap.RobotsTXTGenerator{
 										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
 									},
