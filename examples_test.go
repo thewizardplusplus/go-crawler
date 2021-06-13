@@ -82,6 +82,19 @@ func RunServer() *httptest.Server {
 
 			return
 		}
+		if request.URL.Path == "/hidden/1/sitemap.xml" {
+			links := []string{"/hidden/5", "/hidden/6"}
+			completeLinksWithHost(links, request.Host)
+			renderSitemap(writer, links) // nolint: errcheck
+
+			return
+		}
+		if request.URL.Path == "/1/sitemap.xml" ||
+			request.URL.Path == "/2/sitemap.xml" ||
+			request.URL.Path == "/hidden/sitemap.xml" {
+			renderSitemap(writer, nil) // nolint: errcheck
+			return
+		}
 
 		var links []string
 		switch request.URL.Path {
@@ -91,6 +104,8 @@ func RunServer() *httptest.Server {
 			links = []string{"/1/1", "/1/2"}
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
+		case "/hidden/1":
+			links = []string{"/hidden/1/test"}
 		}
 		completeLinksWithHost(links, request.Host)
 
@@ -712,7 +727,9 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 							SitemapRegister: registers.NewSitemapRegister(
 								time.Second,
 								sitemap.GeneratorGroup{
-									sitemap.SimpleGenerator{},
+									sitemap.HierarchicalGenerator{
+										SanitizeLink: sanitizing.SanitizeLink,
+									},
 									sitemap.RobotsTXTGenerator{
 										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
 									},
@@ -767,8 +784,11 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
 	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "http://example.com/hidden/1" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/1/test" from the page "http://example.com/hidden/1"
 	// have got the link "http://example.com/hidden/2" from the page "http://example.com"
 	// have got the link "http://example.com/hidden/3" from the page "http://example.com"
 	// have got the link "http://example.com/hidden/4" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/5" from the page "http://example.com/hidden/1/test"
+	// have got the link "http://example.com/hidden/6" from the page "http://example.com/hidden/1/test"
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
