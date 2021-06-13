@@ -22,6 +22,15 @@ The library that implements crawling of all relative links for specified ones.
       - returning of an empty Sitemap instead;
     - supporting of few `sitemap.xml` files for a single link:
       - processing of each `sitemap.xml` file is done in a separate goroutine;
+      - supporting of an outer generator for `sitemap.xml` links:
+        - generators:
+          - simple generator (it returns the `sitemap.xml` file in the site root);
+          - hierarchical generator (it returns the suitable `sitemap.xml` file for each part of the URL path);
+          - generator based on the `robots.txt` file;
+        - supporting of grouping of generators:
+          - result of group generating is merged results of each generator in the group;
+          - generating concurrently:
+            - processing of each generator is done in a separate goroutine;
     - supporting of a Sitemap index file:
       - supporting of a delay before loading of each `sitemap.xml` file listed in the index;
   - supporting of grouping of link extractors:
