@@ -49,7 +49,7 @@ func (handler ConcurrentHandler) RunConcurrently(
 	var waiter sync.WaitGroup
 	waiter.Add(concurrencyFactor)
 
-	for i := 0; i < concurrencyFactor; i++ {
+	for threadID := 0; threadID < concurrencyFactor; threadID++ {
 		go func() {
 			defer waiter.Done()
 
