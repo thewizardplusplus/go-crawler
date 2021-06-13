@@ -1,5 +1,20 @@
 # Change Log
 
+## [v1.8](https://github.com/thewizardplusplus/go-crawler/tree/v1.8) (2021-06-13)
+
+- crawling of all relative links for specified ones:
+  - extracting links from a `sitemap.xml` file (optional):
+    - supporting of few `sitemap.xml` files for a single link:
+      - supporting of an outer generator for `sitemap.xml` links:
+        - generators:
+          - simple generator (it returns the `sitemap.xml` file in the site root);
+          - hierarchical generator (it returns the suitable `sitemap.xml` file for each part of the URL path);
+          - generator based on the `robots.txt` file;
+        - supporting of grouping of generators:
+          - result of group generating is merged results of each generator in the group;
+          - generating concurrently:
+            - processing of each generator is done in a separate goroutine.
+
 ## [v1.7.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.7.1) (2021-05-28)
 
 - crawling of all relative links for specified ones:
