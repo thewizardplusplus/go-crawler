@@ -68,35 +68,24 @@ func RunServer() *httptest.Server {
 			return
 		}
 
-		if request.URL.Path == "/sitemap.xml" {
-			links := []string{"/1", "/2", "/hidden/1", "/hidden/2"}
-			completeLinksWithHost(links, request.Host)
-			renderSitemap(writer, links) // nolint: errcheck
-
-			return
-		}
-		if request.URL.Path == "/sitemap_from_robots_txt.xml" {
-			links := []string{"/hidden/3", "/hidden/4"}
-			completeLinksWithHost(links, request.Host)
-			renderSitemap(writer, links) // nolint: errcheck
-
-			return
-		}
-		if request.URL.Path == "/hidden/1/sitemap.xml" {
-			links := []string{"/hidden/5", "/hidden/6"}
-			completeLinksWithHost(links, request.Host)
-			renderSitemap(writer, links) // nolint: errcheck
-
-			return
-		}
-		if request.URL.Path == "/1/sitemap.xml" ||
-			request.URL.Path == "/2/sitemap.xml" ||
-			request.URL.Path == "/hidden/sitemap.xml" {
-			renderSitemap(writer, nil) // nolint: errcheck
-			return
-		}
-
 		var links []string
+		switch request.URL.Path {
+		case "/sitemap.xml":
+			links = []string{"/1", "/2", "/hidden/1", "/hidden/2"}
+		case "/sitemap_from_robots_txt.xml":
+			links = []string{"/hidden/3", "/hidden/4"}
+		case "/hidden/1/sitemap.xml":
+			links = []string{"/hidden/5", "/hidden/6"}
+		case "/1/sitemap.xml", "/2/sitemap.xml", "/hidden/sitemap.xml":
+			links = []string{}
+		}
+		if links != nil {
+			completeLinksWithHost(links, request.Host)
+			renderSitemap(writer, links) // nolint: errcheck
+
+			return
+		}
+
 		switch request.URL.Path {
 		case "/":
 			links = []string{"/1", "/2", "/2", "https://golang.org/"}
