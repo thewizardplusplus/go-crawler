@@ -1375,7 +1375,21 @@ func RunServer() *httptest.Server {
 			completeLinksWithHost(links, request.Host)
 
 			writer.Header().Set("Content-Encoding", "gzip")
-			renderSitemap(writer, links) // nolint: errcheck
+
+			compressingWriter := gzip.NewWriter(writer)
+			defer compressingWriter.Close()
+
+			// nolint: errcheck
+			renderTemplate(compressingWriter, links, `
+				<?xml version="1.0" encoding="UTF-8" ?>
+				<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+					{{ range $link := . }}
+						<url>
+							<loc>{{ $link }}</loc>
+						</url>
+					{{ end }}
+				</urlset>
+			`)
 
 			return
 		}
@@ -1417,6 +1431,7 @@ func completeLinksWithHost(links []string, host string) {
 	}
 }
 
+// nolint: unparam
 func renderTemplate(writer io.Writer, data interface{}, text string) error {
 	template, err := template.New("").Parse(text)
 	if err != nil {
@@ -1424,23 +1439,6 @@ func renderTemplate(writer io.Writer, data interface{}, text string) error {
 	}
 
 	return template.Execute(writer, data)
-}
-
-// nolint: unparam
-func renderSitemap(writer io.Writer, links []string) error {
-	compressingWriter := gzip.NewWriter(writer)
-	defer compressingWriter.Close()
-
-	return renderTemplate(compressingWriter, links, `
-		<?xml version="1.0" encoding="UTF-8" ?>
-		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-			{{ range $link := . }}
-				<url>
-					<loc>{{ $link }}</loc>
-				</url>
-			{{ end }}
-		</urlset>
-	`)
 }
 
 func main() {
