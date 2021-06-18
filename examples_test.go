@@ -48,6 +48,7 @@ func (handler LinkHandler) replaceServerURL(link string) string {
 	return strings.Replace(link, handler.ServerURL, "http://example.com", -1)
 }
 
+// nolint: gocyclo
 func RunServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(
 		writer http.ResponseWriter,
@@ -56,7 +57,6 @@ func RunServer() *httptest.Server {
 		if request.URL.Path == "/robots.txt" {
 			sitemapLink :=
 				completeLinkWithHost("/sitemap_from_robots_txt.xml", request.Host)
-			// nolint: errcheck
 			fmt.Fprintf(writer, `
 				User-agent: go-crawler
 				Disallow: /2
@@ -84,7 +84,7 @@ func RunServer() *httptest.Server {
 			writer.Header().Set("Content-Encoding", "gzip")
 
 			compressingWriter := gzip.NewWriter(writer)
-			defer compressingWriter.Close()
+			defer compressingWriter.Close() // nolint: errcheck
 
 			// nolint: errcheck
 			renderTemplate(compressingWriter, links, `

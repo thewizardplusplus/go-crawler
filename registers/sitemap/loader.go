@@ -34,11 +34,11 @@ func (loader Loader) LoadLink(link string, options interface{}) (
 
 	responseReader := response.Body
 	if response.Header.Get("Content-Encoding") == "gzip" {
-		var err error
-		responseReader, err = gzip.NewReader(responseReader)
-		if err != nil {
+		var err2 error
+		responseReader, err2 = gzip.NewReader(responseReader)
+		if err2 != nil {
 			return nil,
-				errors.Wrap(err, "unable to create the gzip reader for the response")
+				errors.Wrap(err2, "unable to create the gzip reader for the response")
 		}
 		defer responseReader.Close() // nolint: errcheck
 	}
