@@ -1,5 +1,11 @@
 # Change Log
 
+## [v1.9](https://github.com/thewizardplusplus/go-crawler/tree/v1.9) (2021-06-18)
+
+- crawling of all relative links for specified ones:
+  - extracting links from a `sitemap.xml` file (optional):
+    - supporting of a gzip compression of a `sitemap.xml` file.
+
 ## [v1.8](https://github.com/thewizardplusplus/go-crawler/tree/v1.8) (2021-06-13)
 
 - crawling of all relative links for specified ones:
