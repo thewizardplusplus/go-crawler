@@ -1,6 +1,7 @@
 package crawler_test
 
 import (
+	"compress/gzip"
 	"context"
 	"fmt"
 	"html/template"
@@ -81,6 +82,8 @@ func RunServer() *httptest.Server {
 		}
 		if links != nil {
 			completeLinksWithHost(links, request.Host)
+
+			writer.Header().Set("Content-Encoding", "gzip")
 			renderSitemap(writer, links) // nolint: errcheck
 
 			return
@@ -134,7 +137,10 @@ func renderTemplate(writer io.Writer, data interface{}, text string) error {
 
 // nolint: unparam
 func renderSitemap(writer io.Writer, links []string) error {
-	return renderTemplate(writer, links, `
+	compressingWriter := gzip.NewWriter(writer)
+	defer compressingWriter.Close()
+
+	return renderTemplate(compressingWriter, links, `
 		<?xml version="1.0" encoding="UTF-8" ?>
 		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 			{{ range $link := . }}
@@ -724,7 +730,7 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 									},
 								},
 								wrappedLogger,
-								nil,
+								sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
 							),
 							Logger: wrappedLogger,
 						},
