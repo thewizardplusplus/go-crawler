@@ -1345,17 +1345,15 @@ func RunServer() *httptest.Server {
 		request *http.Request,
 	) {
 		if request.URL.Path == "/robots.txt" {
+			sitemapLink :=
+				completeLinkWithHost("/sitemap_from_robots_txt.xml", request.Host)
 			// nolint: errcheck
-			fmt.Fprintf(
-				writer,
-				`
-					User-agent: go-crawler
-					Disallow: /2
+			fmt.Fprintf(writer, `
+				User-agent: go-crawler
+				Disallow: /2
 
-					Sitemap: %s
-				`,
-				completeLinkWithHost("/sitemap_from_robots_txt.xml", request.Host),
-			)
+				Sitemap: %s
+			`, sitemapLink)
 
 			return
 		}
@@ -1371,9 +1369,9 @@ func RunServer() *httptest.Server {
 		case "/1/sitemap.xml", "/2/sitemap.xml", "/hidden/sitemap.xml":
 			links = []string{}
 		}
-		if links != nil {
-			completeLinksWithHost(links, request.Host)
+		completeLinksWithHost(links, request.Host)
 
+		if links != nil {
 			writer.Header().Set("Content-Encoding", "gzip")
 
 			compressingWriter := gzip.NewWriter(writer)
