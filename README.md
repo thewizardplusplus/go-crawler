@@ -33,6 +33,7 @@ The library that implements crawling of all relative links for specified ones.
             - processing of each generator is done in a separate goroutine;
     - supporting of a Sitemap index file:
       - supporting of a delay before loading of each `sitemap.xml` file listed in the index;
+    - supporting of a gzip compression of a `sitemap.xml` file;
   - supporting of grouping of link extractors:
     - result of group extracting is merged results of each extractor in the group;
     - extracting links concurrently:
