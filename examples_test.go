@@ -717,7 +717,7 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 						extractors.SitemapExtractor{
 							SitemapRegister: registers.NewSitemapRegister(
 								time.Second,
-								sitemap.GeneratorGroup{
+								extractors.ExtractorGroup{
 									sitemap.HierarchicalGenerator{
 										SanitizeLink: sanitizing.SanitizeLink,
 									},
