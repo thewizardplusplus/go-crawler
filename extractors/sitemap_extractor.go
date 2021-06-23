@@ -19,7 +19,8 @@ func (extractor SitemapExtractor) ExtractLinks(
 	threadID int,
 	link string,
 ) ([]string, error) {
-	sitemapData, err := extractor.SitemapRegister.RegisterSitemap(ctx, link)
+	sitemapData, err :=
+		extractor.SitemapRegister.RegisterSitemap(ctx, threadID, link)
 	if err != nil {
 		extractor.Logger.Logf("unable to register the sitemap.xml link: %s", err)
 		return nil, nil

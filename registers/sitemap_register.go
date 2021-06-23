@@ -42,12 +42,13 @@ func NewSitemapRegister(
 // RegisterSitemap ...
 func (register SitemapRegister) RegisterSitemap(
 	ctx context.Context,
+	threadID int,
 	link string,
 ) (
 	sitemap.Sitemap,
 	error,
 ) {
-	sitemapLinks, err := register.linkGenerator.ExtractLinks(ctx, -1, link)
+	sitemapLinks, err := register.linkGenerator.ExtractLinks(ctx, threadID, link)
 	if err != nil {
 		return sitemap.Sitemap{}, errors.Wrap(err, "unable to generate Sitemap links")
 	}

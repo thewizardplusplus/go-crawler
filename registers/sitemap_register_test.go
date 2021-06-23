@@ -91,8 +91,9 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 		registeredSitemaps *sync.Map
 	}
 	type args struct {
-		ctx  context.Context
-		link string
+		ctx      context.Context
+		threadID int
+		link     string
 	}
 
 	for _, data := range []struct {
@@ -113,7 +114,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 
 					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("ExtractLinks", context.Background(), -1, "http://example.com/test").
+						On("ExtractLinks", context.Background(), 23, "http://example.com/test").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
@@ -155,8 +156,9 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 				registeredSitemaps: new(sync.Map),
 			},
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/test",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/test",
 			},
 			wantSitemapData: sitemap.Sitemap{
 				URL: []sitemap.URL{
@@ -174,7 +176,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 				linkGenerator: func() models.LinkExtractor {
 					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("ExtractLinks", context.Background(), -1, "http://example.com/test").
+						On("ExtractLinks", context.Background(), 23, "http://example.com/test").
 						Return(nil, iotest.ErrTimeout)
 
 					return linkGenerator
@@ -183,8 +185,9 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 				registeredSitemaps: new(sync.Map),
 			},
 			args: args{
-				ctx:  context.Background(),
-				link: "http://example.com/test",
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/test",
 			},
 			wantSitemapData: sitemap.Sitemap{},
 			wantErr:         assert.Error,
@@ -198,7 +201,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 				registeredSitemaps: data.fields.registeredSitemaps,
 			}
 			gotSitemapData, gotErr :=
-				register.RegisterSitemap(data.args.ctx, data.args.link)
+				register.RegisterSitemap(data.args.ctx, data.args.threadID, data.args.link)
 
 			mock.AssertExpectationsForObjects(
 				test,
