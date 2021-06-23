@@ -3,12 +3,12 @@ package registers
 import (
 	mapset "github.com/deckarep/golang-set"
 	"github.com/go-log/log"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
 
 // LinkRegister ...
 type LinkRegister struct {
-	sanitizeLink sanitizing.LinkSanitizing
+	sanitizeLink urlutils.LinkSanitizing
 	logger       log.Logger
 
 	registeredLinks mapset.Set
@@ -16,7 +16,7 @@ type LinkRegister struct {
 
 // NewLinkRegister ...
 func NewLinkRegister(
-	sanitizeLink sanitizing.LinkSanitizing,
+	sanitizeLink urlutils.LinkSanitizing,
 	logger log.Logger,
 ) LinkRegister {
 	return LinkRegister{
@@ -29,9 +29,9 @@ func NewLinkRegister(
 
 // RegisterLink ...
 func (register LinkRegister) RegisterLink(link string) bool {
-	if register.sanitizeLink == sanitizing.SanitizeLink {
+	if register.sanitizeLink == urlutils.SanitizeLink {
 		var err error
-		link, err = sanitizing.ApplyLinkSanitizing(link)
+		link, err = urlutils.ApplyLinkSanitizing(link)
 		if err != nil {
 			register.logger.Logf("unable to sanitize the link: %s", err)
 			return false

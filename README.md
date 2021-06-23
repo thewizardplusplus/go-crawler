@@ -106,7 +106,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -199,7 +199,7 @@ func main() {
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -208,7 +208,7 @@ func main() {
 				LinkChecker: checkers.DuplicateChecker{
 					// don't use here the link register from the duplicate checker above
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -255,7 +255,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -361,7 +361,7 @@ func main() {
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -370,7 +370,7 @@ func main() {
 				LinkChecker: checkers.DuplicateChecker{
 					// don't use here the link register from the duplicate checker above
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -554,7 +554,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -647,7 +647,7 @@ func main() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -700,7 +700,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -793,7 +793,7 @@ func main() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -802,7 +802,7 @@ func main() {
 					LinkChecker: checkers.DuplicateChecker{
 						// don't use here the link register from the duplicate checker above
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -854,7 +854,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -951,7 +951,7 @@ func main() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -960,7 +960,7 @@ func main() {
 					LinkChecker: checkers.DuplicateChecker{
 						// don't use here the link register from the duplicate checker above
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -1315,7 +1315,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/registers/sitemap"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -1472,7 +1472,7 @@ func main() {
 								time.Second,
 								extractors.ExtractorGroup{
 									sitemap.HierarchicalGenerator{
-										SanitizeLink: sanitizing.SanitizeLink,
+										SanitizeLink: urlutils.SanitizeLink,
 									},
 									sitemap.RobotsTXTGenerator{
 										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
@@ -1495,7 +1495,7 @@ func main() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -1504,7 +1504,7 @@ func main() {
 					LinkChecker: checkers.DuplicateChecker{
 						// don't use here the link register from the duplicate checker above
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},

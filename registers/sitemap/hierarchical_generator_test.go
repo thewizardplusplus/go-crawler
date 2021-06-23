@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
 
 func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 	type fields struct {
-		SanitizeLink sanitizing.LinkSanitizing
+		SanitizeLink urlutils.LinkSanitizing
 	}
 	type args struct {
 		ctx      context.Context
@@ -28,7 +28,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success without a trailing slash",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -41,7 +41,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success with a trailing slash",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -57,7 +57,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success with a long path",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -74,7 +74,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success with an HTTPS scheme",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -87,7 +87,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success with an user",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -102,7 +102,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success with a query",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -115,7 +115,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success with a fragment",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -128,7 +128,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "success with sanitizing",
 			fields: fields{
-				SanitizeLink: sanitizing.SanitizeLink,
+				SanitizeLink: urlutils.SanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -144,7 +144,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "error with link sanitizing",
 			fields: fields{
-				SanitizeLink: sanitizing.SanitizeLink,
+				SanitizeLink: urlutils.SanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -157,7 +157,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		{
 			name: "error with link parsing",
 			fields: fields{
-				SanitizeLink: sanitizing.DoNotSanitizeLink,
+				SanitizeLink: urlutils.DoNotSanitizeLink,
 			},
 			args: args{
 				ctx:      context.Background(),

@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
 
 // HierarchicalGenerator ...
 type HierarchicalGenerator struct {
-	SanitizeLink sanitizing.LinkSanitizing
+	SanitizeLink urlutils.LinkSanitizing
 }
 
 // ExtractLinks ...
@@ -23,9 +23,9 @@ func (generator HierarchicalGenerator) ExtractLinks(
 	[]string,
 	error,
 ) {
-	if generator.SanitizeLink == sanitizing.SanitizeLink {
+	if generator.SanitizeLink == urlutils.SanitizeLink {
 		var err error
-		baseLink, err = sanitizing.ApplyLinkSanitizing(baseLink)
+		baseLink, err = urlutils.ApplyLinkSanitizing(baseLink)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to sanitize the base link")
 		}

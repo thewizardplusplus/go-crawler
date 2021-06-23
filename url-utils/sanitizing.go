@@ -1,4 +1,4 @@
-package sanitizing
+package urlutils
 
 import (
 	"net/url"

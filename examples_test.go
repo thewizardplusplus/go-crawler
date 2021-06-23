@@ -24,7 +24,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	"github.com/thewizardplusplus/go-crawler/registers/sitemap"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -186,7 +186,7 @@ func ExampleCrawl() {
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -195,7 +195,7 @@ func ExampleCrawl() {
 				LinkChecker: checkers.DuplicateChecker{
 					// don't use here the link register from the duplicate checker above
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -259,7 +259,7 @@ func ExampleCrawl_withConcurrentHandling() {
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -268,7 +268,7 @@ func ExampleCrawl_withConcurrentHandling() {
 				LinkChecker: checkers.DuplicateChecker{
 					// don't use here the link register from the duplicate checker above
 					LinkRegister: registers.NewLinkRegister(
-						sanitizing.SanitizeLink,
+						urlutils.SanitizeLink,
 						wrappedLogger,
 					),
 				},
@@ -387,7 +387,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnExtracting() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -452,7 +452,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -461,7 +461,7 @@ func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
 					LinkChecker: checkers.DuplicateChecker{
 						// don't use here the link register from the duplicate checker above
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -529,7 +529,7 @@ func ExampleHandleLinksConcurrently_withDelayingExtracting() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -538,7 +538,7 @@ func ExampleHandleLinksConcurrently_withDelayingExtracting() {
 					LinkChecker: checkers.DuplicateChecker{
 						// don't use here the link register from the duplicate checker above
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -719,7 +719,7 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 								time.Second,
 								extractors.ExtractorGroup{
 									sitemap.HierarchicalGenerator{
-										SanitizeLink: sanitizing.SanitizeLink,
+										SanitizeLink: urlutils.SanitizeLink,
 									},
 									sitemap.RobotsTXTGenerator{
 										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
@@ -742,7 +742,7 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 					},
 					checkers.DuplicateChecker{
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},
@@ -751,7 +751,7 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 					LinkChecker: checkers.DuplicateChecker{
 						// don't use here the link register from the duplicate checker above
 						LinkRegister: registers.NewLinkRegister(
-							sanitizing.SanitizeLink,
+							urlutils.SanitizeLink,
 							wrappedLogger,
 						),
 					},

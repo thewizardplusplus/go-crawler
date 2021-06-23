@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
-	"github.com/thewizardplusplus/go-crawler/sanitizing"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
 
 func TestDuplicateChecker_CheckLink(test *testing.T) {
@@ -29,7 +29,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		{
 			name: "without a duplicate",
 			fields: fields{
-				LinkRegister: registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil),
+				LinkRegister: registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -39,7 +39,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				},
 			},
 			wantLinkRegister: func() registers.LinkRegister {
-				linkRegister := registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+				linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil)
 				linkRegister.RegisterLink("http://example.com/test")
 
 				return linkRegister
@@ -51,7 +51,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 			fields: fields{
 				LinkRegister: func() registers.LinkRegister {
 					linkRegister :=
-						registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+						registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil)
 					linkRegister.RegisterLink("http://example.com/test")
 
 					return linkRegister
@@ -65,7 +65,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				},
 			},
 			wantLinkRegister: func() registers.LinkRegister {
-				linkRegister := registers.NewLinkRegister(sanitizing.DoNotSanitizeLink, nil)
+				linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil)
 				linkRegister.RegisterLink("http://example.com/test")
 
 				return linkRegister
