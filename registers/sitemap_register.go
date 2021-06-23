@@ -7,19 +7,13 @@ import (
 
 	"github.com/go-log/log"
 	"github.com/pkg/errors"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/yterajima/go-sitemap"
 )
 
-//go:generate mockery --name=LinkGenerator --inpackage --case=underscore --testonly
-
-// LinkGenerator ...
-type LinkGenerator interface {
-	GenerateLinks(ctx context.Context, baseLink string) ([]string, error)
-}
-
 // SitemapRegister ...
 type SitemapRegister struct {
-	linkGenerator LinkGenerator
+	linkGenerator models.LinkExtractor
 	logger        log.Logger
 
 	registeredSitemaps *sync.Map
@@ -28,7 +22,7 @@ type SitemapRegister struct {
 // NewSitemapRegister ...
 func NewSitemapRegister(
 	loadingInterval time.Duration,
-	linkGenerator LinkGenerator,
+	linkGenerator models.LinkExtractor,
 	logger log.Logger,
 	linkLoader func(link string, options interface{}) ([]byte, error),
 ) SitemapRegister {
@@ -53,7 +47,7 @@ func (register SitemapRegister) RegisterSitemap(
 	sitemap.Sitemap,
 	error,
 ) {
-	sitemapLinks, err := register.linkGenerator.GenerateLinks(ctx, link)
+	sitemapLinks, err := register.linkGenerator.ExtractLinks(ctx, -1, link)
 	if err != nil {
 		return sitemap.Sitemap{}, errors.Wrap(err, "unable to generate Sitemap links")
 	}

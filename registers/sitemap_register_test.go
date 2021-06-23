@@ -13,13 +13,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/yterajima/go-sitemap"
 )
 
 func TestNewSitemapRegister(test *testing.T) {
 	type args struct {
 		loadingInterval time.Duration
-		linkGenerator   LinkGenerator
+		linkGenerator   models.LinkExtractor
 		logger          log.Logger
 		linkLoader      LinkLoader
 	}
@@ -27,7 +28,7 @@ func TestNewSitemapRegister(test *testing.T) {
 	for _, data := range []struct {
 		name                   string
 		args                   args
-		wantLinkGenerator      LinkGenerator
+		wantLinkGenerator      models.LinkExtractor
 		wantLogger             log.Logger
 		wantRegisteredSitemaps *sync.Map
 	}{
@@ -35,11 +36,11 @@ func TestNewSitemapRegister(test *testing.T) {
 			name: "with a link loader",
 			args: args{
 				loadingInterval: 5 * time.Second,
-				linkGenerator:   new(MockLinkGenerator),
+				linkGenerator:   new(MockLinkExtractor),
 				logger:          new(MockLogger),
 				linkLoader:      new(MockLinkLoader),
 			},
-			wantLinkGenerator:      new(MockLinkGenerator),
+			wantLinkGenerator:      new(MockLinkExtractor),
 			wantLogger:             new(MockLogger),
 			wantRegisteredSitemaps: new(sync.Map),
 		},
@@ -47,11 +48,11 @@ func TestNewSitemapRegister(test *testing.T) {
 			name: "without a link loader",
 			args: args{
 				loadingInterval: 5 * time.Second,
-				linkGenerator:   new(MockLinkGenerator),
+				linkGenerator:   new(MockLinkExtractor),
 				logger:          new(MockLogger),
 				linkLoader:      nil,
 			},
-			wantLinkGenerator:      new(MockLinkGenerator),
+			wantLinkGenerator:      new(MockLinkExtractor),
 			wantLogger:             new(MockLogger),
 			wantRegisteredSitemaps: new(sync.Map),
 		},
@@ -85,7 +86,7 @@ func TestNewSitemapRegister(test *testing.T) {
 
 func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 	type fields struct {
-		linkGenerator      LinkGenerator
+		linkGenerator      models.LinkExtractor
 		linkLoader         LinkLoader
 		registeredSitemaps *sync.Map
 	}
@@ -104,15 +105,15 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				linkGenerator: func() LinkGenerator {
+				linkGenerator: func() models.LinkExtractor {
 					sitemapLinks := []string{
 						"http://example.com/sitemap_1.xml",
 						"http://example.com/sitemap_2.xml",
 					}
 
-					linkGenerator := new(MockLinkGenerator)
+					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("GenerateLinks", context.Background(), "http://example.com/test").
+						On("ExtractLinks", context.Background(), -1, "http://example.com/test").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
@@ -170,10 +171,10 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 		{
 			name: "error",
 			fields: fields{
-				linkGenerator: func() LinkGenerator {
-					linkGenerator := new(MockLinkGenerator)
+				linkGenerator: func() models.LinkExtractor {
+					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("GenerateLinks", context.Background(), "http://example.com/test").
+						On("ExtractLinks", context.Background(), -1, "http://example.com/test").
 						Return(nil, iotest.ErrTimeout)
 
 					return linkGenerator

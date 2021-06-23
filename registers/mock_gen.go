@@ -2,6 +2,7 @@ package registers
 
 import (
 	"github.com/go-log/log"
+	"github.com/thewizardplusplus/go-crawler/models"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
@@ -23,6 +24,16 @@ type Logger interface {
 //
 type HTTPClient interface {
 	httputils.HTTPClient
+}
+
+//go:generate mockery --name=LinkExtractor --inpackage --case=underscore --testonly
+
+// LinkExtractor ...
+//
+// It's used only for mock generating.
+//
+type LinkExtractor interface {
+	models.LinkExtractor
 }
 
 //go:generate mockery --name=LinkLoader --inpackage --case=underscore --testonly
