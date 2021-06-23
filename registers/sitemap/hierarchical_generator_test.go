@@ -8,12 +8,13 @@ import (
 	"github.com/thewizardplusplus/go-crawler/sanitizing"
 )
 
-func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
+func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 	type fields struct {
 		SanitizeLink sanitizing.LinkSanitizing
 	}
 	type args struct {
 		ctx      context.Context
+		threadID int
 		baseLink string
 	}
 
@@ -31,6 +32,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
@@ -43,6 +45,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test/",
 			},
 			wantSitemapLinks: []string{
@@ -58,6 +61,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/one/two/test",
 			},
 			wantSitemapLinks: []string{
@@ -74,6 +78,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "https://example.com/test",
 			},
 			wantSitemapLinks: []string{"https://example.com/sitemap.xml"},
@@ -86,6 +91,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://username:password@example.com/test",
 			},
 			wantSitemapLinks: []string{
@@ -100,6 +106,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test?key=value",
 			},
 			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
@@ -112,6 +119,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test#fragment",
 			},
 			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
@@ -124,6 +132,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/one/two/../test",
 			},
 			wantSitemapLinks: []string{
@@ -139,6 +148,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: ":",
 			},
 			wantSitemapLinks: nil,
@@ -151,6 +161,7 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: ":",
 			},
 			wantSitemapLinks: nil,
@@ -161,8 +172,11 @@ func TestHierarchicalGenerator_GenerateLinks(test *testing.T) {
 			generator := HierarchicalGenerator{
 				SanitizeLink: data.fields.SanitizeLink,
 			}
-			gotSitemapLinks, gotErr :=
-				generator.GenerateLinks(data.args.ctx, data.args.baseLink)
+			gotSitemapLinks, gotErr := generator.ExtractLinks(
+				data.args.ctx,
+				data.args.threadID,
+				data.args.baseLink,
+			)
 
 			assert.Equal(test, data.wantSitemapLinks, gotSitemapLinks)
 			data.wantErr(test, gotErr)

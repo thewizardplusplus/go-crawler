@@ -14,9 +14,10 @@ type HierarchicalGenerator struct {
 	SanitizeLink sanitizing.LinkSanitizing
 }
 
-// GenerateLinks ...
-func (generator HierarchicalGenerator) GenerateLinks(
+// ExtractLinks ...
+func (generator HierarchicalGenerator) ExtractLinks(
 	ctx context.Context,
+	threadID int,
 	baseLink string,
 ) (
 	[]string,

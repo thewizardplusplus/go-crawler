@@ -12,12 +12,13 @@ import (
 	"github.com/thewizardplusplus/go-crawler/registers"
 )
 
-func TestRobotsTXTGenerator_GenerateLinks(test *testing.T) {
+func TestRobotsTXTGenerator_ExtractLinks(test *testing.T) {
 	type fields struct {
 		RobotsTXTRegister registers.RobotsTXTRegister
 	}
 	type args struct {
 		ctx      context.Context
+		threadID int
 		baseLink string
 	}
 
@@ -60,6 +61,7 @@ func TestRobotsTXTGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: nil,
@@ -100,6 +102,7 @@ func TestRobotsTXTGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: []string{
@@ -125,6 +128,7 @@ func TestRobotsTXTGenerator_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: nil,
@@ -135,8 +139,11 @@ func TestRobotsTXTGenerator_GenerateLinks(test *testing.T) {
 			generator := RobotsTXTGenerator{
 				RobotsTXTRegister: data.fields.RobotsTXTRegister,
 			}
-			gotSitemapLinks, gotErr :=
-				generator.GenerateLinks(data.args.ctx, data.args.baseLink)
+			gotSitemapLinks, gotErr := generator.ExtractLinks(
+				data.args.ctx,
+				data.args.threadID,
+				data.args.baseLink,
+			)
 
 			assert.Equal(test, data.wantSitemapLinks, gotSitemapLinks)
 			data.wantErr(test, gotErr)

@@ -1,18 +1,18 @@
 package sitemap
 
 import (
-	"github.com/thewizardplusplus/go-crawler/registers"
+	"github.com/thewizardplusplus/go-crawler/models"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
-//go:generate mockery --name=LinkGenerator --inpackage --case=underscore --testonly
+//go:generate mockery --name=LinkExtractor --inpackage --case=underscore --testonly
 
-// LinkGenerator ...
+// LinkExtractor ...
 //
 // It's used only for mock generating.
 //
-type LinkGenerator interface {
-	registers.LinkGenerator
+type LinkExtractor interface {
+	models.LinkExtractor
 }
 
 //go:generate mockery --name=HTTPClient --inpackage --case=underscore --testonly

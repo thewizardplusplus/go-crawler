@@ -12,9 +12,10 @@ type RobotsTXTGenerator struct {
 	RobotsTXTRegister registers.RobotsTXTRegister
 }
 
-// GenerateLinks ...
-func (generator RobotsTXTGenerator) GenerateLinks(
+// ExtractLinks ...
+func (generator RobotsTXTGenerator) ExtractLinks(
 	ctx context.Context,
+	threadID int,
 	baseLink string,
 ) (
 	[]string,

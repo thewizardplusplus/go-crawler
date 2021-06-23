@@ -7,12 +7,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/thewizardplusplus/go-crawler/registers"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
-func TestGeneratorGroup_GenerateLinks(test *testing.T) {
+func TestGeneratorGroup_ExtractLinks(test *testing.T) {
 	type args struct {
 		ctx      context.Context
+		threadID int
 		baseLink string
 	}
 
@@ -28,6 +29,7 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 			generators: nil,
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: nil,
@@ -36,12 +38,12 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 		{
 			name: "without failed generatings",
 			generators: GeneratorGroup{
-				func() registers.LinkGenerator {
+				func() models.LinkExtractor {
 					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
 
-					generator := new(MockLinkGenerator)
+					generator := new(MockLinkExtractor)
 					generator.
-						On("GenerateLinks", ctxMatcher, "http://example.com/test").
+						On("ExtractLinks", ctxMatcher, 23, "http://example.com/test").
 						Return(
 							[]string{
 								"http://example.com/sitemap_1.xml",
@@ -52,12 +54,12 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 
 					return generator
 				}(),
-				func() registers.LinkGenerator {
+				func() models.LinkExtractor {
 					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
 
-					generator := new(MockLinkGenerator)
+					generator := new(MockLinkExtractor)
 					generator.
-						On("GenerateLinks", ctxMatcher, "http://example.com/test").
+						On("ExtractLinks", ctxMatcher, 23, "http://example.com/test").
 						Return(
 							[]string{
 								"http://example.com/sitemap_3.xml",
@@ -71,6 +73,7 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: []string{
@@ -84,22 +87,22 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 		{
 			name: "with some failed generatings",
 			generators: GeneratorGroup{
-				func() registers.LinkGenerator {
+				func() models.LinkExtractor {
 					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
 
-					generator := new(MockLinkGenerator)
+					generator := new(MockLinkExtractor)
 					generator.
-						On("GenerateLinks", ctxMatcher, "http://example.com/test").
+						On("ExtractLinks", ctxMatcher, 23, "http://example.com/test").
 						Return(nil, iotest.ErrTimeout)
 
 					return generator
 				}(),
-				func() registers.LinkGenerator {
+				func() models.LinkExtractor {
 					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
 
-					generator := new(MockLinkGenerator)
+					generator := new(MockLinkExtractor)
 					generator.
-						On("GenerateLinks", ctxMatcher, "http://example.com/test").
+						On("ExtractLinks", ctxMatcher, 23, "http://example.com/test").
 						Return(
 							[]string{
 								"http://example.com/sitemap_3.xml",
@@ -113,6 +116,7 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: nil,
@@ -121,22 +125,22 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 		{
 			name: "with all failed generatings",
 			generators: GeneratorGroup{
-				func() registers.LinkGenerator {
+				func() models.LinkExtractor {
 					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
 
-					generator := new(MockLinkGenerator)
+					generator := new(MockLinkExtractor)
 					generator.
-						On("GenerateLinks", ctxMatcher, "http://example.com/test").
+						On("ExtractLinks", ctxMatcher, 23, "http://example.com/test").
 						Return(nil, iotest.ErrTimeout)
 
 					return generator
 				}(),
-				func() registers.LinkGenerator {
+				func() models.LinkExtractor {
 					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
 
-					generator := new(MockLinkGenerator)
+					generator := new(MockLinkExtractor)
 					generator.
-						On("GenerateLinks", ctxMatcher, "http://example.com/test").
+						On("ExtractLinks", ctxMatcher, 23, "http://example.com/test").
 						Return(nil, iotest.ErrTimeout)
 
 					return generator
@@ -144,6 +148,7 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 			},
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: nil,
@@ -151,8 +156,11 @@ func TestGeneratorGroup_GenerateLinks(test *testing.T) {
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			gotSitemapLinks, gotErr :=
-				data.generators.GenerateLinks(data.args.ctx, data.args.baseLink)
+			gotSitemapLinks, gotErr := data.generators.ExtractLinks(
+				data.args.ctx,
+				data.args.threadID,
+				data.args.baseLink,
+			)
 
 			assert.Equal(test, data.wantSitemapLinks, gotSitemapLinks)
 			data.wantErr(test, gotErr)

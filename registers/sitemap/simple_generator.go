@@ -10,9 +10,10 @@ import (
 // SimpleGenerator ...
 type SimpleGenerator struct{}
 
-// GenerateLinks ...
-func (generator SimpleGenerator) GenerateLinks(
+// ExtractLinks ...
+func (generator SimpleGenerator) ExtractLinks(
 	ctx context.Context,
+	threadID int,
 	baseLink string,
 ) (
 	[]string,

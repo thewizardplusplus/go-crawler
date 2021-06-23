@@ -4,16 +4,17 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"github.com/thewizardplusplus/go-crawler/registers"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"golang.org/x/sync/errgroup"
 )
 
 // GeneratorGroup ...
-type GeneratorGroup []registers.LinkGenerator
+type GeneratorGroup []models.LinkExtractor
 
-// GenerateLinks ...
-func (generators GeneratorGroup) GenerateLinks(
+// ExtractLinks ...
+func (generators GeneratorGroup) ExtractLinks(
 	ctx context.Context,
+	threadID int,
 	baseLink string,
 ) (
 	[]string,
@@ -26,7 +27,7 @@ func (generators GeneratorGroup) GenerateLinks(
 		index, generator := index, generator
 
 		waiter.Go(func() error {
-			links, err := generator.GenerateLinks(ctx, baseLink)
+			links, err := generator.ExtractLinks(ctx, threadID, baseLink)
 			if err != nil {
 				return errors.Wrapf(err, "error with generator #%d", index)
 			}

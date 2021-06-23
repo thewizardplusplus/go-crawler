@@ -7,9 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSimpleGenerator_GenerateLinks(test *testing.T) {
+func TestSimpleGenerator_ExtractLinks(test *testing.T) {
 	type args struct {
 		ctx      context.Context
+		threadID int
 		baseLink string
 	}
 
@@ -23,6 +24,7 @@ func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 			name: "success with a path only",
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test",
 			},
 			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
@@ -32,6 +34,7 @@ func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 			name: "success with an HTTPS scheme",
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "https://example.com/test",
 			},
 			wantSitemapLinks: []string{"https://example.com/sitemap.xml"},
@@ -41,6 +44,7 @@ func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 			name: "success with an user",
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://username:password@example.com/test",
 			},
 			wantSitemapLinks: []string{
@@ -52,6 +56,7 @@ func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 			name: "success with a query",
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test?key=value",
 			},
 			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
@@ -61,6 +66,7 @@ func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 			name: "success with a fragment",
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: "http://example.com/test#fragment",
 			},
 			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
@@ -70,6 +76,7 @@ func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 			name: "error",
 			args: args{
 				ctx:      context.Background(),
+				threadID: 23,
 				baseLink: ":",
 			},
 			wantSitemapLinks: nil,
@@ -78,8 +85,11 @@ func TestSimpleGenerator_GenerateLinks(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			var generator SimpleGenerator
-			gotSitemapLinks, gotErr :=
-				generator.GenerateLinks(data.args.ctx, data.args.baseLink)
+			gotSitemapLinks, gotErr := generator.ExtractLinks(
+				data.args.ctx,
+				data.args.threadID,
+				data.args.baseLink,
+			)
 
 			assert.Equal(test, data.wantSitemapLinks, gotSitemapLinks)
 			data.wantErr(test, gotErr)
