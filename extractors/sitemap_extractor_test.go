@@ -10,13 +10,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 )
 
 func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
 		loadingInterval time.Duration
-		linkGenerator   registers.LinkGenerator
+		linkGenerator   models.LinkExtractor
 		logger          log.Logger
 		linkLoader      LinkLoader
 	}
@@ -37,10 +38,10 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 			name: "success without sitemap.xml links",
 			fields: fields{
 				loadingInterval: 5 * time.Second,
-				linkGenerator: func() LinkGenerator {
-					linkGenerator := new(MockLinkGenerator)
+				linkGenerator: func() models.LinkExtractor {
+					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("GenerateLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), -1, "http://example.com/").
 						Return(nil, nil)
 
 					return linkGenerator
@@ -60,15 +61,15 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 			name: "success without links",
 			fields: fields{
 				loadingInterval: 5 * time.Second,
-				linkGenerator: func() LinkGenerator {
+				linkGenerator: func() models.LinkExtractor {
 					sitemapLinks := []string{
 						"http://example.com/sitemap_1.xml",
 						"http://example.com/sitemap_2.xml",
 					}
 
-					linkGenerator := new(MockLinkGenerator)
+					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("GenerateLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), -1, "http://example.com/").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
@@ -109,15 +110,15 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 			name: "success with links",
 			fields: fields{
 				loadingInterval: 5 * time.Second,
-				linkGenerator: func() LinkGenerator {
+				linkGenerator: func() models.LinkExtractor {
 					sitemapLinks := []string{
 						"http://example.com/sitemap_1.xml",
 						"http://example.com/sitemap_2.xml",
 					}
 
-					linkGenerator := new(MockLinkGenerator)
+					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("GenerateLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), -1, "http://example.com/").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
@@ -175,10 +176,10 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 			name: "error with generation",
 			fields: fields{
 				loadingInterval: 5 * time.Second,
-				linkGenerator: func() LinkGenerator {
-					linkGenerator := new(MockLinkGenerator)
+				linkGenerator: func() models.LinkExtractor {
+					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("GenerateLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), -1, "http://example.com/").
 						Return(nil, iotest.ErrTimeout)
 
 					return linkGenerator
@@ -212,15 +213,15 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 			name: "error with loading",
 			fields: fields{
 				loadingInterval: 5 * time.Second,
-				linkGenerator: func() LinkGenerator {
+				linkGenerator: func() models.LinkExtractor {
 					sitemapLinks := []string{
 						"http://example.com/sitemap_1.xml",
 						"http://example.com/sitemap_2.xml",
 					}
 
-					linkGenerator := new(MockLinkGenerator)
+					linkGenerator := new(MockLinkExtractor)
 					linkGenerator.
-						On("GenerateLinks", context.Background(), "http://example.com/").
+						On("ExtractLinks", context.Background(), -1, "http://example.com/").
 						Return(sitemapLinks, nil)
 
 					return linkGenerator
