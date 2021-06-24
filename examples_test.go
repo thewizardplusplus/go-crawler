@@ -165,18 +165,122 @@ func ExampleCrawl() {
 		[]string{server.URL},
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.NewDelayingExtractor(
-					time.Second,
-					time.Sleep,
-					extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-					},
-				),
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
 				RepeatCount:  5,
-				RepeatDelay:  0,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.HostChecker{
+				Logger: wrappedLogger,
+			},
+			LinkHandler: LinkHandler{
+				ServerURL: server.URL,
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
+func ExampleCrawl_withoutDuplicatesOnExtracting() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.CheckerGroup{
+				checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				checkers.DuplicateChecker{
+					LinkRegister: registers.NewLinkRegister(
+						urlutils.SanitizeLink,
+						wrappedLogger,
+					),
+				},
+			},
+			LinkHandler: LinkHandler{
+				ServerURL: server.URL,
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
+func ExampleCrawl_withoutDuplicatesOnHandling() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
 				Logger:       wrappedLogger,
 				SleepHandler: time.Sleep,
 			},
@@ -217,7 +321,7 @@ func ExampleCrawl() {
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
 
-func ExampleCrawl_withConcurrentHandling() {
+func ExampleCrawl_withDelayingExtracting() {
 	server := RunServer()
 	defer server.Close()
 
@@ -225,12 +329,8 @@ func ExampleCrawl_withConcurrentHandling() {
 	// wrap the standard logger via the github.com/go-log/log package
 	wrappedLogger := print.New(logger)
 
-	crawler.CrawlByConcurrentHandler(
+	crawler.Crawl(
 		context.Background(),
-		crawler.ConcurrencyConfig{
-			ConcurrencyFactor: runtime.NumCPU(),
-			BufferSize:        1000,
-		},
 		crawler.ConcurrencyConfig{
 			ConcurrencyFactor: runtime.NumCPU(),
 			BufferSize:        1000,
@@ -286,6 +386,258 @@ func ExampleCrawl_withConcurrentHandling() {
 	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
 	// have got the link "http://example.com/2" from the page "http://example.com"
 	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
+func ExampleCrawl_withRobotsTXTOnExtracting() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.CheckerGroup{
+				checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				checkers.RobotsTXTChecker{
+					UserAgent:         "go-crawler",
+					RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
+					Logger:            wrappedLogger,
+				},
+			},
+			LinkHandler: LinkHandler{
+				ServerURL: server.URL,
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
+func ExampleCrawl_withRobotsTXTOnHandling() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.HostChecker{
+				Logger: wrappedLogger,
+			},
+			LinkHandler: handlers.CheckedHandler{
+				LinkChecker: checkers.RobotsTXTChecker{
+					UserAgent:         "go-crawler",
+					RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
+					Logger:            wrappedLogger,
+				},
+				LinkHandler: LinkHandler{
+					ServerURL: server.URL,
+				},
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
+func ExampleCrawl_withSitemap() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.ExtractorGroup{
+					extractors.DefaultExtractor{
+						HTTPClient: http.DefaultClient,
+						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+							"a": {"href"},
+						}),
+					},
+					extractors.SitemapExtractor{
+						SitemapRegister: registers.NewSitemapRegister(
+							time.Second,
+							extractors.ExtractorGroup{
+								sitemap.HierarchicalGenerator{
+									SanitizeLink: urlutils.SanitizeLink,
+									MaximalDepth: -1,
+								},
+								sitemap.RobotsTXTGenerator{
+									RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
+								},
+							},
+							wrappedLogger,
+							sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
+						),
+						Logger: wrappedLogger,
+					},
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.CheckerGroup{
+				checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				checkers.DuplicateChecker{
+					LinkRegister: registers.NewLinkRegister(
+						urlutils.SanitizeLink,
+						wrappedLogger,
+					),
+				},
+			},
+			LinkHandler: handlers.CheckedHandler{
+				LinkChecker: checkers.DuplicateChecker{
+					// don't use here the link register from the duplicate checker above
+					LinkRegister: registers.NewLinkRegister(
+						urlutils.SanitizeLink,
+						wrappedLogger,
+					),
+				},
+				LinkHandler: LinkHandler{
+					ServerURL: server.URL,
+				},
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
+	// have got the link "http://example.com/hidden/1" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/1/test" from the page "http://example.com/hidden/1"
+	// have got the link "http://example.com/hidden/2" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/3" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/4" from the page "http://example.com"
+	// have got the link "http://example.com/hidden/5" from the page "http://example.com/hidden/1/test"
+	// have got the link "http://example.com/hidden/6" from the page "http://example.com/hidden/1/test"
+	// have got the link "https://golang.org/" from the page "http://example.com"
+}
+
+func ExampleCrawlByConcurrentHandler() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.CrawlByConcurrentHandler(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.HostChecker{
+				Logger: wrappedLogger,
+			},
+			LinkHandler: LinkHandler{
+				ServerURL: server.URL,
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// have got the link "http://example.com/1" from the page "http://example.com"
+	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
+	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2" from the page "http://example.com"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
+	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
@@ -346,441 +698,5 @@ func ExampleHandleLinksConcurrently() {
 	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
 	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
 	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
-}
-
-func ExampleHandleLinksConcurrently_withoutDuplicatesOnExtracting() {
-	server := RunServer()
-	defer server.Close()
-
-	links := make(chan string, 1000)
-	links <- server.URL
-
-	var waiter sync.WaitGroup
-	waiter.Add(1)
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.HandleLinksConcurrently(
-		context.Background(),
-		runtime.NumCPU(),
-		links,
-		crawler.HandleLinkDependencies{
-			CrawlDependencies: crawler.CrawlDependencies{
-				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-					},
-					RepeatCount:  5,
-					RepeatDelay:  time.Second,
-					Logger:       wrappedLogger,
-					SleepHandler: time.Sleep,
-				},
-				LinkChecker: checkers.CheckerGroup{
-					checkers.HostChecker{
-						Logger: wrappedLogger,
-					},
-					checkers.DuplicateChecker{
-						LinkRegister: registers.NewLinkRegister(
-							urlutils.SanitizeLink,
-							wrappedLogger,
-						),
-					},
-				},
-				LinkHandler: LinkHandler{
-					ServerURL: server.URL,
-				},
-				Logger: wrappedLogger,
-			},
-			Waiter: &waiter,
-		},
-	)
-
-	waiter.Wait()
-
-	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
-}
-
-func ExampleHandleLinksConcurrently_withoutDuplicatesOnHandling() {
-	server := RunServer()
-	defer server.Close()
-
-	links := make(chan string, 1000)
-	links <- server.URL
-
-	var waiter sync.WaitGroup
-	waiter.Add(1)
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.HandleLinksConcurrently(
-		context.Background(),
-		runtime.NumCPU(),
-		links,
-		crawler.HandleLinkDependencies{
-			CrawlDependencies: crawler.CrawlDependencies{
-				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-					},
-					RepeatCount:  5,
-					RepeatDelay:  time.Second,
-					Logger:       wrappedLogger,
-					SleepHandler: time.Sleep,
-				},
-				LinkChecker: checkers.CheckerGroup{
-					checkers.HostChecker{
-						Logger: wrappedLogger,
-					},
-					checkers.DuplicateChecker{
-						LinkRegister: registers.NewLinkRegister(
-							urlutils.SanitizeLink,
-							wrappedLogger,
-						),
-					},
-				},
-				LinkHandler: handlers.CheckedHandler{
-					LinkChecker: checkers.DuplicateChecker{
-						// don't use here the link register from the duplicate checker above
-						LinkRegister: registers.NewLinkRegister(
-							urlutils.SanitizeLink,
-							wrappedLogger,
-						),
-					},
-					LinkHandler: LinkHandler{
-						ServerURL: server.URL,
-					},
-				},
-				Logger: wrappedLogger,
-			},
-			Waiter: &waiter,
-		},
-	)
-
-	waiter.Wait()
-
-	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
-}
-
-func ExampleHandleLinksConcurrently_withDelayingExtracting() {
-	server := RunServer()
-	defer server.Close()
-
-	links := make(chan string, 1000)
-	links <- server.URL
-
-	var waiter sync.WaitGroup
-	waiter.Add(1)
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.HandleLinksConcurrently(
-		context.Background(),
-		runtime.NumCPU(),
-		links,
-		crawler.HandleLinkDependencies{
-			CrawlDependencies: crawler.CrawlDependencies{
-				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.NewDelayingExtractor(
-						time.Second,
-						time.Sleep,
-						extractors.DefaultExtractor{
-							HTTPClient: http.DefaultClient,
-							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-								"a": {"href"},
-							}),
-						},
-					),
-					RepeatCount:  5,
-					RepeatDelay:  0,
-					Logger:       wrappedLogger,
-					SleepHandler: time.Sleep,
-				},
-				LinkChecker: checkers.CheckerGroup{
-					checkers.HostChecker{
-						Logger: wrappedLogger,
-					},
-					checkers.DuplicateChecker{
-						LinkRegister: registers.NewLinkRegister(
-							urlutils.SanitizeLink,
-							wrappedLogger,
-						),
-					},
-				},
-				LinkHandler: handlers.CheckedHandler{
-					LinkChecker: checkers.DuplicateChecker{
-						// don't use here the link register from the duplicate checker above
-						LinkRegister: registers.NewLinkRegister(
-							urlutils.SanitizeLink,
-							wrappedLogger,
-						),
-					},
-					LinkHandler: LinkHandler{
-						ServerURL: server.URL,
-					},
-				},
-				Logger: wrappedLogger,
-			},
-			Waiter: &waiter,
-		},
-	)
-
-	waiter.Wait()
-
-	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
-}
-
-func ExampleHandleLinksConcurrently_withRobotsTXTOnExtracting() {
-	server := RunServer()
-	defer server.Close()
-
-	links := make(chan string, 1000)
-	links <- server.URL
-
-	var waiter sync.WaitGroup
-	waiter.Add(1)
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.HandleLinksConcurrently(
-		context.Background(),
-		runtime.NumCPU(),
-		links,
-		crawler.HandleLinkDependencies{
-			CrawlDependencies: crawler.CrawlDependencies{
-				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-					},
-					RepeatCount:  5,
-					RepeatDelay:  time.Second,
-					Logger:       wrappedLogger,
-					SleepHandler: time.Sleep,
-				},
-				LinkChecker: checkers.CheckerGroup{
-					checkers.HostChecker{
-						Logger: wrappedLogger,
-					},
-					checkers.RobotsTXTChecker{
-						UserAgent:         "go-crawler",
-						RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
-						Logger:            wrappedLogger,
-					},
-				},
-				LinkHandler: LinkHandler{
-					ServerURL: server.URL,
-				},
-				Logger: wrappedLogger,
-			},
-			Waiter: &waiter,
-		},
-	)
-
-	waiter.Wait()
-
-	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "https://golang.org/" from the page "http://example.com"
-}
-
-func ExampleHandleLinksConcurrently_withRobotsTXTOnHandling() {
-	server := RunServer()
-	defer server.Close()
-
-	links := make(chan string, 1000)
-	links <- server.URL
-
-	var waiter sync.WaitGroup
-	waiter.Add(1)
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.HandleLinksConcurrently(
-		context.Background(),
-		runtime.NumCPU(),
-		links,
-		crawler.HandleLinkDependencies{
-			CrawlDependencies: crawler.CrawlDependencies{
-				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-					},
-					RepeatCount:  5,
-					RepeatDelay:  time.Second,
-					Logger:       wrappedLogger,
-					SleepHandler: time.Sleep,
-				},
-				LinkChecker: checkers.HostChecker{
-					Logger: wrappedLogger,
-				},
-				LinkHandler: handlers.CheckedHandler{
-					LinkChecker: checkers.RobotsTXTChecker{
-						UserAgent:         "go-crawler",
-						RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
-						Logger:            wrappedLogger,
-					},
-					LinkHandler: LinkHandler{
-						ServerURL: server.URL,
-					},
-				},
-				Logger: wrappedLogger,
-			},
-			Waiter: &waiter,
-		},
-	)
-
-	waiter.Wait()
-
-	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "https://golang.org/" from the page "http://example.com"
-}
-
-func ExampleHandleLinksConcurrently_withSitemap() {
-	server := RunServer()
-	defer server.Close()
-
-	links := make(chan string, 1000)
-	links <- server.URL
-
-	var waiter sync.WaitGroup
-	waiter.Add(1)
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.HandleLinksConcurrently(
-		context.Background(),
-		runtime.NumCPU(),
-		links,
-		crawler.HandleLinkDependencies{
-			CrawlDependencies: crawler.CrawlDependencies{
-				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.ExtractorGroup{
-						extractors.DefaultExtractor{
-							HTTPClient: http.DefaultClient,
-							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-								"a": {"href"},
-							}),
-						},
-						extractors.SitemapExtractor{
-							SitemapRegister: registers.NewSitemapRegister(
-								time.Second,
-								extractors.ExtractorGroup{
-									sitemap.HierarchicalGenerator{
-										SanitizeLink: urlutils.SanitizeLink,
-										MaximalDepth: -1,
-									},
-									sitemap.RobotsTXTGenerator{
-										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
-									},
-								},
-								wrappedLogger,
-								sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
-							),
-							Logger: wrappedLogger,
-						},
-					},
-					RepeatCount:  5,
-					RepeatDelay:  time.Second,
-					Logger:       wrappedLogger,
-					SleepHandler: time.Sleep,
-				},
-				LinkChecker: checkers.CheckerGroup{
-					checkers.HostChecker{
-						Logger: wrappedLogger,
-					},
-					checkers.DuplicateChecker{
-						LinkRegister: registers.NewLinkRegister(
-							urlutils.SanitizeLink,
-							wrappedLogger,
-						),
-					},
-				},
-				LinkHandler: handlers.CheckedHandler{
-					LinkChecker: checkers.DuplicateChecker{
-						// don't use here the link register from the duplicate checker above
-						LinkRegister: registers.NewLinkRegister(
-							urlutils.SanitizeLink,
-							wrappedLogger,
-						),
-					},
-					LinkHandler: LinkHandler{
-						ServerURL: server.URL,
-					},
-				},
-				Logger: wrappedLogger,
-			},
-			Waiter: &waiter,
-		},
-	)
-
-	waiter.Wait()
-
-	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "http://example.com/hidden/1" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/1/test" from the page "http://example.com/hidden/1"
-	// have got the link "http://example.com/hidden/2" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/3" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/4" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/5" from the page "http://example.com/hidden/1/test"
-	// have got the link "http://example.com/hidden/6" from the page "http://example.com/hidden/1/test"
 	// have got the link "https://golang.org/" from the page "http://example.com"
 }
