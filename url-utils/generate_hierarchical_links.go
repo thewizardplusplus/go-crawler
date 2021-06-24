@@ -34,8 +34,11 @@ func GenerateHierarchicalLinks(
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to parse the base link")
 	}
-	if !strings.HasPrefix(parsedBaseLink.Path, "/") {
+	if parsedBaseLink.Path != "" && !strings.HasPrefix(parsedBaseLink.Path, "/") {
 		return nil, errors.New("link path is not absolute")
+	}
+	if parsedBaseLink.Path == "" {
+		parsedBaseLink.Path = "/"
 	}
 
 	pathParts := strings.Split(parsedBaseLink.Path, "/")

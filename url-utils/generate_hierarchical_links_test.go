@@ -20,6 +20,26 @@ func TestGenerateHierarchicalLinks(test *testing.T) {
 		wantErr   assert.ErrorAssertionFunc
 	}{
 		{
+			name: "success with an empty path and without a trailing slash",
+			args: args{
+				baseLink:   "http://example.com",
+				linkSuffix: "suffix",
+				options:    nil,
+			},
+			wantLinks: []string{"http://example.com/suffix"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with an empty path and trailing slash",
+			args: args{
+				baseLink:   "http://example.com/",
+				linkSuffix: "suffix",
+				options:    nil,
+			},
+			wantLinks: []string{"http://example.com/suffix"},
+			wantErr:   assert.NoError,
+		},
+		{
 			name: "success without a trailing slash",
 			args: args{
 				baseLink:   "http://example.com/test",
