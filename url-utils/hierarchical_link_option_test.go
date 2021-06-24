@@ -13,3 +13,11 @@ func TestSanitizeBaseLink(test *testing.T) {
 
 	assert.Equal(test, SanitizeLink, config.sanitizeBaseLink)
 }
+
+func TestWithMaximalHierarchyDepth(test *testing.T) {
+	var config HierarchicalLinkConfig
+	option := WithMaximalHierarchyDepth(23)
+	option(&config)
+
+	assert.Equal(test, 23, config.maximalHierarchyDepth)
+}
