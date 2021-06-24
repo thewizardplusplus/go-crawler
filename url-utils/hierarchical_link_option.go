@@ -8,3 +8,10 @@ type HierarchicalLinkConfig struct {
 
 // HierarchicalLinkOption ...
 type HierarchicalLinkOption func(config *HierarchicalLinkConfig)
+
+// SanitizeBaseLink ...
+func SanitizeBaseLink(sanitize LinkSanitizing) HierarchicalLinkOption {
+	return func(config *HierarchicalLinkConfig) {
+		config.sanitizeBaseLink = sanitize
+	}
+}
