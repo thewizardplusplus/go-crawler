@@ -15,3 +15,10 @@ func SanitizeBaseLink(sanitize LinkSanitizing) HierarchicalLinkOption {
 		config.sanitizeBaseLink = sanitize
 	}
 }
+
+// WithMaximalHierarchyDepth ...
+func WithMaximalHierarchyDepth(depth int) HierarchicalLinkOption {
+	return func(config *HierarchicalLinkConfig) {
+		config.maximalHierarchyDepth = depth
+	}
+}
