@@ -720,6 +720,7 @@ func ExampleHandleLinksConcurrently_withSitemap() {
 								extractors.ExtractorGroup{
 									sitemap.HierarchicalGenerator{
 										SanitizeLink: urlutils.SanitizeLink,
+										MaximalDepth: -1,
 									},
 									sitemap.RobotsTXTGenerator{
 										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),

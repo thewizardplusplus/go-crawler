@@ -11,6 +11,7 @@ import (
 func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 	type fields struct {
 		SanitizeLink urlutils.LinkSanitizing
+		MaximalDepth int
 	}
 	type args struct {
 		ctx      context.Context
@@ -26,43 +27,34 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		wantErr          assert.ErrorAssertionFunc
 	}{
 		{
-			name: "success without a trailing slash",
+			name: "success",
 			fields: fields{
 				SanitizeLink: urlutils.DoNotSanitizeLink,
+				MaximalDepth: -1,
 			},
 			args: args{
 				ctx:      context.Background(),
 				threadID: 23,
-				baseLink: "http://example.com/test",
-			},
-			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
-			wantErr:          assert.NoError,
-		},
-		{
-			name: "success with a trailing slash",
-			fields: fields{
-				SanitizeLink: urlutils.DoNotSanitizeLink,
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				baseLink: "http://example.com/test/",
+				baseLink: "http://example.com/one/two/three/test",
 			},
 			wantSitemapLinks: []string{
 				"http://example.com/sitemap.xml",
-				"http://example.com/test/sitemap.xml",
+				"http://example.com/one/sitemap.xml",
+				"http://example.com/one/two/sitemap.xml",
+				"http://example.com/one/two/three/sitemap.xml",
 			},
 			wantErr: assert.NoError,
 		},
 		{
-			name: "success with a long path",
+			name: "success with a depth limit",
 			fields: fields{
 				SanitizeLink: urlutils.DoNotSanitizeLink,
+				MaximalDepth: 2,
 			},
 			args: args{
 				ctx:      context.Background(),
 				threadID: 23,
-				baseLink: "http://example.com/one/two/test",
+				baseLink: "http://example.com/one/two/three/test",
 			},
 			wantSitemapLinks: []string{
 				"http://example.com/sitemap.xml",
@@ -72,92 +64,28 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 			wantErr: assert.NoError,
 		},
 		{
-			name: "success with an HTTPS scheme",
-			fields: fields{
-				SanitizeLink: urlutils.DoNotSanitizeLink,
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				baseLink: "https://example.com/test",
-			},
-			wantSitemapLinks: []string{"https://example.com/sitemap.xml"},
-			wantErr:          assert.NoError,
-		},
-		{
-			name: "success with an user",
-			fields: fields{
-				SanitizeLink: urlutils.DoNotSanitizeLink,
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				baseLink: "http://username:password@example.com/test",
-			},
-			wantSitemapLinks: []string{
-				"http://username:password@example.com/sitemap.xml",
-			},
-			wantErr: assert.NoError,
-		},
-		{
-			name: "success with a query",
-			fields: fields{
-				SanitizeLink: urlutils.DoNotSanitizeLink,
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				baseLink: "http://example.com/test?key=value",
-			},
-			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
-			wantErr:          assert.NoError,
-		},
-		{
-			name: "success with a fragment",
-			fields: fields{
-				SanitizeLink: urlutils.DoNotSanitizeLink,
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				baseLink: "http://example.com/test#fragment",
-			},
-			wantSitemapLinks: []string{"http://example.com/sitemap.xml"},
-			wantErr:          assert.NoError,
-		},
-		{
 			name: "success with sanitizing",
 			fields: fields{
 				SanitizeLink: urlutils.SanitizeLink,
+				MaximalDepth: -1,
 			},
 			args: args{
 				ctx:      context.Background(),
 				threadID: 23,
-				baseLink: "http://example.com/one/two/../test",
+				baseLink: "http://example.com/one/two//three/../test",
 			},
 			wantSitemapLinks: []string{
 				"http://example.com/sitemap.xml",
 				"http://example.com/one/sitemap.xml",
+				"http://example.com/one/two/sitemap.xml",
 			},
 			wantErr: assert.NoError,
 		},
 		{
-			name: "error with link sanitizing",
-			fields: fields{
-				SanitizeLink: urlutils.SanitizeLink,
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				baseLink: ":",
-			},
-			wantSitemapLinks: nil,
-			wantErr:          assert.Error,
-		},
-		{
-			name: "error with link parsing",
+			name: "error",
 			fields: fields{
 				SanitizeLink: urlutils.DoNotSanitizeLink,
+				MaximalDepth: -1,
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -171,6 +99,7 @@ func TestHierarchicalGenerator_ExtractLinks(test *testing.T) {
 		test.Run(data.name, func(test *testing.T) {
 			generator := HierarchicalGenerator{
 				SanitizeLink: data.fields.SanitizeLink,
+				MaximalDepth: data.fields.MaximalDepth,
 			}
 			gotSitemapLinks, gotErr := generator.ExtractLinks(
 				data.args.ctx,
