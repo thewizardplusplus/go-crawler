@@ -3,11 +3,11 @@ package registers
 import (
 	"context"
 	"net/http"
-	"net/url"
 	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/temoto/robotstxt"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
@@ -35,11 +35,17 @@ func (register RobotsTXTRegister) RegisterRobotsTXT(
 	*robotstxt.RobotsData,
 	error,
 ) {
-	robotsTXTLink, err := makeRobotsTXTLink(link)
+	robotsTXTLinks, err := urlutils.GenerateHierarchicalLinks(
+		link,
+		"robots.txt",
+		urlutils.WithMaximalHierarchyDepth(0),
+	)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to make the robots.txt link")
 	}
 
+	// if successful, the result will always be one link
+	robotsTXTLink := robotsTXTLinks[0]
 	robotsTXTData, ok := register.registeredRobotsTXT.Load(robotsTXTLink)
 	if !ok {
 		var err error
@@ -79,19 +85,4 @@ func (register RobotsTXTRegister) loadRobotsTXTData(
 	}
 
 	return robotsTXTData, nil
-}
-
-func makeRobotsTXTLink(regularLink string) (robotsTXTLink string, err error) {
-	parsedRegularLink, err := url.Parse(regularLink)
-	if err != nil {
-		return "", errors.Wrap(err, "unable to parse the regular link")
-	}
-
-	parsedRobotsTXTLink := &url.URL{
-		Scheme: parsedRegularLink.Scheme,
-		User:   parsedRegularLink.User,
-		Host:   parsedRegularLink.Host,
-		Path:   "/robots.txt",
-	}
-	return parsedRobotsTXTLink.String(), nil
 }
