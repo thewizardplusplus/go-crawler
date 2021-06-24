@@ -1,5 +1,19 @@
 # Change Log
 
+## [v1.9.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.9.1) (2021-06-24)
+
+- perform the refactoring:
+  - move the interfaces of the `models` package to the separate file;
+  - replace the `registers.LinkGenerator` interface with `models.LinkExtractor`:
+    - replace the `sitemap.GeneratorGroup` type with `extractors.ExtractorGroup`;
+  - pass a thread ID to the `registers.SitemapRegister.RegisterSitemap()` method;
+  - rename the `sanitizing` package to `urlutils`;
+  - add the `urlutils.GenerateHierarchicalLinks()` function:
+    - use in the `registers.RobotsTXTRegister` structure;
+    - use in the `sitemap.HierarchicalGenerator` structure:
+      - replace the `sitemap.SimpleGenerator` structure with `sitemap.HierarchicalGenerator`;
+- simplify the examples.
+
 ## [v1.9](https://github.com/thewizardplusplus/go-crawler/tree/v1.9) (2021-06-18)
 
 - crawling of all relative links for specified ones:
