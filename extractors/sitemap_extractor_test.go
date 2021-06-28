@@ -191,7 +191,8 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 					logger := new(MockLogger)
 					logger.On(
 						"Logf",
-						"unable to register the sitemap.xml link: %s",
+						"unable to register the sitemap.xml link for link %q: %s",
+						"http://example.com/",
 						mock.MatchedBy(func(gotErr error) bool {
 							return gotErr.Error() == wantErr.Error()
 						}),
