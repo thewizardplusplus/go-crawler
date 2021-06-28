@@ -97,7 +97,8 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 						logger.
 							On(
 								"Logf",
-								"unable to extract links (repeat #%d): %s",
+								"unable to extract links for link %q (repeat #%d): %s",
+								"http://example.com/",
 								repeat,
 								iotest.ErrTimeout,
 							).
@@ -142,7 +143,8 @@ func TestRepeatingExtractor_ExtractLinks(test *testing.T) {
 						logger.
 							On(
 								"Logf",
-								"unable to extract links (repeat #%d): %s",
+								"unable to extract links for link %q (repeat #%d): %s",
+								"http://example.com/",
 								repeat,
 								iotest.ErrTimeout,
 							).

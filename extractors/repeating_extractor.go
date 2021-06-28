@@ -37,7 +37,9 @@ func (extractor RepeatingExtractor) ExtractLinks(
 			return nil, err
 		}
 
-		extractor.Logger.Logf("unable to extract links (repeat #%d): %s", repeat, err)
+		const logMessage = "unable to extract links for link %q (repeat #%d): %s"
+		extractor.Logger.Logf(logMessage, link, repeat, err)
+
 		extractor.SleepHandler(extractor.RepeatDelay)
 	}
 
