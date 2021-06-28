@@ -30,12 +30,13 @@ func NewLinkRegister(
 // RegisterLink ...
 func (register LinkRegister) RegisterLink(link string) bool {
 	if register.sanitizeLink == urlutils.SanitizeLink {
-		var err error
-		link, err = urlutils.ApplyLinkSanitizing(link)
+		sanitizedLink, err := urlutils.ApplyLinkSanitizing(link)
 		if err != nil {
-			register.logger.Logf("unable to sanitize the link: %s", err)
+			register.logger.Logf("unable to sanitize link %q: %s", link, err)
 			return false
 		}
+
+		link = sanitizedLink
 	}
 
 	return register.registeredLinks.Add(link)

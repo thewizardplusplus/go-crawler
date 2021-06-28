@@ -97,7 +97,8 @@ func TestLinkRegister_RegisterLink(test *testing.T) {
 					logger.
 						On(
 							"Logf",
-							"unable to sanitize the link: %s",
+							"unable to sanitize link %q: %s",
+							":",
 							mock.MatchedBy(func(err error) bool {
 								unwrappedErr := errors.Cause(err)
 								return reflect.DeepEqual(unwrappedErr, urlErr)
