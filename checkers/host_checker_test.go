@@ -63,7 +63,15 @@ func TestHostChecker_CheckLink(test *testing.T) {
 					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
 
 					logger := new(MockLogger)
-					logger.On("Logf", "unable to parse the parent link: %s", urlErr).Return()
+					logger.
+						On(
+							"Logf",
+							"%s: unable to parse parent link %q: %s",
+							"host checking",
+							":",
+							urlErr,
+						).
+						Return()
 
 					return logger
 				}(),
@@ -85,7 +93,15 @@ func TestHostChecker_CheckLink(test *testing.T) {
 					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
 
 					logger := new(MockLogger)
-					logger.On("Logf", "unable to parse the link: %s", urlErr).Return()
+					logger.
+						On(
+							"Logf",
+							"%s: unable to parse link %q: %s",
+							"host checking",
+							":",
+							urlErr,
+						).
+						Return()
 
 					return logger
 				}(),

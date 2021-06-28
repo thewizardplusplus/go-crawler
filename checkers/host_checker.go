@@ -18,15 +18,21 @@ func (checker HostChecker) CheckLink(
 	ctx context.Context,
 	link models.SourcedLink,
 ) bool {
+	const logPrefix = "host checking"
+
 	parsedSourceLink, err := url.Parse(link.SourceLink)
 	if err != nil {
-		checker.Logger.Logf("unable to parse the parent link: %s", err)
+		const logMessage = "%s: unable to parse parent link %q: %s"
+		checker.Logger.Logf(logMessage, logPrefix, link.SourceLink, err)
+
 		return false
 	}
 
 	parsedLink, err := url.Parse(link.Link)
 	if err != nil {
-		checker.Logger.Logf("unable to parse the link: %s", err)
+		const logMessage = "%s: unable to parse link %q: %s"
+		checker.Logger.Logf(logMessage, logPrefix, link.Link, err)
+
 		return false
 	}
 
