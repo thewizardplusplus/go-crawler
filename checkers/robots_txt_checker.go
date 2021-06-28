@@ -21,16 +21,24 @@ func (checker RobotsTXTChecker) CheckLink(
 	ctx context.Context,
 	link models.SourcedLink,
 ) bool {
+	const logPrefix = "robots.txt checking"
+
 	parsedLink, err := url.Parse(link.Link)
 	if err != nil {
-		checker.Logger.Logf("unable to parse the link: %s", err)
+		const logMessage = "%s: unable to parse link %q: %s"
+		checker.Logger.Logf(logMessage, logPrefix, link.Link, err)
+
 		return false
 	}
 
 	robotsTXTData, err :=
 		checker.RobotsTXTRegister.RegisterRobotsTXT(ctx, link.Link)
 	if err != nil {
-		checker.Logger.Logf("unable to register the robots.txt link: %s", err)
+		const logMessage = "%s: " +
+			"unable to register the robots.txt link for link %q: " +
+			"%s"
+		checker.Logger.Logf(logMessage, logPrefix, link.Link, err)
+
 		return false
 	}
 

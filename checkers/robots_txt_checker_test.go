@@ -171,7 +171,15 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
 
 					logger := new(MockLogger)
-					logger.On("Logf", "unable to parse the link: %s", urlErr).Return()
+					logger.
+						On(
+							"Logf",
+							"%s: unable to parse link %q: %s",
+							"robots.txt checking",
+							":",
+							urlErr,
+						).
+						Return()
 
 					return logger
 				}(),
@@ -210,7 +218,13 @@ func TestRobotsTXTChecker_CheckLink(test *testing.T) {
 
 					logger := new(MockLogger)
 					logger.
-						On("Logf", "unable to register the robots.txt link: %s", errMatcher).
+						On(
+							"Logf",
+							"%s: unable to register the robots.txt link for link %q: %s",
+							"robots.txt checking",
+							"http://example.com/post/23",
+							errMatcher,
+						).
 						Return()
 
 					return logger
