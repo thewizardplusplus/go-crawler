@@ -327,7 +327,7 @@ func TestSitemapRegister_loadSitemapData(test *testing.T) {
 					logger.
 						On(
 							"Logf",
-							"unable to load the Sitemap link %q: %s",
+							"unable to load Sitemap link %q: %s",
 							"http://example.com/sitemap.xml",
 							mock.MatchedBy(func(err error) bool {
 								unwrappedErr := errors.Cause(err)

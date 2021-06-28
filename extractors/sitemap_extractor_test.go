@@ -233,7 +233,7 @@ func TestSitemapExtractor_ExtractLinks(test *testing.T) {
 					logger := new(MockLogger)
 					logger.On(
 						"Logf",
-						"unable to load the Sitemap link %q: %s",
+						"unable to load Sitemap link %q: %s",
 						"http://example.com/sitemap_1.xml",
 						mock.MatchedBy(func(gotErr error) bool {
 							return gotErr.Error() == wantErr.Error()

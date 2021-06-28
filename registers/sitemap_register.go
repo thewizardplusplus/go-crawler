@@ -85,8 +85,7 @@ func (register SitemapRegister) loadSitemapData(
 		var err error
 		sitemapData, err = sitemap.Get(sitemapLink, ctx)
 		if err != nil {
-			register.logger.
-				Logf("unable to load the Sitemap link %q: %s", sitemapLink, err)
+			register.logger.Logf("unable to load Sitemap link %q: %s", sitemapLink, err)
 		}
 
 		register.registeredSitemaps.Store(sitemapLink, sitemapData)
