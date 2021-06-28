@@ -41,7 +41,7 @@ func (register RobotsTXTRegister) RegisterRobotsTXT(
 		urlutils.WithMaximalHierarchyDepth(0),
 	)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to make the robots.txt link")
+		return nil, errors.Wrap(err, "unable to create the robots.txt link")
 	}
 
 	// if successful, the result will always be one link
