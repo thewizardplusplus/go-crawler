@@ -420,7 +420,12 @@ func TestHandleLink(test *testing.T) {
 						Logger: func() Logger {
 							logger := new(MockLogger)
 							logger.
-								On("Logf", "unable to extract links: %s", iotest.ErrTimeout).
+								On(
+									"Logf",
+									"unable to extract links for link %q: %s",
+									"http://example.com/",
+									iotest.ErrTimeout,
+								).
 								Return()
 
 							return logger

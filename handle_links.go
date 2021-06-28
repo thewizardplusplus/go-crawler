@@ -55,7 +55,7 @@ func HandleLink(
 	extractedLinks, err :=
 		dependencies.LinkExtractor.ExtractLinks(ctx, threadID, link)
 	if err != nil {
-		dependencies.Logger.Logf("unable to extract links: %s", err)
+		dependencies.Logger.Logf("unable to extract links for link %q: %s", link, err)
 		return nil
 	}
 
