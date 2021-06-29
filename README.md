@@ -176,6 +176,7 @@ func main() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -306,6 +307,7 @@ func main() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -443,6 +445,7 @@ func main() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -591,6 +594,7 @@ func main() {
 					time.Second,
 					time.Sleep,
 					extractors.DefaultExtractor{
+						TrimLink:   urlutils.TrimLink,
 						HTTPClient: http.DefaultClient,
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
@@ -744,6 +748,7 @@ func main() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -886,6 +891,7 @@ func main() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -1092,6 +1098,7 @@ func main() {
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.ExtractorGroup{
 					extractors.DefaultExtractor{
+						TrimLink:   urlutils.TrimLink,
 						HTTPClient: http.DefaultClient,
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
@@ -1263,6 +1270,7 @@ func main() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -1396,6 +1404,7 @@ func main() {
 			CrawlDependencies: crawler.CrawlDependencies{
 				LinkExtractor: extractors.RepeatingExtractor{
 					LinkExtractor: extractors.DefaultExtractor{
+						TrimLink:   urlutils.TrimLink,
 						HTTPClient: http.DefaultClient,
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},

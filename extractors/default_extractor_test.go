@@ -10,12 +10,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
 func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
+		TrimLink   urlutils.LinkTrimming
 		HTTPClient httputils.HTTPClient
 		Filters    htmlselector.OptimizedFilterGroup
 	}
@@ -35,12 +37,13 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "success without links",
 			fields: fields{
+				TrimLink: urlutils.DoNotTrimLink,
 				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
 
 					response := &http.Response{
-						Body: ioutil.NopCloser(strings.NewReader(``)),
+						Body: ioutil.NopCloser(strings.NewReader("")),
 					}
 
 					httpClient := new(MockHTTPClient)
@@ -61,8 +64,9 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 			wantErr:   assert.NoError,
 		},
 		{
-			name: "success with links",
+			name: "success with links (without link trimming)",
 			fields: fields{
+				TrimLink: urlutils.DoNotTrimLink,
 				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
@@ -70,8 +74,42 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 					response := &http.Response{
 						Body: ioutil.NopCloser(strings.NewReader(`
 							<ul>
-								<li><a href="http://example.com/1">1</a></li>
-								<li><a href="http://example.com/2">2</a></li>
+								<li><a href="  http://example.com/1  ">1</a></li>
+								<li><a href="  http://example.com/2  ">2</a></li>
+							</ul>
+						`)),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+					"a": {"href"},
+				}),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"  http://example.com/1  ", "  http://example.com/2  "},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with links (with link trimming)",
+			fields: fields{
+				TrimLink: urlutils.TrimLink,
+				HTTPClient: func() httputils.HTTPClient {
+					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
+					request = request.WithContext(context.Background())
+
+					response := &http.Response{
+						Body: ioutil.NopCloser(strings.NewReader(`
+							<ul>
+								<li><a href="  http://example.com/1  ">1</a></li>
+								<li><a href="  http://example.com/2  ">2</a></li>
 							</ul>
 						`)),
 					}
@@ -96,6 +134,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "error with request creating",
 			fields: fields{
+				TrimLink:   urlutils.DoNotTrimLink,
 				HTTPClient: new(MockHTTPClient),
 				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 					"a": {"href"},
@@ -112,6 +151,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "error with request sending",
 			fields: fields{
+				TrimLink: urlutils.DoNotTrimLink,
 				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
@@ -136,6 +176,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		{
 			name: "error with tags selecting",
 			fields: fields{
+				TrimLink: urlutils.DoNotTrimLink,
 				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
@@ -143,8 +184,8 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 					response := &http.Response{
 						Body: ioutil.NopCloser(iotest.TimeoutReader(strings.NewReader(`
 							<ul>
-								<li><a href="http://example.com/1">1</a></li>
-								<li><a href="http://example.com/2">2</a></li>
+								<li><a href="  http://example.com/1  ">1</a></li>
+								<li><a href="  http://example.com/2  ">2</a></li>
 							</ul>
 						`))),
 					}
@@ -169,6 +210,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := DefaultExtractor{
+				TrimLink:   data.fields.TrimLink,
 				HTTPClient: data.fields.HTTPClient,
 				Filters:    data.fields.Filters,
 			}
