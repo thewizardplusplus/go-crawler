@@ -17,7 +17,46 @@ func TestApplyLinkTrimming(test *testing.T) {
 		args       args
 		wantedLink string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "DoNotTrimLink",
+			args: args{
+				link:     "  http://example.com/  ",
+				trimming: DoNotTrimLink,
+			},
+			wantedLink: "  http://example.com/  ",
+		},
+		{
+			name: "TrimLinkLeft",
+			args: args{
+				link:     "  http://example.com/  ",
+				trimming: TrimLinkLeft,
+			},
+			wantedLink: "http://example.com/  ",
+		},
+		{
+			name: "TrimLinkRight",
+			args: args{
+				link:     "  http://example.com/  ",
+				trimming: TrimLinkRight,
+			},
+			wantedLink: "  http://example.com/",
+		},
+		{
+			name: "TrimLink",
+			args: args{
+				link:     "  http://example.com/  ",
+				trimming: TrimLink,
+			},
+			wantedLink: "http://example.com/",
+		},
+		{
+			name: "without spaces",
+			args: args{
+				link:     "http://example.com/",
+				trimming: TrimLink,
+			},
+			wantedLink: "http://example.com/",
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			receivedLink := ApplyLinkTrimming(data.args.link, data.args.trimming)
