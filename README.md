@@ -10,6 +10,7 @@ The library that implements crawling of all relative links for specified ones.
 ## Features
 
 - crawling of all relative links for specified ones:
+  - supporting of leading and trailing spaces trimming in extracted links (optional);
   - repeated extracting of relative links on error (optional):
     - only specified repeat count;
     - supporting of delay between repeats;
@@ -44,8 +45,11 @@ The library that implements crawling of all relative links for specified ones.
   - passing of the source link in the outer handler;
   - handling links filtered by a custom link filter (optional);
   - handling links concurrently (optional);
+  - supporting of grouping of outer handlers:
+    - processing of each outer handler is done in a separate goroutine;
 - custom filtering of considered links:
-  - by relativity of a link (optional);
+  - by relativity of a link (optional):
+    - supporting of result inverting;
   - by uniqueness of an extracted link (optional):
     - supporting of sanitizing of a link before checking of uniqueness (optional);
   - by a `robots.txt` file (optional):
