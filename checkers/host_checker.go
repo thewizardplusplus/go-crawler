@@ -2,15 +2,16 @@ package checkers
 
 import (
 	"context"
-	"net/url"
 
 	"github.com/go-log/log"
 	"github.com/thewizardplusplus/go-crawler/models"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
 
 // HostChecker ...
 type HostChecker struct {
-	Logger log.Logger
+	ComparisonResult urlutils.ComparisonResult
+	Logger           log.Logger
 }
 
 // CheckLink ...
@@ -20,21 +21,13 @@ func (checker HostChecker) CheckLink(
 ) bool {
 	const logPrefix = "host checking"
 
-	parsedSourceLink, err := url.Parse(link.SourceLink)
+	result, err := urlutils.CompareLinkHosts(link.SourceLink, link.Link)
 	if err != nil {
-		const logMessage = "%s: unable to parse parent link %q: %s"
-		checker.Logger.Logf(logMessage, logPrefix, link.SourceLink, err)
+		const logMessage = "%s: unable to compare link hosts: %s"
+		checker.Logger.Logf(logMessage, logPrefix, err)
 
 		return false
 	}
 
-	parsedLink, err := url.Parse(link.Link)
-	if err != nil {
-		const logMessage = "%s: unable to parse link %q: %s"
-		checker.Logger.Logf(logMessage, logPrefix, link.Link, err)
-
-		return false
-	}
-
-	return parsedLink.Host == parsedSourceLink.Host
+	return result == checker.ComparisonResult
 }

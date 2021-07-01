@@ -178,7 +178,8 @@ func ExampleCrawl() {
 				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
-				Logger: wrappedLogger,
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
 			},
 			LinkHandler: LinkHandler{
 				ServerURL: server.URL,
@@ -231,7 +232,8 @@ func ExampleCrawl_withoutDuplicatesOnExtracting() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -289,7 +291,8 @@ func ExampleCrawl_withoutDuplicatesOnHandling() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -359,7 +362,8 @@ func ExampleCrawl_withDelayingExtracting() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -425,7 +429,8 @@ func ExampleCrawl_withRobotsTXTOnExtracting() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.RobotsTXTChecker{
 					UserAgent:         "go-crawler",
@@ -479,7 +484,8 @@ func ExampleCrawl_withRobotsTXTOnHandling() {
 				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
-				Logger: wrappedLogger,
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
 			},
 			LinkHandler: handlers.CheckedHandler{
 				LinkChecker: checkers.RobotsTXTChecker{
@@ -552,7 +558,8 @@ func ExampleCrawl_withSitemap() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -628,7 +635,8 @@ func ExampleCrawlByConcurrentHandler() {
 				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
-				Logger: wrappedLogger,
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
 			},
 			LinkHandler: LinkHandler{
 				ServerURL: server.URL,
@@ -684,7 +692,8 @@ func ExampleHandleLinksConcurrently() {
 					SleepHandler: time.Sleep,
 				},
 				LinkChecker: checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				LinkHandler: LinkHandler{
 					ServerURL: server.URL,

@@ -188,7 +188,8 @@ func main() {
 				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
-				Logger: wrappedLogger,
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
 			},
 			LinkHandler: LinkHandler{
 				ServerURL: server.URL,
@@ -320,7 +321,8 @@ func main() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -458,7 +460,8 @@ func main() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -608,7 +611,8 @@ func main() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -761,7 +765,8 @@ func main() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.RobotsTXTChecker{
 					UserAgent:         "go-crawler",
@@ -903,7 +908,8 @@ func main() {
 				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
-				Logger: wrappedLogger,
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
 			},
 			LinkHandler: handlers.CheckedHandler{
 				LinkChecker: checkers.RobotsTXTChecker{
@@ -1129,7 +1135,8 @@ func main() {
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
 					LinkRegister: registers.NewLinkRegister(
@@ -1282,7 +1289,8 @@ func main() {
 				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
-				Logger: wrappedLogger,
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
 			},
 			LinkHandler: LinkHandler{
 				ServerURL: server.URL,
@@ -1416,7 +1424,8 @@ func main() {
 					SleepHandler: time.Sleep,
 				},
 				LinkChecker: checkers.HostChecker{
-					Logger: wrappedLogger,
+					ComparisonResult: urlutils.Same,
+					Logger:           wrappedLogger,
 				},
 				LinkHandler: LinkHandler{
 					ServerURL: server.URL,

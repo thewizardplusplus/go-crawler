@@ -2,19 +2,19 @@ package checkers
 
 import (
 	"context"
-	"errors"
-	"net/url"
 	"testing"
 
 	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/thewizardplusplus/go-crawler/models"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
 
 func TestHostChecker_CheckLink(test *testing.T) {
 	type fields struct {
-		Logger log.Logger
+		ComparisonResult urlutils.ComparisonResult
+		Logger           log.Logger
 	}
 	type args struct {
 		ctx  context.Context
@@ -28,9 +28,10 @@ func TestHostChecker_CheckLink(test *testing.T) {
 		want   assert.BoolAssertionFunc
 	}{
 		{
-			name: "success with different hosts",
+			name: "success with different hosts (false)",
 			fields: fields{
-				Logger: new(MockLogger),
+				ComparisonResult: urlutils.Same,
+				Logger:           new(MockLogger),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -42,9 +43,40 @@ func TestHostChecker_CheckLink(test *testing.T) {
 			want: assert.False,
 		},
 		{
-			name: "success with same hosts",
+			name: "success with different hosts (true)",
 			fields: fields{
-				Logger: new(MockLogger),
+				ComparisonResult: urlutils.Different,
+				Logger:           new(MockLogger),
+			},
+			args: args{
+				ctx: context.Background(),
+				link: models.SourcedLink{
+					SourceLink: "http://example1.com/",
+					Link:       "http://example2.com/test",
+				},
+			},
+			want: assert.True,
+		},
+		{
+			name: "success with same hosts (false)",
+			fields: fields{
+				ComparisonResult: urlutils.Different,
+				Logger:           new(MockLogger),
+			},
+			args: args{
+				ctx: context.Background(),
+				link: models.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
+			},
+			want: assert.False,
+		},
+		{
+			name: "success with same hosts (true)",
+			fields: fields{
+				ComparisonResult: urlutils.Same,
+				Logger:           new(MockLogger),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -58,18 +90,20 @@ func TestHostChecker_CheckLink(test *testing.T) {
 		{
 			name: "error with the parent link",
 			fields: fields{
+				ComparisonResult: urlutils.Same,
 				Logger: func() Logger {
-					err := errors.New("missing protocol scheme")
-					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
-
 					logger := new(MockLogger)
 					logger.
 						On(
 							"Logf",
-							"%s: unable to parse parent link %q: %s",
+							"%s: unable to compare link hosts: %s",
 							"host checking",
-							":",
-							urlErr,
+							mock.MatchedBy(func(err error) bool {
+								wantErrMessage := `unable to parse link ":": ` +
+									`parse :: ` +
+									"missing protocol scheme"
+								return err.Error() == wantErrMessage
+							}),
 						).
 						Return()
 
@@ -88,18 +122,20 @@ func TestHostChecker_CheckLink(test *testing.T) {
 		{
 			name: "error with the link",
 			fields: fields{
+				ComparisonResult: urlutils.Same,
 				Logger: func() Logger {
-					err := errors.New("missing protocol scheme")
-					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
-
 					logger := new(MockLogger)
 					logger.
 						On(
 							"Logf",
-							"%s: unable to parse link %q: %s",
+							"%s: unable to compare link hosts: %s",
 							"host checking",
-							":",
-							urlErr,
+							mock.MatchedBy(func(err error) bool {
+								wantErrMessage := `unable to parse link ":": ` +
+									`parse :: ` +
+									"missing protocol scheme"
+								return err.Error() == wantErrMessage
+							}),
 						).
 						Return()
 
@@ -118,7 +154,8 @@ func TestHostChecker_CheckLink(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			checker := HostChecker{
-				Logger: data.fields.Logger,
+				ComparisonResult: data.fields.ComparisonResult,
+				Logger:           data.fields.Logger,
 			}
 			got := checker.CheckLink(data.args.ctx, data.args.link)
 
