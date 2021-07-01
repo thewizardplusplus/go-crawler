@@ -19,7 +19,51 @@ func TestHandlerGroup_HandleLink(test *testing.T) {
 		handlers HandlerGroup
 		args     args
 	}{
-		// TODO: Add test cases.
+		{
+			name:     "empty",
+			handlers: nil,
+			args: args{
+				ctx: context.Background(),
+				link: models.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
+			},
+		},
+		{
+			name: "non-empty",
+			handlers: HandlerGroup{
+				func() models.LinkHandler {
+					handler := new(MockLinkHandler)
+					handler.
+						On("HandleLink", context.Background(), models.SourcedLink{
+							SourceLink: "http://example.com/",
+							Link:       "http://example.com/test",
+						}).
+						Return()
+
+					return handler
+				}(),
+				func() models.LinkHandler {
+					handler := new(MockLinkHandler)
+					handler.
+						On("HandleLink", context.Background(), models.SourcedLink{
+							SourceLink: "http://example.com/",
+							Link:       "http://example.com/test",
+						}).
+						Return()
+
+					return handler
+				}(),
+			},
+			args: args{
+				ctx: context.Background(),
+				link: models.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       "http://example.com/test",
+				},
+			},
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			data.handlers.HandleLink(data.args.ctx, data.args.link)
