@@ -29,6 +29,7 @@ import (
 )
 
 type LinkHandler struct {
+	Name      string
 	ServerURL string
 }
 
@@ -36,8 +37,14 @@ func (handler LinkHandler) HandleLink(
 	ctx context.Context,
 	link models.SourcedLink,
 ) {
+	var prefix string
+	if handler.Name != "" {
+		prefix = fmt.Sprintf("[%s] ", handler.Name)
+	}
+
 	fmt.Printf(
-		"received link %q from page %q\n",
+		"%sreceived link %q from page %q\n",
+		prefix,
 		handler.replaceServerURL(link.Link),
 		handler.replaceServerURL(link.SourceLink),
 	)
@@ -599,6 +606,78 @@ func ExampleCrawl_withSitemap() {
 	// received link "http://example.com/hidden/5" from page "http://example.com/hidden/1/test"
 	// received link "http://example.com/hidden/6" from page "http://example.com/hidden/1/test"
 	// received link "https://golang.org/" from page "http://example.com"
+}
+
+func ExampleCrawl_withFewHandlers() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.HostChecker{
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
+			},
+			LinkHandler: handlers.HandlerGroup{
+				handlers.CheckedHandler{
+					LinkChecker: checkers.HostChecker{
+						ComparisonResult: urlutils.Same,
+						Logger:           wrappedLogger,
+					},
+					LinkHandler: LinkHandler{
+						Name:      "inner",
+						ServerURL: server.URL,
+					},
+				},
+				handlers.CheckedHandler{
+					LinkChecker: checkers.HostChecker{
+						ComparisonResult: urlutils.Different,
+						Logger:           wrappedLogger,
+					},
+					LinkHandler: LinkHandler{
+						Name:      "outer",
+						ServerURL: server.URL,
+					},
+				},
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// [inner] received link "http://example.com/1" from page "http://example.com"
+	// [inner] received link "http://example.com/1/1" from page "http://example.com/1"
+	// [inner] received link "http://example.com/1/2" from page "http://example.com/1"
+	// [inner] received link "http://example.com/2" from page "http://example.com"
+	// [inner] received link "http://example.com/2" from page "http://example.com"
+	// [inner] received link "http://example.com/2/1" from page "http://example.com/2"
+	// [inner] received link "http://example.com/2/1" from page "http://example.com/2"
+	// [inner] received link "http://example.com/2/2" from page "http://example.com/2"
+	// [inner] received link "http://example.com/2/2" from page "http://example.com/2"
+	// [outer] received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawlByConcurrentHandler() {

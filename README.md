@@ -1179,6 +1179,159 @@ func main() {
 }
 ```
 
+`crawler.Crawl()` with few handlers:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"html/template"
+	stdlog "log"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"runtime"
+	"strings"
+	"time"
+
+	"github.com/go-log/log/print"
+	crawler "github.com/thewizardplusplus/go-crawler"
+	"github.com/thewizardplusplus/go-crawler/checkers"
+	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/handlers"
+	"github.com/thewizardplusplus/go-crawler/models"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
+	htmlselector "github.com/thewizardplusplus/go-html-selector"
+)
+
+type LinkHandler struct {
+	Name      string
+	ServerURL string
+}
+
+func (handler LinkHandler) HandleLink(
+	ctx context.Context,
+	link models.SourcedLink,
+) {
+	fmt.Printf(
+		"[%s] received link %q from page %q\n",
+		handler.Name,
+		handler.replaceServerURL(link.Link),
+		handler.replaceServerURL(link.SourceLink),
+	)
+}
+
+// replace the test server URL for reproducibility of the example
+func (handler LinkHandler) replaceServerURL(link string) string {
+	return strings.Replace(link, handler.ServerURL, "http://example.com", -1)
+}
+
+func RunServer() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(
+		writer http.ResponseWriter,
+		request *http.Request,
+	) {
+		var links []string
+		switch request.URL.Path {
+		case "/":
+			links = []string{"/1", "/2", "/2", "https://golang.org/"}
+		case "/1":
+			links = []string{"/1/1", "/1/2"}
+		case "/2":
+			links = []string{"/2/1", "/2/2"}
+		}
+		for index := range links {
+			if strings.HasPrefix(links[index], "/") {
+				links[index] = "http://" + request.Host + links[index]
+			}
+		}
+
+		template, _ := template.New("").Parse( // nolint: errcheck
+			`<ul>
+				{{ range $link := . }}
+					<li><a href="{{ $link }}">{{ $link }}</a></li>
+				{{ end }}
+			</ul>`,
+		)
+		template.Execute(writer, links) // nolint: errcheck
+	}))
+}
+
+func main() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	crawler.Crawl(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.RepeatingExtractor{
+				LinkExtractor: extractors.DefaultExtractor{
+					TrimLink:   urlutils.TrimLink,
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+				},
+				RepeatCount:  5,
+				RepeatDelay:  time.Second,
+				Logger:       wrappedLogger,
+				SleepHandler: time.Sleep,
+			},
+			LinkChecker: checkers.HostChecker{
+				ComparisonResult: urlutils.Same,
+				Logger:           wrappedLogger,
+			},
+			LinkHandler: handlers.HandlerGroup{
+				handlers.CheckedHandler{
+					LinkChecker: checkers.HostChecker{
+						ComparisonResult: urlutils.Same,
+						Logger:           wrappedLogger,
+					},
+					LinkHandler: LinkHandler{
+						Name:      "inner",
+						ServerURL: server.URL,
+					},
+				},
+				handlers.CheckedHandler{
+					LinkChecker: checkers.HostChecker{
+						ComparisonResult: urlutils.Different,
+						Logger:           wrappedLogger,
+					},
+					LinkHandler: LinkHandler{
+						Name:      "outer",
+						ServerURL: server.URL,
+					},
+				},
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// [inner] received link "http://example.com/1" from page "http://example.com"
+	// [inner] received link "http://example.com/1/1" from page "http://example.com/1"
+	// [inner] received link "http://example.com/1/2" from page "http://example.com/1"
+	// [inner] received link "http://example.com/2" from page "http://example.com"
+	// [inner] received link "http://example.com/2" from page "http://example.com"
+	// [inner] received link "http://example.com/2/1" from page "http://example.com/2"
+	// [inner] received link "http://example.com/2/1" from page "http://example.com/2"
+	// [inner] received link "http://example.com/2/2" from page "http://example.com/2"
+	// [inner] received link "http://example.com/2/2" from page "http://example.com/2"
+	// [outer] received link "https://golang.org/" from page "http://example.com"
+}
+```
+
 `crawler.CrawlByConcurrentHandler()`:
 
 ```go
