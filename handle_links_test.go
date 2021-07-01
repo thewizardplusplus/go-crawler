@@ -122,7 +122,6 @@ func TestHandleLinksConcurrently(test *testing.T) {
 			waiter := data.args.dependencies.Waiter
 			synchronousWaiter := syncutils.MultiWaitGroup{waiter, new(sync.WaitGroup)}
 			synchronousWaiter.Add(len(data.args.links))
-
 			data.args.dependencies.Waiter = synchronousWaiter
 
 			HandleLinksConcurrently(
@@ -236,7 +235,6 @@ func TestHandleLinks(test *testing.T) {
 			waiter := data.args.dependencies.Waiter
 			synchronousWaiter := syncutils.MultiWaitGroup{waiter, new(sync.WaitGroup)}
 			synchronousWaiter.Add(len(data.args.links))
-
 			data.args.dependencies.Waiter = synchronousWaiter
 
 			go HandleLinks(
@@ -245,7 +243,6 @@ func TestHandleLinks(test *testing.T) {
 				data.args.links,
 				data.args.dependencies,
 			)
-
 			synchronousWaiter.Wait()
 
 			mock.AssertExpectationsForObjects(
