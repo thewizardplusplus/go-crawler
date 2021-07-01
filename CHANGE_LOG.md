@@ -1,5 +1,28 @@
 # Change Log
 
+## [v1.10](https://github.com/thewizardplusplus/go-crawler/tree/v1.10) (2021-07-01)
+
+- crawling of all relative links for specified ones:
+  - supporting of leading and trailing spaces trimming in extracted links (optional);
+- calling of an outer handler for an each found link:
+  - supporting of grouping of outer handlers:
+    - processing of each outer handler is done in a separate goroutine;
+- custom filtering of considered links:
+  - by relativity of a link (optional):
+    - supporting of result inverting;
+- extend the logging:
+  - in the `crawler.HandleLink()` function;
+  - in the `extractors` package:
+    - in the `RepeatingExtractor` structure;
+    - in the `SitemapExtractor` structure;
+  - in the `checkers` package:
+    - in the `HostChecker` structure;
+    - in the `RobotsTXTChecker` structure;
+  - in the `registers.LinkRegister` structure;
+- examples:
+  - fix the output messages;
+  - add the example with few handlers.
+
 ## [v1.9.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.9.1) (2021-06-24)
 
 - perform the refactoring:
