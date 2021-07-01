@@ -37,7 +37,7 @@ func (handler LinkHandler) HandleLink(
 	link models.SourcedLink,
 ) {
 	fmt.Printf(
-		"have got the link %q from the page %q\n",
+		"received link %q from page %q\n",
 		handler.replaceServerURL(link.Link),
 		handler.replaceServerURL(link.SourceLink),
 	)
@@ -189,16 +189,16 @@ func ExampleCrawl() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawl_withoutDuplicatesOnExtracting() {
@@ -250,14 +250,14 @@ func ExampleCrawl_withoutDuplicatesOnExtracting() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawl_withoutDuplicatesOnHandling() {
@@ -318,13 +318,13 @@ func ExampleCrawl_withoutDuplicatesOnHandling() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawl_withDelayingExtracting() {
@@ -389,13 +389,13 @@ func ExampleCrawl_withDelayingExtracting() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawl_withRobotsTXTOnExtracting() {
@@ -446,12 +446,12 @@ func ExampleCrawl_withRobotsTXTOnExtracting() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawl_withRobotsTXTOnHandling() {
@@ -502,10 +502,10 @@ func ExampleCrawl_withRobotsTXTOnHandling() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawl_withSitemap() {
@@ -585,20 +585,20 @@ func ExampleCrawl_withSitemap() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "http://example.com/hidden/1" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/1/test" from the page "http://example.com/hidden/1"
-	// have got the link "http://example.com/hidden/2" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/3" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/4" from the page "http://example.com"
-	// have got the link "http://example.com/hidden/5" from the page "http://example.com/hidden/1/test"
-	// have got the link "http://example.com/hidden/6" from the page "http://example.com/hidden/1/test"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "http://example.com/hidden/1" from page "http://example.com"
+	// received link "http://example.com/hidden/1/test" from page "http://example.com/hidden/1"
+	// received link "http://example.com/hidden/2" from page "http://example.com"
+	// received link "http://example.com/hidden/3" from page "http://example.com"
+	// received link "http://example.com/hidden/4" from page "http://example.com"
+	// received link "http://example.com/hidden/5" from page "http://example.com/hidden/1/test"
+	// received link "http://example.com/hidden/6" from page "http://example.com/hidden/1/test"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleCrawlByConcurrentHandler() {
@@ -646,16 +646,16 @@ func ExampleCrawlByConcurrentHandler() {
 	)
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "https://golang.org/" from page "http://example.com"
 }
 
 func ExampleHandleLinksConcurrently() {
@@ -707,14 +707,14 @@ func ExampleHandleLinksConcurrently() {
 	waiter.Wait()
 
 	// Unordered output:
-	// have got the link "http://example.com/1" from the page "http://example.com"
-	// have got the link "http://example.com/1/1" from the page "http://example.com/1"
-	// have got the link "http://example.com/1/2" from the page "http://example.com/1"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2" from the page "http://example.com"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/1" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "http://example.com/2/2" from the page "http://example.com/2"
-	// have got the link "https://golang.org/" from the page "http://example.com"
+	// received link "http://example.com/1" from page "http://example.com"
+	// received link "http://example.com/1/1" from page "http://example.com/1"
+	// received link "http://example.com/1/2" from page "http://example.com/1"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2" from page "http://example.com"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/1" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "http://example.com/2/2" from page "http://example.com/2"
+	// received link "https://golang.org/" from page "http://example.com"
 }
