@@ -3,6 +3,7 @@ package extractors
 import (
 	"context"
 	"testing"
+	"testing/iotest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thewizardplusplus/go-crawler/models"
@@ -27,7 +28,117 @@ func TestTrimmingExtractor_ExtractLinks(test *testing.T) {
 		wantLinks []string
 		wantErr   assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success without links",
+			fields: fields{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: func() models.LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return(nil, nil)
+
+					return extractor
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: nil,
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with links and without spaces",
+			fields: fields{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: func() models.LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+
+					return extractor
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with links and spaces (DoNotTrimLink)",
+			fields: fields{
+				TrimLink: urlutils.DoNotTrimLink,
+				LinkExtractor: func() models.LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return(
+							[]string{"  http://example.com/1  ", "  http://example.com/2  "},
+							nil,
+						)
+
+					return extractor
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"  http://example.com/1  ", "  http://example.com/2  "},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with links and spaces (TrimLink)",
+			fields: fields{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: func() models.LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return(
+							[]string{"  http://example.com/1  ", "  http://example.com/2  "},
+							nil,
+						)
+
+					return extractor
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "error",
+			fields: fields{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: func() models.LinkExtractor {
+					extractor := new(MockLinkExtractor)
+					extractor.
+						On("ExtractLinks", context.Background(), 23, "http://example.com/").
+						Return(nil, iotest.ErrTimeout)
+
+					return extractor
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := TrimmingExtractor{
