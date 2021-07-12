@@ -2,6 +2,8 @@ package checkers
 
 import (
 	"context"
+	"errors"
+	"net/url"
 	"testing"
 
 	"github.com/go-log/log"
@@ -92,6 +94,9 @@ func TestHostChecker_CheckLink(test *testing.T) {
 			fields: fields{
 				ComparisonResult: urlutils.Same,
 				Logger: func() Logger {
+					err := errors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
 					logger := new(MockLogger)
 					logger.
 						On(
@@ -99,9 +104,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 							"%s: unable to compare link hosts: %s",
 							"host checking",
 							mock.MatchedBy(func(err error) bool {
-								wantErrMessage := `unable to parse link ":": ` +
-									`parse :: ` +
-									"missing protocol scheme"
+								wantErrMessage := `unable to parse link ":": ` + urlErr.Error()
 								return err.Error() == wantErrMessage
 							}),
 						).
@@ -124,6 +127,9 @@ func TestHostChecker_CheckLink(test *testing.T) {
 			fields: fields{
 				ComparisonResult: urlutils.Same,
 				Logger: func() Logger {
+					err := errors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
 					logger := new(MockLogger)
 					logger.
 						On(
@@ -131,9 +137,7 @@ func TestHostChecker_CheckLink(test *testing.T) {
 							"%s: unable to compare link hosts: %s",
 							"host checking",
 							mock.MatchedBy(func(err error) bool {
-								wantErrMessage := `unable to parse link ":": ` +
-									`parse :: ` +
-									"missing protocol scheme"
+								wantErrMessage := `unable to parse link ":": ` + urlErr.Error()
 								return err.Error() == wantErrMessage
 							}),
 						).
