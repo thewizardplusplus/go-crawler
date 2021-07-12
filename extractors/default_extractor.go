@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	"github.com/thewizardplusplus/go-html-selector/builders"
 	httputils "github.com/thewizardplusplus/go-http-utils"
@@ -13,7 +12,6 @@ import (
 
 // DefaultExtractor ...
 type DefaultExtractor struct {
-	TrimLink   urlutils.LinkTrimming
 	HTTPClient httputils.HTTPClient
 	Filters    htmlselector.OptimizedFilterGroup
 }
@@ -50,8 +48,6 @@ func (extractor DefaultExtractor) ExtractLinks(
 	var links []string
 	for _, attributeValue := range builder.AttributeValues() {
 		link := string(attributeValue)
-		link = urlutils.ApplyLinkTrimming(link, extractor.TrimLink)
-
 		links = append(links, link)
 	}
 

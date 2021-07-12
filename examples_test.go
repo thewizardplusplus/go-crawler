@@ -173,7 +173,6 @@ func ExampleCrawl() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
-					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -226,7 +225,6 @@ func ExampleCrawl_withoutDuplicatesOnExtracting() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
-					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -285,7 +283,6 @@ func ExampleCrawl_withoutDuplicatesOnHandling() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
-					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -355,7 +352,6 @@ func ExampleCrawl_withDelayingExtracting() {
 					time.Second,
 					time.Sleep,
 					extractors.DefaultExtractor{
-						TrimLink:   urlutils.TrimLink,
 						HTTPClient: http.DefaultClient,
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
@@ -423,7 +419,6 @@ func ExampleCrawl_withRobotsTXTOnExtracting() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
-					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -479,7 +474,6 @@ func ExampleCrawl_withRobotsTXTOnHandling() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
-					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -534,7 +528,6 @@ func ExampleCrawl_withSitemap() {
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.ExtractorGroup{
 					extractors.DefaultExtractor{
-						TrimLink:   urlutils.TrimLink,
 						HTTPClient: http.DefaultClient,
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
@@ -626,7 +619,6 @@ func ExampleCrawl_withFewHandlers() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
-					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -702,7 +694,6 @@ func ExampleCrawlByConcurrentHandler() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.DefaultExtractor{
-					TrimLink:   urlutils.TrimLink,
 					HTTPClient: http.DefaultClient,
 					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 						"a": {"href"},
@@ -759,7 +750,6 @@ func ExampleHandleLinksConcurrently() {
 			CrawlDependencies: crawler.CrawlDependencies{
 				LinkExtractor: extractors.RepeatingExtractor{
 					LinkExtractor: extractors.DefaultExtractor{
-						TrimLink:   urlutils.TrimLink,
 						HTTPClient: http.DefaultClient,
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
