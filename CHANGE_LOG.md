@@ -1,5 +1,19 @@
 # Change Log
 
+## [v1.10.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.10.1) (2021-07-16)
+
+- perform the refactoring:
+  - link trimming:
+    - add the `extractors.TrimmingExtractor` structure;
+    - remove the link trimming from the `extractors.DefaultExtractor` structure;
+  - fix the `extractors.ExtractorGroup` structure:
+    - ignore errors from each extractor in the group, instead of logging them;
+  - add the `registers.BasicRegister` structure:
+    - use in the `registers.RobotsTXTRegister` structure;
+    - use in the `registers.SitemapRegister` structure;
+- fix the bugs:
+  - fix the tests of the `checkers.HostChecker.CheckLink()` method.
+
 ## [v1.10](https://github.com/thewizardplusplus/go-crawler/tree/v1.10) (2021-07-01)
 
 - crawling of all relative links for specified ones:
