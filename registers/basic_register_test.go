@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"testing/iotest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -32,7 +33,64 @@ func TestBasicRegister_RegisterValue(test *testing.T) {
 		wantValue interface{}
 		wantErr   assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success with an unregistered value",
+			fields: fields{
+				registeredValues: new(sync.Map),
+			},
+			args: args{
+				ctx: context.Background(),
+				key: "key",
+				registeringHandler: func() RegisteringHandler {
+					registeringHandler := new(MockRegisteringHandler)
+					registeringHandler.
+						On("HandleRegistering", context.Background(), "key").
+						Return("value", nil)
+
+					return registeringHandler
+				}(),
+			},
+			wantValue: "value",
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with a registered value",
+			fields: fields{
+				registeredValues: func() *sync.Map {
+					registeredRobotsTXT := new(sync.Map)
+					registeredRobotsTXT.Store("key", "value")
+
+					return registeredRobotsTXT
+				}(),
+			},
+			args: args{
+				ctx:                context.Background(),
+				key:                "key",
+				registeringHandler: new(MockRegisteringHandler),
+			},
+			wantValue: "value",
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "error",
+			fields: fields{
+				registeredValues: new(sync.Map),
+			},
+			args: args{
+				ctx: context.Background(),
+				key: "key",
+				registeringHandler: func() RegisteringHandler {
+					registeringHandler := new(MockRegisteringHandler)
+					registeringHandler.
+						On("HandleRegistering", context.Background(), "key").
+						Return(nil, iotest.ErrTimeout)
+
+					return registeringHandler
+				}(),
+			},
+			wantValue: nil,
+			wantErr:   assert.Error,
+		},
 	} {
 		test.Run(data.name, func(t *testing.T) {
 			register := BasicRegister{
