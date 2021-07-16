@@ -1,6 +1,8 @@
 package registers
 
 import (
+	"context"
+
 	"github.com/go-log/log"
 	"github.com/thewizardplusplus/go-crawler/models"
 	httputils "github.com/thewizardplusplus/go-http-utils"
@@ -44,4 +46,17 @@ type LinkExtractor interface {
 //
 type LinkLoader interface {
 	LoadLink(link string, options interface{}) ([]byte, error)
+}
+
+//go:generate mockery --name=RegisteringHandler --inpackage --case=underscore --testonly
+
+// RegisteringHandler ...
+//
+// It's used only for mock generating.
+//
+type RegisteringHandler interface {
+	HandleRegistering(ctx context.Context, key interface{}) (
+		value interface{},
+		err error,
+	)
 }
