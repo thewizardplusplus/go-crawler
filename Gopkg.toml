@@ -43,7 +43,3 @@ required = [
 [[constraint]]
   name = "github.com/yterajima/go-sitemap"
   version = "0.2.2"
-
-[[constraint]]
-  name = "golang.org/x/sync"
-  revision = "036812b2e83c0ddf193dd5a34e034151da389d09"

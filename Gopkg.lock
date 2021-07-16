@@ -363,14 +363,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:b521f10a2d8fa85c04a8ef4e62f2d1e14d303599a55d64dabf9f5a02f84d35eb"
-  name = "golang.org/x/sync"
-  packages = ["errgroup"]
-  pruneopts = "UT"
-  revision = "036812b2e83c0ddf193dd5a34e034151da389d09"
-
-[[projects]]
-  branch = "master"
   digest = "1:ac04e573816a5de51145f9cd25cd5f1770568e931032d7dc7f7704d183844b0f"
   name = "golang.org/x/sys"
   packages = [
@@ -494,7 +486,6 @@
     "github.com/thewizardplusplus/go-sync-utils",
     "github.com/vektra/mockery/cmd",
     "github.com/yterajima/go-sitemap",
-    "golang.org/x/sync/errgroup",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
