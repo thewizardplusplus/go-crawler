@@ -5,12 +5,17 @@ import (
 	"testing"
 	"testing/iotest"
 
+	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestExtractorGroup_ExtractLinks(test *testing.T) {
+	type fields struct {
+		LinkExtractors []models.LinkExtractor
+		Logger         log.Logger
+	}
 	type args struct {
 		ctx      context.Context
 		threadID int
@@ -18,15 +23,18 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 	}
 
 	for _, data := range []struct {
-		name       string
-		extractors ExtractorGroup
-		args       args
-		wantLinks  []string
-		wantErr    assert.ErrorAssertionFunc
+		name      string
+		fields    fields
+		args      args
+		wantLinks []string
+		wantErr   assert.ErrorAssertionFunc
 	}{
 		{
-			name:       "empty",
-			extractors: nil,
+			name: "empty",
+			fields: fields{
+				LinkExtractors: nil,
+				Logger:         new(MockLogger),
+			},
 			args: args{
 				ctx:      context.Background(),
 				threadID: 23,
@@ -37,27 +45,26 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 		},
 		{
 			name: "without failed extractings",
-			extractors: ExtractorGroup{
-				func() models.LinkExtractor {
-					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
+			fields: fields{
+				LinkExtractors: []models.LinkExtractor{
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
 
-					extractor := new(MockLinkExtractor)
-					extractor.
-						On("ExtractLinks", ctxMatcher, 23, "http://example.com/").
-						Return([]string{"http://example.com/1", "http://example.com/2"}, nil)
+						return extractor
+					}(),
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return([]string{"http://example.com/3", "http://example.com/4"}, nil)
 
-					return extractor
-				}(),
-				func() models.LinkExtractor {
-					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
-
-					extractor := new(MockLinkExtractor)
-					extractor.
-						On("ExtractLinks", ctxMatcher, 23, "http://example.com/").
-						Return([]string{"http://example.com/3", "http://example.com/4"}, nil)
-
-					return extractor
-				}(),
+						return extractor
+					}(),
+				},
+				Logger: new(MockLogger),
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -74,26 +81,38 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 		},
 		{
 			name: "with some failed extractings",
-			extractors: ExtractorGroup{
-				func() models.LinkExtractor {
-					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
+			fields: fields{
+				LinkExtractors: []models.LinkExtractor{
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return(nil, iotest.ErrTimeout)
 
-					extractor := new(MockLinkExtractor)
-					extractor.
-						On("ExtractLinks", ctxMatcher, 23, "http://example.com/").
-						Return(nil, iotest.ErrTimeout)
+						return extractor
+					}(),
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return([]string{"http://example.com/3", "http://example.com/4"}, nil)
 
-					return extractor
-				}(),
-				func() models.LinkExtractor {
-					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
+						return extractor
+					}(),
+				},
+				Logger: func() Logger {
+					logger := new(MockLogger)
+					logger.
+						On(
+							"Logf",
+							"unable to extract links for link %q via extractor #%d: %s",
+							"http://example.com/",
+							0,
+							iotest.ErrTimeout,
+						).
+						Return()
 
-					extractor := new(MockLinkExtractor)
-					extractor.
-						On("ExtractLinks", ctxMatcher, 23, "http://example.com/").
-						Return([]string{"http://example.com/3", "http://example.com/4"}, nil)
-
-					return extractor
+					return logger
 				}(),
 			},
 			args: args{
@@ -101,31 +120,45 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 				threadID: 23,
 				link:     "http://example.com/",
 			},
-			wantLinks: nil,
-			wantErr:   assert.Error,
+			wantLinks: []string{"http://example.com/3", "http://example.com/4"},
+			wantErr:   assert.NoError,
 		},
 		{
 			name: "with all failed extractings",
-			extractors: ExtractorGroup{
-				func() models.LinkExtractor {
-					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
+			fields: fields{
+				LinkExtractors: []models.LinkExtractor{
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return(nil, iotest.ErrTimeout)
 
-					extractor := new(MockLinkExtractor)
-					extractor.
-						On("ExtractLinks", ctxMatcher, 23, "http://example.com/").
-						Return(nil, iotest.ErrTimeout)
+						return extractor
+					}(),
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return(nil, iotest.ErrTimeout)
 
-					return extractor
-				}(),
-				func() models.LinkExtractor {
-					ctxMatcher := mock.MatchedBy(func(context.Context) bool { return true })
+						return extractor
+					}(),
+				},
+				Logger: func() Logger {
+					logger := new(MockLogger)
+					for _, index := range []int{0, 1} {
+						logger.
+							On(
+								"Logf",
+								"unable to extract links for link %q via extractor #%d: %s",
+								"http://example.com/",
+								index,
+								iotest.ErrTimeout,
+							).
+							Return()
+					}
 
-					extractor := new(MockLinkExtractor)
-					extractor.
-						On("ExtractLinks", ctxMatcher, 23, "http://example.com/").
-						Return(nil, iotest.ErrTimeout)
-
-					return extractor
+					return logger
 				}(),
 			},
 			args: args{
@@ -134,19 +167,24 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 				link:     "http://example.com/",
 			},
 			wantLinks: nil,
-			wantErr:   assert.Error,
+			wantErr:   assert.NoError,
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			gotLinks, gotErr := data.extractors.ExtractLinks(
+			extractors := ExtractorGroup{
+				LinkExtractors: data.fields.LinkExtractors,
+				Logger:         data.fields.Logger,
+			}
+			gotLinks, gotErr := extractors.ExtractLinks(
 				data.args.ctx,
 				data.args.threadID,
 				data.args.link,
 			)
 
-			for _, extractor := range data.extractors {
+			for _, extractor := range data.fields.LinkExtractors {
 				mock.AssertExpectationsForObjects(test, extractor)
 			}
+			mock.AssertExpectationsForObjects(test, data.fields.Logger)
 			assert.Equal(test, data.wantLinks, gotLinks)
 			data.wantErr(test, gotErr)
 		})
