@@ -2,14 +2,17 @@ package extractors
 
 import (
 	"context"
+	"sync"
 
-	"github.com/pkg/errors"
+	"github.com/go-log/log"
 	"github.com/thewizardplusplus/go-crawler/models"
-	"golang.org/x/sync/errgroup"
 )
 
 // ExtractorGroup ...
-type ExtractorGroup []models.LinkExtractor
+type ExtractorGroup struct {
+	LinkExtractors []models.LinkExtractor
+	Logger         log.Logger
+}
 
 // ExtractLinks ...
 func (extractors ExtractorGroup) ExtractLinks(
@@ -17,26 +20,26 @@ func (extractors ExtractorGroup) ExtractLinks(
 	threadID int,
 	link string,
 ) ([]string, error) {
-	waiter, ctx := errgroup.WithContext(ctx)
+	var waiter sync.WaitGroup
+	waiter.Add(len(extractors.LinkExtractors))
 
-	linkGroups := make([][]string, len(extractors))
-	for index, extractor := range extractors {
-		index, extractor := index, extractor
+	linkGroups := make([][]string, len(extractors.LinkExtractors))
+	for index, extractor := range extractors.LinkExtractors {
+		go func(index int, extractor models.LinkExtractor) {
+			defer waiter.Done()
 
-		waiter.Go(func() error {
 			links, err := extractor.ExtractLinks(ctx, threadID, link)
 			if err != nil {
-				return errors.Wrapf(err, "error with extractor #%d", index)
+				const logMessage = "unable to extract links for link %q " +
+					"via extractor #%d: %s"
+				extractors.Logger.Logf(logMessage, link, index, err)
 			}
 
 			linkGroups[index] = links
-			return nil
-		})
+		}(index, extractor)
 	}
 
-	if err := waiter.Wait(); err != nil {
-		return nil, errors.Wrap(err, "unable to extract links")
-	}
+	waiter.Wait()
 
 	var totalLinks []string
 	for _, linkGroup := range linkGroups {
