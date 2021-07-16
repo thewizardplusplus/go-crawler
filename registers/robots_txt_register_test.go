@@ -22,13 +22,13 @@ func TestNewRobotsTXTRegister(test *testing.T) {
 
 	mock.AssertExpectationsForObjects(test, httpClient)
 	assert.Equal(test, httpClient, got.httpClient)
-	assert.Equal(test, new(sync.Map), got.registeredRobotsTXT)
+	assert.Equal(test, new(sync.Map), got.robotsTXTRegister.registeredValues)
 }
 
 func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 	type fields struct {
-		httpClient          httputils.HTTPClient
-		registeredRobotsTXT *sync.Map
+		httpClient        httputils.HTTPClient
+		robotsTXTRegister BasicRegister
 	}
 	type args struct {
 		ctx  context.Context
@@ -67,7 +67,7 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 
 					return httpClient
 				}(),
-				registeredRobotsTXT: new(sync.Map),
+				robotsTXTRegister: BasicRegister{registeredValues: new(sync.Map)},
 			},
 			args: args{
 				ctx:  context.Background(),
@@ -92,22 +92,24 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 			name: "success with a registered robots.txt link",
 			fields: fields{
 				httpClient: new(MockHTTPClient),
-				registeredRobotsTXT: func() *sync.Map {
-					robotsTXTData, err := robotstxt.FromString(`
-						User-agent: *
-						Disallow: /
-						Allow: /$
-						Allow: /sitemap.xml$
-						Allow: /post/
-						Allow: /storage/app/media/
-					`)
-					require.NoError(test, err)
+				robotsTXTRegister: BasicRegister{
+					registeredValues: func() *sync.Map {
+						robotsTXTData, err := robotstxt.FromString(`
+							User-agent: *
+							Disallow: /
+							Allow: /$
+							Allow: /sitemap.xml$
+							Allow: /post/
+							Allow: /storage/app/media/
+						`)
+						require.NoError(test, err)
 
-					registeredRobotsTXT := new(sync.Map)
-					registeredRobotsTXT.Store("http://example.com/robots.txt", robotsTXTData)
+						registeredRobotsTXT := new(sync.Map)
+						registeredRobotsTXT.Store("http://example.com/robots.txt", robotsTXTData)
 
-					return registeredRobotsTXT
-				}(),
+						return registeredRobotsTXT
+					}(),
+				},
 			},
 			args: args{
 				ctx:  context.Background(),
@@ -131,8 +133,8 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 		{
 			name: "error with making of a robots.txt link",
 			fields: fields{
-				httpClient:          new(MockHTTPClient),
-				registeredRobotsTXT: new(sync.Map),
+				httpClient:        new(MockHTTPClient),
+				robotsTXTRegister: BasicRegister{registeredValues: new(sync.Map)},
 			},
 			args: args{
 				ctx:  context.Background(),
@@ -154,7 +156,7 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 
 					return httpClient
 				}(),
-				registeredRobotsTXT: new(sync.Map),
+				robotsTXTRegister: BasicRegister{registeredValues: new(sync.Map)},
 			},
 			args: args{
 				ctx:  context.Background(),
@@ -166,8 +168,8 @@ func TestRobotsTXTRegister_RegisterRobotsTXT(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			register := RobotsTXTRegister{
-				httpClient:          data.fields.httpClient,
-				registeredRobotsTXT: data.fields.registeredRobotsTXT,
+				httpClient:        data.fields.httpClient,
+				robotsTXTRegister: data.fields.robotsTXTRegister,
 			}
 			gotRobotsTXTData, gotErr :=
 				register.RegisterRobotsTXT(data.args.ctx, data.args.link)

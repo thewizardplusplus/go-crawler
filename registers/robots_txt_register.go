@@ -3,7 +3,6 @@ package registers
 import (
 	"context"
 	"net/http"
-	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/temoto/robotstxt"
@@ -15,7 +14,7 @@ import (
 type RobotsTXTRegister struct {
 	httpClient httputils.HTTPClient
 
-	registeredRobotsTXT *sync.Map
+	robotsTXTRegister BasicRegister
 }
 
 // NewRobotsTXTRegister ...
@@ -23,7 +22,7 @@ func NewRobotsTXTRegister(httpClient httputils.HTTPClient) RobotsTXTRegister {
 	return RobotsTXTRegister{
 		httpClient: httpClient,
 
-		registeredRobotsTXT: new(sync.Map),
+		robotsTXTRegister: NewBasicRegister(),
 	}
 }
 
@@ -46,15 +45,15 @@ func (register RobotsTXTRegister) RegisterRobotsTXT(
 
 	// if successful, the result will always be one link
 	robotsTXTLink := robotsTXTLinks[0]
-	robotsTXTData, ok := register.registeredRobotsTXT.Load(robotsTXTLink)
-	if !ok {
-		var err error
-		robotsTXTData, err = register.loadRobotsTXTData(ctx, robotsTXTLink)
-		if err != nil {
-			return nil, errors.Wrap(err, "unable to load the robots.txt data")
-		}
-
-		register.registeredRobotsTXT.Store(robotsTXTLink, robotsTXTData)
+	robotsTXTData, err := register.robotsTXTRegister.RegisterValue(
+		ctx,
+		robotsTXTLink,
+		func(ctx context.Context, robotsTXTLink interface{}) (interface{}, error) {
+			return register.loadRobotsTXTData(ctx, robotsTXTLink.(string))
+		},
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to load the robots.txt data")
 	}
 
 	return robotsTXTData.(*robotstxt.RobotsData), nil
