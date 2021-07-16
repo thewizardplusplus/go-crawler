@@ -16,7 +16,7 @@ type SitemapRegister struct {
 	linkGenerator models.LinkExtractor
 	logger        log.Logger
 
-	registeredSitemaps *sync.Map
+	sitemapRegister BasicRegister
 }
 
 // NewSitemapRegister ...
@@ -35,7 +35,7 @@ func NewSitemapRegister(
 		linkGenerator: linkGenerator,
 		logger:        logger,
 
-		registeredSitemaps: new(sync.Map),
+		sitemapRegister: NewBasicRegister(),
 	}
 }
 
@@ -80,16 +80,18 @@ func (register SitemapRegister) loadSitemapData(
 	ctx context.Context,
 	sitemapLink string,
 ) sitemap.Sitemap {
-	sitemapData, ok := register.registeredSitemaps.Load(sitemapLink)
-	if !ok {
-		var err error
-		sitemapData, err = sitemap.Get(sitemapLink, ctx)
-		if err != nil {
-			register.logger.Logf("unable to load Sitemap link %q: %s", sitemapLink, err)
-		}
+	sitemapData, _ := register.sitemapRegister.RegisterValue( // nolint: gosec
+		ctx,
+		sitemapLink,
+		func(ctx context.Context, sitemapLink interface{}) (interface{}, error) {
+			sitemapData, err := sitemap.Get(sitemapLink.(string), ctx)
+			if err != nil {
+				register.logger.Logf("unable to load Sitemap link %q: %s", sitemapLink, err)
+			}
 
-		register.registeredSitemaps.Store(sitemapLink, sitemapData)
-	}
+			return sitemapData, nil
+		},
+	)
 
 	return sitemapData.(sitemap.Sitemap)
 }

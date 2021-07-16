@@ -26,11 +26,11 @@ func TestNewSitemapRegister(test *testing.T) {
 	}
 
 	for _, data := range []struct {
-		name                   string
-		args                   args
-		wantLinkGenerator      models.LinkExtractor
-		wantLogger             log.Logger
-		wantRegisteredSitemaps *sync.Map
+		name                string
+		args                args
+		wantLinkGenerator   models.LinkExtractor
+		wantLogger          log.Logger
+		wantSitemapRegister BasicRegister
 	}{
 		{
 			name: "with a link loader",
@@ -40,9 +40,9 @@ func TestNewSitemapRegister(test *testing.T) {
 				logger:          new(MockLogger),
 				linkLoader:      new(MockLinkLoader),
 			},
-			wantLinkGenerator:      new(MockLinkExtractor),
-			wantLogger:             new(MockLogger),
-			wantRegisteredSitemaps: new(sync.Map),
+			wantLinkGenerator:   new(MockLinkExtractor),
+			wantLogger:          new(MockLogger),
+			wantSitemapRegister: BasicRegister{registeredValues: new(sync.Map)},
 		},
 		{
 			name: "without a link loader",
@@ -52,9 +52,9 @@ func TestNewSitemapRegister(test *testing.T) {
 				logger:          new(MockLogger),
 				linkLoader:      nil,
 			},
-			wantLinkGenerator:      new(MockLinkExtractor),
-			wantLogger:             new(MockLogger),
-			wantRegisteredSitemaps: new(sync.Map),
+			wantLinkGenerator:   new(MockLinkExtractor),
+			wantLogger:          new(MockLogger),
+			wantSitemapRegister: BasicRegister{registeredValues: new(sync.Map)},
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
@@ -79,16 +79,16 @@ func TestNewSitemapRegister(test *testing.T) {
 			}
 			assert.Equal(test, data.wantLinkGenerator, register.linkGenerator)
 			assert.Equal(test, data.wantLogger, register.logger)
-			assert.Equal(test, data.wantRegisteredSitemaps, register.registeredSitemaps)
+			assert.Equal(test, data.wantSitemapRegister, register.sitemapRegister)
 		})
 	}
 }
 
 func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 	type fields struct {
-		linkGenerator      models.LinkExtractor
-		linkLoader         LinkLoader
-		registeredSitemaps *sync.Map
+		linkGenerator   models.LinkExtractor
+		linkLoader      LinkLoader
+		sitemapRegister BasicRegister
 	}
 	type args struct {
 		ctx      context.Context
@@ -153,7 +153,7 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 
 					return linkLoader
 				}(),
-				registeredSitemaps: new(sync.Map),
+				sitemapRegister: BasicRegister{registeredValues: new(sync.Map)},
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -181,8 +181,8 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 
 					return linkGenerator
 				}(),
-				linkLoader:         new(MockLinkLoader),
-				registeredSitemaps: new(sync.Map),
+				linkLoader:      new(MockLinkLoader),
+				sitemapRegister: BasicRegister{registeredValues: new(sync.Map)},
 			},
 			args: args{
 				ctx:      context.Background(),
@@ -197,8 +197,8 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 			sitemap.SetFetch(data.fields.linkLoader.LoadLink)
 
 			register := SitemapRegister{
-				linkGenerator:      data.fields.linkGenerator,
-				registeredSitemaps: data.fields.registeredSitemaps,
+				linkGenerator:   data.fields.linkGenerator,
+				sitemapRegister: data.fields.sitemapRegister,
 			}
 			gotSitemapData, gotErr :=
 				register.RegisterSitemap(data.args.ctx, data.args.threadID, data.args.link)
@@ -217,9 +217,9 @@ func TestSitemapRegister_RegisterSitemap(test *testing.T) {
 
 func TestSitemapRegister_loadSitemapData(test *testing.T) {
 	type fields struct {
-		linkLoader         LinkLoader
-		logger             log.Logger
-		registeredSitemaps *sync.Map
+		linkLoader      LinkLoader
+		logger          log.Logger
+		sitemapRegister BasicRegister
 	}
 	type args struct {
 		ctx         context.Context
@@ -255,8 +255,8 @@ func TestSitemapRegister_loadSitemapData(test *testing.T) {
 
 					return linkLoader
 				}(),
-				logger:             new(MockLogger),
-				registeredSitemaps: new(sync.Map),
+				logger:          new(MockLogger),
+				sitemapRegister: BasicRegister{registeredValues: new(sync.Map)},
 			},
 			args: args{
 				ctx:         context.Background(),
@@ -278,23 +278,25 @@ func TestSitemapRegister_loadSitemapData(test *testing.T) {
 			fields: fields{
 				linkLoader: new(MockLinkLoader),
 				logger:     new(MockLogger),
-				registeredSitemaps: func() *sync.Map {
-					sitemapData := sitemap.Sitemap{
-						XMLName: xml.Name{
-							Space: "http://www.sitemaps.org/schemas/sitemap/0.9",
-							Local: "urlset",
-						},
-						URL: []sitemap.URL{
-							{Loc: "http://example.com/1"},
-							{Loc: "http://example.com/2"},
-						},
-					}
+				sitemapRegister: BasicRegister{
+					registeredValues: func() *sync.Map {
+						sitemapData := sitemap.Sitemap{
+							XMLName: xml.Name{
+								Space: "http://www.sitemaps.org/schemas/sitemap/0.9",
+								Local: "urlset",
+							},
+							URL: []sitemap.URL{
+								{Loc: "http://example.com/1"},
+								{Loc: "http://example.com/2"},
+							},
+						}
 
-					registeredSitemaps := new(sync.Map)
-					registeredSitemaps.Store("http://example.com/sitemap.xml", sitemapData)
+						registeredSitemaps := new(sync.Map)
+						registeredSitemaps.Store("http://example.com/sitemap.xml", sitemapData)
 
-					return registeredSitemaps
-				}(),
+						return registeredSitemaps
+					}(),
+				},
 			},
 			args: args{
 				ctx:         context.Background(),
@@ -338,7 +340,7 @@ func TestSitemapRegister_loadSitemapData(test *testing.T) {
 
 					return logger
 				}(),
-				registeredSitemaps: new(sync.Map),
+				sitemapRegister: BasicRegister{registeredValues: new(sync.Map)},
 			},
 			args: args{
 				ctx:         context.Background(),
@@ -351,8 +353,8 @@ func TestSitemapRegister_loadSitemapData(test *testing.T) {
 			sitemap.SetFetch(data.fields.linkLoader.LoadLink)
 
 			register := SitemapRegister{
-				logger:             data.fields.logger,
-				registeredSitemaps: data.fields.registeredSitemaps,
+				logger:          data.fields.logger,
+				sitemapRegister: data.fields.sitemapRegister,
 			}
 			gotSitemapData :=
 				register.loadSitemapData(data.args.ctx, data.args.sitemapLink)
