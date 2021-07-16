@@ -545,35 +545,43 @@ func ExampleCrawl_withSitemap() {
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.RepeatingExtractor{
 				LinkExtractor: extractors.ExtractorGroup{
-					extractors.TrimmingExtractor{
-						TrimLink: urlutils.TrimLink,
-						LinkExtractor: extractors.DefaultExtractor{
-							HTTPClient: http.DefaultClient,
-							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-								"a": {"href"},
-							}),
+					LinkExtractors: []models.LinkExtractor{
+						extractors.TrimmingExtractor{
+							TrimLink: urlutils.TrimLink,
+							LinkExtractor: extractors.DefaultExtractor{
+								HTTPClient: http.DefaultClient,
+								Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+									"a": {"href"},
+								}),
+							},
+						},
+						extractors.TrimmingExtractor{
+							TrimLink: urlutils.TrimLink,
+							LinkExtractor: extractors.SitemapExtractor{
+								SitemapRegister: registers.NewSitemapRegister(
+									time.Second,
+									extractors.ExtractorGroup{
+										LinkExtractors: []models.LinkExtractor{
+											sitemap.HierarchicalGenerator{
+												SanitizeLink: urlutils.SanitizeLink,
+												MaximalDepth: -1,
+											},
+											sitemap.RobotsTXTGenerator{
+												RobotsTXTRegister: registers.NewRobotsTXTRegister(
+													http.DefaultClient,
+												),
+											},
+										},
+										Logger: wrappedLogger,
+									},
+									wrappedLogger,
+									sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
+								),
+								Logger: wrappedLogger,
+							},
 						},
 					},
-					extractors.TrimmingExtractor{
-						TrimLink: urlutils.TrimLink,
-						LinkExtractor: extractors.SitemapExtractor{
-							SitemapRegister: registers.NewSitemapRegister(
-								time.Second,
-								extractors.ExtractorGroup{
-									sitemap.HierarchicalGenerator{
-										SanitizeLink: urlutils.SanitizeLink,
-										MaximalDepth: -1,
-									},
-									sitemap.RobotsTXTGenerator{
-										RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
-									},
-								},
-								wrappedLogger,
-								sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
-							),
-							Logger: wrappedLogger,
-						},
-					},
+					Logger: wrappedLogger,
 				},
 				RepeatCount:  5,
 				RepeatDelay:  time.Second,
