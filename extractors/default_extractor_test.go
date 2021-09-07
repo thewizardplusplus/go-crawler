@@ -201,7 +201,86 @@ func TestDefaultExtractor_loadData(test *testing.T) {
 		wantData []byte
 		wantErr  assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			fields: fields{
+				HTTPClient: func() httputils.HTTPClient {
+					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
+					request = request.WithContext(context.Background())
+
+					response := &http.Response{
+						Body: ioutil.NopCloser(strings.NewReader("data")),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/",
+			},
+			wantData: []byte("data"),
+			wantErr:  assert.NoError,
+		},
+		{
+			name: "error with request creating",
+			fields: fields{
+				HTTPClient: new(MockHTTPClient),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: ":",
+			},
+			wantData: nil,
+			wantErr:  assert.Error,
+		},
+		{
+			name: "error with request sending",
+			fields: fields{
+				HTTPClient: func() httputils.HTTPClient {
+					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
+					request = request.WithContext(context.Background())
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(nil, iotest.ErrTimeout)
+
+					return httpClient
+				}(),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/",
+			},
+			wantData: nil,
+			wantErr:  assert.Error,
+		},
+		{
+			name: "error with request reading",
+			fields: fields{
+				HTTPClient: func() httputils.HTTPClient {
+					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
+					request = request.WithContext(context.Background())
+
+					response := &http.Response{
+						Body: ioutil.NopCloser(iotest.TimeoutReader(strings.NewReader("data"))),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+			},
+			args: args{
+				ctx:  context.Background(),
+				link: "http://example.com/",
+			},
+			wantData: nil,
+			wantErr:  assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := DefaultExtractor{
