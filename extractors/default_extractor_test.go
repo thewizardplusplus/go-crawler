@@ -184,3 +184,34 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		})
 	}
 }
+
+func TestDefaultExtractor_loadData(test *testing.T) {
+	type fields struct {
+		HTTPClient httputils.HTTPClient
+	}
+	type args struct {
+		ctx  context.Context
+		link string
+	}
+
+	for _, data := range []struct {
+		name     string
+		fields   fields
+		args     args
+		wantData []byte
+		wantErr  assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			extractor := DefaultExtractor{
+				HTTPClient: data.fields.HTTPClient,
+			}
+			gotData, gotErr := extractor.loadData(data.args.ctx, data.args.link)
+
+			mock.AssertExpectationsForObjects(test, data.fields.HTTPClient)
+			assert.Equal(test, data.wantData, gotData)
+			data.wantErr(test, gotErr)
+		})
+	}
+}
