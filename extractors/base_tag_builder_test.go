@@ -67,3 +67,26 @@ func TestBaseTagBuilder_AddAttribute(test *testing.T) {
 	}
 	assert.Equal(test, wantBuilder, builder)
 }
+
+func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
+	type fields struct {
+		isFirstFound bool
+	}
+
+	for _, data := range []struct {
+		name   string
+		fields fields
+		wantOk assert.BoolAssertionFunc
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			builder := BaseTagBuilder{
+				isFirstFound: data.fields.isFirstFound,
+			}
+			gotOk := builder.IsSelectionTerminated()
+
+			data.wantOk(test, gotOk)
+		})
+	}
+}
