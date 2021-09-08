@@ -33,3 +33,8 @@ func (builder *BaseTagBuilder) AddAttribute(name []byte, value []byte) {
 	builder.baseLink = byteutils.Copy(value)
 	builder.isFirstFound = true
 }
+
+// IsSelectionTerminated ...
+func (builder BaseTagBuilder) IsSelectionTerminated() bool {
+	return builder.isFirstFound
+}
