@@ -75,3 +75,17 @@ func (extractor DefaultExtractor) selectLinks(data []byte) []string {
 
 	return links
 }
+
+func selectBaseTag(data []byte) string {
+	var builder BaseTagBuilder
+	htmlselector.SelectTags( // nolint: errcheck, gosec
+		bytes.NewReader(data),
+		BaseTagFilters,
+		&builder,
+		htmlselector.SkipEmptyTags(),
+		htmlselector.SkipEmptyAttributes(),
+	)
+
+	baseLink, _ := builder.BaseLink()
+	return string(baseLink)
+}
