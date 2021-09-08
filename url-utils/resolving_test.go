@@ -19,7 +19,47 @@ func TestNewLinkResolver(test *testing.T) {
 		wantLinkResolver LinkResolver
 		wantErr          assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success with the single absolute link",
+			args: args{
+				baseLinks: []string{"e/f/", "c/d/", "http://example.com/a/b/"},
+			},
+			wantLinkResolver: LinkResolver{
+				BaseLink: &url.URL{
+					Scheme: "http",
+					Host:   "example.com",
+					Path:   "/a/b/c/d/e/f/",
+				},
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "success with the several absolute links",
+			args: args{
+				baseLinks: []string{
+					"e/f/", "c/d/", "http://example.com/a/b/",
+					"3/4/", "http://example.com/1/2/",
+				},
+			},
+			wantLinkResolver: LinkResolver{
+				BaseLink: &url.URL{
+					Scheme: "http",
+					Host:   "example.com",
+					Path:   "/a/b/c/d/e/f/",
+				},
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "error",
+			args: args{
+				baseLinks: []string{"e/f/", ":", "http://example.com/a/b/"},
+			},
+			wantLinkResolver: LinkResolver{
+				BaseLink: nil,
+			},
+			wantErr: assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			gotLinkResolver, gotErr := NewLinkResolver(data.args.baseLinks)
