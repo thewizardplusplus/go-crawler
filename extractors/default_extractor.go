@@ -29,23 +29,7 @@ func (extractor DefaultExtractor) ExtractLinks(
 		return nil, errors.Wrap(err, "unable to load the data")
 	}
 
-	var builder builders.FlattenBuilder
-	if err := htmlselector.SelectTags(
-		bytes.NewReader(data),
-		extractor.Filters,
-		&builder,
-		htmlselector.SkipEmptyTags(),
-		htmlselector.SkipEmptyAttributes(),
-	); err != nil {
-		return nil, errors.Wrap(err, "unable to select tags")
-	}
-
-	var links []string
-	for _, attributeValue := range builder.AttributeValues() {
-		link := string(attributeValue)
-		links = append(links, link)
-	}
-
+	links := extractor.selectLinks(data)
 	return links, nil
 }
 
@@ -71,4 +55,23 @@ func (extractor DefaultExtractor) loadData(
 	}
 
 	return data, nil
+}
+
+func (extractor DefaultExtractor) selectLinks(data []byte) []string {
+	var builder builders.FlattenBuilder
+	htmlselector.SelectTags( // nolint: errcheck, gosec
+		bytes.NewReader(data),
+		extractor.Filters,
+		&builder,
+		htmlselector.SkipEmptyTags(),
+		htmlselector.SkipEmptyAttributes(),
+	)
+
+	var links []string
+	for _, attributeValue := range builder.AttributeValues() {
+		link := string(attributeValue)
+		links = append(links, link)
+	}
+
+	return links
 }
