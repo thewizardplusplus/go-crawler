@@ -294,3 +294,30 @@ func TestDefaultExtractor_loadData(test *testing.T) {
 		})
 	}
 }
+
+func TestDefaultExtractor_selectLinks(test *testing.T) {
+	type fields struct {
+		Filters htmlselector.OptimizedFilterGroup
+	}
+	type args struct {
+		data []byte
+	}
+
+	for _, data := range []struct {
+		name      string
+		fields    fields
+		args      args
+		wantLinks []string
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			extractor := DefaultExtractor{
+				Filters: data.fields.Filters,
+			}
+			gotLinks := extractor.selectLinks(data.args.data)
+
+			assert.Equal(test, data.wantLinks, gotLinks)
+		})
+	}
+}
