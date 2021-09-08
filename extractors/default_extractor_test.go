@@ -349,3 +349,23 @@ func TestDefaultExtractor_selectLinks(test *testing.T) {
 		})
 	}
 }
+
+func Test_selectBaseTag(test *testing.T) {
+	type args struct {
+		data []byte
+	}
+
+	for _, data := range []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			got := selectBaseTag(data.args.data)
+
+			assert.Equal(test, data.want, got)
+		})
+	}
+}
