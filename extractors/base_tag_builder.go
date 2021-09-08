@@ -23,3 +23,6 @@ func (builder BaseTagBuilder) BaseLink() (baseLink []byte, isFound bool) {
 
 	return builder.baseLink, true
 }
+
+// AddTag ...
+func (builder BaseTagBuilder) AddTag(name []byte) {}
