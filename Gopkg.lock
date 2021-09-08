@@ -283,7 +283,7 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:c078608aa57118f5a115e8517c89228a5a7539128d30fe1d10cfce541d416379"
+  digest = "1:6dd323c86ce3f519b624f6eec2f2bd3bd0b9e76717dbcea6d28853ecf1f0853b"
   name = "github.com/thewizardplusplus/go-html-selector"
   packages = [
     ".",
@@ -291,8 +291,8 @@
     "byte-utils",
   ]
   pruneopts = "UT"
-  revision = "f13a4ff946605c93aceee71676bd678bd70eb1a7"
-  version = "v1.4"
+  revision = "1e333aa0d9162f88a04d05313c0d2eace8a7d440"
+  version = "v1.7"
 
 [[projects]]
   digest = "1:9dc4b31de2509ce8025bfec4659b6f26cd07ac4bb0b39fe71fb8dca2f4894472"
@@ -482,6 +482,7 @@
     "github.com/temoto/robotstxt",
     "github.com/thewizardplusplus/go-html-selector",
     "github.com/thewizardplusplus/go-html-selector/builders",
+    "github.com/thewizardplusplus/go-html-selector/byte-utils",
     "github.com/thewizardplusplus/go-http-utils",
     "github.com/thewizardplusplus/go-sync-utils",
     "github.com/vektra/mockery/cmd",
