@@ -8,6 +8,28 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestNewLinkResolver(test *testing.T) {
+	type args struct {
+		baseLinks []string
+	}
+
+	for _, data := range []struct {
+		name             string
+		args             args
+		wantLinkResolver LinkResolver
+		wantErr          assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			gotLinkResolver, gotErr := NewLinkResolver(data.args.baseLinks)
+
+			assert.Equal(test, data.wantLinkResolver, gotLinkResolver)
+			data.wantErr(test, gotErr)
+		})
+	}
+}
+
 func TestLinkResolver_ResolveLink(test *testing.T) {
 	type fields struct {
 		BaseLink *url.URL
