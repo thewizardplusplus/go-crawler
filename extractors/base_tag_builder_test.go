@@ -49,3 +49,10 @@ func TestBaseTagBuilder_BaseLink(test *testing.T) {
 		})
 	}
 }
+
+func TestBaseTagBuilder_AddTag(test *testing.T) {
+	var builder BaseTagBuilder
+	builder.AddTag([]byte("tag"))
+
+	assert.Equal(test, BaseTagBuilder{}, builder)
+}
