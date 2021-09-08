@@ -2,6 +2,7 @@ package urlutils
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 
@@ -21,7 +22,79 @@ func TestGenerateBaseLinks(test *testing.T) {
 		args args
 		want []string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "with the full data",
+			args: args{
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				baseTagValue:    "g/h/",
+				baseHeaderNames: []string{"Content-Base", "Content-Location"},
+			},
+			want: []string{"g/h/", "e/f/", "c/d/", "http://example.com/a/b/"},
+		},
+		{
+			name: "without the base tag",
+			args: args{
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				baseTagValue:    "",
+				baseHeaderNames: []string{"Content-Base", "Content-Location"},
+			},
+			want: []string{"e/f/", "c/d/", "http://example.com/a/b/"},
+		},
+		{
+			name: "without the several header values",
+			args: args{
+				response: &http.Response{
+					Header: http.Header{"Content-Location": {"c/d/"}},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				baseTagValue:    "g/h/",
+				baseHeaderNames: []string{"Content-Base", "Content-Location"},
+			},
+			want: []string{"g/h/", "c/d/", "http://example.com/a/b/"},
+		},
+		{
+			name: "without the header names",
+			args: args{
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				baseTagValue:    "g/h/",
+				baseHeaderNames: nil,
+			},
+			want: []string{"g/h/", "http://example.com/a/b/"},
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			got := GenerateBaseLinks(
