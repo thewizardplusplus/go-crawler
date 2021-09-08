@@ -2,6 +2,7 @@ package extractors
 
 import (
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
+	byteutils "github.com/thewizardplusplus/go-html-selector/byte-utils"
 )
 
 // BaseTagFilters ...
@@ -26,3 +27,9 @@ func (builder BaseTagBuilder) BaseLink() (baseLink []byte, isFound bool) {
 
 // AddTag ...
 func (builder BaseTagBuilder) AddTag(name []byte) {}
+
+// AddAttribute ...
+func (builder *BaseTagBuilder) AddAttribute(name []byte, value []byte) {
+	builder.baseLink = byteutils.Copy(value)
+	builder.isFirstFound = true
+}
