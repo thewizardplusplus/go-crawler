@@ -24,7 +24,7 @@ func (extractor DefaultExtractor) ExtractLinks(
 	threadID int,
 	link string,
 ) ([]string, error) {
-	data, err := extractor.loadData(ctx, link)
+	data, _, err := extractor.loadData(ctx, link)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to load the data")
 	}
@@ -36,25 +36,25 @@ func (extractor DefaultExtractor) ExtractLinks(
 func (extractor DefaultExtractor) loadData(
 	ctx context.Context,
 	link string,
-) ([]byte, error) {
+) ([]byte, *http.Response, error) {
 	request, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to create the request")
+		return nil, nil, errors.Wrap(err, "unable to create the request")
 	}
 	request = request.WithContext(ctx)
 
 	response, err := extractor.HTTPClient.Do(request)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to send the request")
+		return nil, nil, errors.Wrap(err, "unable to send the request")
 	}
 	defer response.Body.Close() // nolint: errcheck
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read the response")
+		return nil, nil, errors.Wrap(err, "unable to read the response")
 	}
 
-	return data, nil
+	return data, response, nil
 }
 
 func (extractor DefaultExtractor) selectLinks(data []byte) []string {

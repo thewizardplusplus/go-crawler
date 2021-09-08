@@ -2,6 +2,7 @@ package extractors
 
 import (
 	"context"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -195,11 +196,12 @@ func TestDefaultExtractor_loadData(test *testing.T) {
 	}
 
 	for _, data := range []struct {
-		name     string
-		fields   fields
-		args     args
-		wantData []byte
-		wantErr  assert.ErrorAssertionFunc
+		name         string
+		fields       fields
+		args         args
+		wantData     []byte
+		wantResponse *http.Response
+		wantErr      assert.ErrorAssertionFunc
 	}{
 		{
 			name: "success",
@@ -223,7 +225,15 @@ func TestDefaultExtractor_loadData(test *testing.T) {
 				link: "http://example.com/",
 			},
 			wantData: []byte("data"),
-			wantErr:  assert.NoError,
+			wantResponse: func() *http.Response {
+				data := strings.NewReader("data")
+				data.Seek(0, io.SeekEnd) // nolint: errcheck
+
+				return &http.Response{
+					Body: ioutil.NopCloser(data),
+				}
+			}(),
+			wantErr: assert.NoError,
 		},
 		{
 			name: "error with request creating",
@@ -234,8 +244,9 @@ func TestDefaultExtractor_loadData(test *testing.T) {
 				ctx:  context.Background(),
 				link: ":",
 			},
-			wantData: nil,
-			wantErr:  assert.Error,
+			wantData:     nil,
+			wantResponse: nil,
+			wantErr:      assert.Error,
 		},
 		{
 			name: "error with request sending",
@@ -254,8 +265,9 @@ func TestDefaultExtractor_loadData(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 			},
-			wantData: nil,
-			wantErr:  assert.Error,
+			wantData:     nil,
+			wantResponse: nil,
+			wantErr:      assert.Error,
 		},
 		{
 			name: "error with request reading",
@@ -278,18 +290,21 @@ func TestDefaultExtractor_loadData(test *testing.T) {
 				ctx:  context.Background(),
 				link: "http://example.com/",
 			},
-			wantData: nil,
-			wantErr:  assert.Error,
+			wantData:     nil,
+			wantResponse: nil,
+			wantErr:      assert.Error,
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := DefaultExtractor{
 				HTTPClient: data.fields.HTTPClient,
 			}
-			gotData, gotErr := extractor.loadData(data.args.ctx, data.args.link)
+			gotData, gotResponse, gotErr :=
+				extractor.loadData(data.args.ctx, data.args.link)
 
 			mock.AssertExpectationsForObjects(test, data.fields.HTTPClient)
 			assert.Equal(test, data.wantData, gotData)
+			assert.Equal(test, data.wantResponse, gotResponse)
 			data.wantErr(test, gotErr)
 		})
 	}
