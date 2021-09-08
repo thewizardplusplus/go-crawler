@@ -7,6 +7,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// DefaultBaseHeaderNames ...
+var DefaultBaseHeaderNames = []string{"Content-Base", "Content-Location"}
+
 // LinkResolver ...
 type LinkResolver struct {
 	BaseLink *url.URL
