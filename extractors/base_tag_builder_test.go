@@ -56,3 +56,14 @@ func TestBaseTagBuilder_AddTag(test *testing.T) {
 
 	assert.Equal(test, BaseTagBuilder{}, builder)
 }
+
+func TestBaseTagBuilder_AddAttribute(test *testing.T) {
+	var builder BaseTagBuilder
+	builder.AddAttribute([]byte("tag"), []byte("attribute"))
+
+	wantBuilder := BaseTagBuilder{
+		baseLink:     []byte("attribute"),
+		isFirstFound: true,
+	}
+	assert.Equal(test, wantBuilder, builder)
+}
