@@ -309,7 +309,35 @@ func TestDefaultExtractor_selectLinks(test *testing.T) {
 		args      args
 		wantLinks []string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "without links",
+			fields: fields{
+				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+					"a": {"href"},
+				}),
+			},
+			args: args{
+				data: []byte(""),
+			},
+			wantLinks: nil,
+		},
+		{
+			name: "with links",
+			fields: fields{
+				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+					"a": {"href"},
+				}),
+			},
+			args: args{
+				data: []byte(`
+					<ul>
+						<li><a href="http://example.com/1">1</a></li>
+						<li><a href="http://example.com/2">2</a></li>
+					</ul>
+				`),
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := DefaultExtractor{
