@@ -1,12 +1,39 @@
 package urlutils
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestGenerateBaseLinks(test *testing.T) {
+	type args struct {
+		response        *http.Response
+		baseTagValue    string
+		baseHeaderNames []string
+	}
+
+	for _, data := range []struct {
+		name string
+		args args
+		want []string
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			got := GenerateBaseLinks(
+				data.args.response,
+				data.args.baseTagValue,
+				data.args.baseHeaderNames,
+			)
+
+			assert.Equal(test, data.want, got)
+		})
+	}
+}
 
 func TestNewLinkResolver(test *testing.T) {
 	type args struct {
