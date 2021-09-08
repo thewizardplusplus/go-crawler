@@ -18,7 +18,24 @@ func TestBaseTagBuilder_BaseLink(test *testing.T) {
 		wantBaseLink []byte
 		wantIsFound  assert.BoolAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "was not found",
+			fields: fields{
+				baseLink:     []byte("base link"),
+				isFirstFound: false,
+			},
+			wantBaseLink: nil,
+			wantIsFound:  assert.False,
+		},
+		{
+			name: "was found",
+			fields: fields{
+				baseLink:     []byte("base link"),
+				isFirstFound: true,
+			},
+			wantBaseLink: []byte("base link"),
+			wantIsFound:  assert.True,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			builder := BaseTagBuilder{
