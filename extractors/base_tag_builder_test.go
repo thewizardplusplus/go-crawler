@@ -78,7 +78,20 @@ func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
 		fields fields
 		wantOk assert.BoolAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "selection is terminated",
+			fields: fields{
+				isFirstFound: false,
+			},
+			wantOk: assert.False,
+		},
+		{
+			name: "selection is not terminated",
+			fields: fields{
+				isFirstFound: true,
+			},
+			wantOk: assert.True,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			builder := BaseTagBuilder{
