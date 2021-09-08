@@ -1,6 +1,7 @@
 package urlutils
 
 import (
+	"net/http"
 	"net/url"
 
 	"github.com/pkg/errors"
@@ -9,6 +10,28 @@ import (
 // LinkResolver ...
 type LinkResolver struct {
 	BaseLink *url.URL
+}
+
+// GenerateBaseLinks ...
+func GenerateBaseLinks(
+	response *http.Response,
+	baseTagValue string,
+	baseHeaderNames []string,
+) []string {
+	var baseLinks []string
+	if baseTagValue != "" {
+		baseLinks = append(baseLinks, baseTagValue)
+	}
+
+	for _, baseHeaderName := range baseHeaderNames {
+		baseHeader := response.Header.Get(baseHeaderName)
+		if baseHeader != "" {
+			baseLinks = append(baseLinks, baseHeader)
+		}
+	}
+
+	requestURI := response.Request.URL.String()
+	return append(baseLinks, requestURI)
 }
 
 // NewLinkResolver ...
