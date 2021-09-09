@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	"github.com/thewizardplusplus/go-html-selector/builders"
 	httputils "github.com/thewizardplusplus/go-http-utils"
@@ -74,6 +75,33 @@ func (extractor DefaultExtractor) selectLinks(data []byte) []string {
 	}
 
 	return links
+}
+
+func resolveLinks(
+	links []string,
+	data []byte,
+	response *http.Response,
+) ([]string, error) {
+	linkResolver, err := urlutils.NewLinkResolver(urlutils.GenerateBaseLinks(
+		response,
+		selectBaseTag(data),
+		urlutils.DefaultBaseHeaderNames,
+	))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to construct the link resolver")
+	}
+
+	var resolvedLinks []string
+	for _, link := range links {
+		resolvedLink, err := linkResolver.ResolveLink(link)
+		if err != nil {
+			return nil, errors.Wrapf(err, "unable to resolve link %q", link)
+		}
+
+		resolvedLinks = append(resolvedLinks, resolvedLink)
+	}
+
+	return resolvedLinks, nil
 }
 
 func selectBaseTag(data []byte) string {
