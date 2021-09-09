@@ -365,6 +365,31 @@ func TestDefaultExtractor_selectLinks(test *testing.T) {
 	}
 }
 
+func Test_resolveLinks(test *testing.T) {
+	type args struct {
+		links    []string
+		data     []byte
+		response *http.Response
+	}
+
+	for _, data := range []struct {
+		name      string
+		args      args
+		wantLinks []string
+		wantErr   assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	} {
+		test.Run(data.name, func(test *testing.T) {
+			gotLinks, gotErr :=
+				resolveLinks(data.args.links, data.args.data, data.args.response)
+
+			assert.Equal(test, data.wantLinks, gotLinks)
+			data.wantErr(test, gotErr)
+		})
+	}
+}
+
 func Test_selectBaseTag(test *testing.T) {
 	type args struct {
 		data []byte
