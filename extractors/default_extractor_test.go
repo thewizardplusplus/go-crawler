@@ -35,36 +35,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		wantErr   assert.ErrorAssertionFunc
 	}{
 		{
-			name: "success without links",
-			fields: fields{
-				HTTPClient: func() httputils.HTTPClient {
-					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
-					request = request.WithContext(context.Background())
-
-					response := &http.Response{
-						Body:    ioutil.NopCloser(strings.NewReader("")),
-						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
-					}
-
-					httpClient := new(MockHTTPClient)
-					httpClient.On("Do", request).Return(response, nil)
-
-					return httpClient
-				}(),
-				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-					"a": {"href"},
-				}),
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				link:     "http://example.com/",
-			},
-			wantLinks: nil,
-			wantErr:   assert.NoError,
-		},
-		{
-			name: "success with links",
+			name: "success with the absolute links",
 			fields: fields{
 				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
@@ -98,7 +69,41 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 			wantErr:   assert.NoError,
 		},
 		{
-			name: "error with request creating",
+			name: "success with the relative links",
+			fields: fields{
+				HTTPClient: func() httputils.HTTPClient {
+					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
+					request = request.WithContext(context.Background())
+
+					response := &http.Response{
+						Body: ioutil.NopCloser(strings.NewReader(`
+							<ul>
+								<li><a href="1">1</a></li>
+								<li><a href="2">2</a></li>
+							</ul>
+						`)),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+					"a": {"href"},
+				}),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/1", "http://example.com/2"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "error with loading of the data",
 			fields: fields{
 				HTTPClient: new(MockHTTPClient),
 				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
@@ -114,43 +119,20 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 			wantErr:   assert.Error,
 		},
 		{
-			name: "error with request sending",
-			fields: fields{
-				HTTPClient: func() httputils.HTTPClient {
-					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
-					request = request.WithContext(context.Background())
-
-					httpClient := new(MockHTTPClient)
-					httpClient.On("Do", request).Return(nil, iotest.ErrTimeout)
-
-					return httpClient
-				}(),
-				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-					"a": {"href"},
-				}),
-			},
-			args: args{
-				ctx:      context.Background(),
-				threadID: 23,
-				link:     "http://example.com/",
-			},
-			wantLinks: nil,
-			wantErr:   assert.Error,
-		},
-		{
-			name: "error with tags selecting",
+			name: "error with resolving of the links",
 			fields: fields{
 				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
 					request = request.WithContext(context.Background())
 
 					response := &http.Response{
-						Body: ioutil.NopCloser(iotest.TimeoutReader(strings.NewReader(`
+						Body: ioutil.NopCloser(strings.NewReader(`
 							<ul>
-								<li><a href="http://example.com/1">1</a></li>
+								<li><a href=":">1</a></li>
 								<li><a href="http://example.com/2">2</a></li>
 							</ul>
-						`))),
+						`)),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
 					}
 
 					httpClient := new(MockHTTPClient)
