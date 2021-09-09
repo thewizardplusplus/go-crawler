@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"testing/iotest"
@@ -378,7 +379,69 @@ func Test_resolveLinks(test *testing.T) {
 		wantLinks []string
 		wantErr   assert.ErrorAssertionFunc
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success",
+			args: args{
+				links: []string{"one", "two"},
+				data:  []byte(`<base href="g/h/" />`),
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+			},
+			wantLinks: []string{
+				"http://example.com/a/b/c/d/e/f/g/h/one",
+				"http://example.com/a/b/c/d/e/f/g/h/two",
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "error with constructing of the link resolver",
+			args: args{
+				links: []string{"one", "two"},
+				data:  []byte(`<base href=":" />`),
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
+		{
+			name: "error with resolving of the link",
+			args: args{
+				links: []string{":", "two"},
+				data:  []byte(`<base href="g/h/" />`),
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			gotLinks, gotErr :=
