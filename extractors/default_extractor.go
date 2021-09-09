@@ -25,13 +25,18 @@ func (extractor DefaultExtractor) ExtractLinks(
 	threadID int,
 	link string,
 ) ([]string, error) {
-	data, _, err := extractor.loadData(ctx, link)
+	data, response, err := extractor.loadData(ctx, link)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to load the data")
 	}
 
 	links := extractor.selectLinks(data)
-	return links, nil
+	resolvedLinks, err := resolveLinks(links, data, response)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to resolve the links")
+	}
+
+	return resolvedLinks, nil
 }
 
 func (extractor DefaultExtractor) loadData(

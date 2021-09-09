@@ -42,7 +42,8 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 					request = request.WithContext(context.Background())
 
 					response := &http.Response{
-						Body: ioutil.NopCloser(strings.NewReader("")),
+						Body:    ioutil.NopCloser(strings.NewReader("")),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
 					}
 
 					httpClient := new(MockHTTPClient)
@@ -76,6 +77,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 								<li><a href="http://example.com/2">2</a></li>
 							</ul>
 						`)),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
 					}
 
 					httpClient := new(MockHTTPClient)
