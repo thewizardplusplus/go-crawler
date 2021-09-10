@@ -12,6 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
@@ -350,7 +351,10 @@ func TestDefaultExtractor_selectLinks(test *testing.T) {
 	}
 }
 
-func Test_resolveLinks(test *testing.T) {
+func TestDefaultExtractor_resolveLinks(test *testing.T) {
+	type fields struct {
+		BaseHeaderNames []string
+	}
 	type args struct {
 		links    []string
 		data     []byte
@@ -359,12 +363,16 @@ func Test_resolveLinks(test *testing.T) {
 
 	for _, data := range []struct {
 		name      string
+		fields    fields
 		args      args
 		wantLinks []string
 		wantErr   assert.ErrorAssertionFunc
 	}{
 		{
 			name: "success",
+			fields: fields{
+				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+			},
 			args: args{
 				links: []string{"one", "two"},
 				data:  []byte(`<base href="g/h/" />`),
@@ -388,6 +396,9 @@ func Test_resolveLinks(test *testing.T) {
 		},
 		{
 			name: "error with constructing of the link resolver",
+			fields: fields{
+				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+			},
 			args: args{
 				links: []string{"one", "two"},
 				data:  []byte(`<base href=":" />`),
@@ -408,6 +419,9 @@ func Test_resolveLinks(test *testing.T) {
 		},
 		{
 			name: "error with resolving of the link",
+			fields: fields{
+				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+			},
 			args: args{
 				links: []string{":", "two"},
 				data:  []byte(`<base href="g/h/" />`),
@@ -428,8 +442,11 @@ func Test_resolveLinks(test *testing.T) {
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
+			extractor := DefaultExtractor{
+				BaseHeaderNames: data.fields.BaseHeaderNames,
+			}
 			gotLinks, gotErr :=
-				resolveLinks(data.args.links, data.args.data, data.args.response)
+				extractor.resolveLinks(data.args.links, data.args.data, data.args.response)
 
 			assert.Equal(test, data.wantLinks, gotLinks)
 			data.wantErr(test, gotErr)

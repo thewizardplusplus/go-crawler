@@ -15,8 +15,9 @@ import (
 
 // DefaultExtractor ...
 type DefaultExtractor struct {
-	HTTPClient httputils.HTTPClient
-	Filters    htmlselector.OptimizedFilterGroup
+	HTTPClient      httputils.HTTPClient
+	Filters         htmlselector.OptimizedFilterGroup
+	BaseHeaderNames []string
 }
 
 // ExtractLinks ...
@@ -31,7 +32,7 @@ func (extractor DefaultExtractor) ExtractLinks(
 	}
 
 	links := extractor.selectLinks(data)
-	resolvedLinks, err := resolveLinks(links, data, response)
+	resolvedLinks, err := extractor.resolveLinks(links, data, response)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to resolve the links")
 	}
@@ -82,7 +83,7 @@ func (extractor DefaultExtractor) selectLinks(data []byte) []string {
 	return links
 }
 
-func resolveLinks(
+func (extractor DefaultExtractor) resolveLinks(
 	links []string,
 	data []byte,
 	response *http.Response,
@@ -90,7 +91,7 @@ func resolveLinks(
 	linkResolver, err := urlutils.NewLinkResolver(urlutils.GenerateBaseLinks(
 		response,
 		selectBaseTag(data),
-		urlutils.DefaultBaseHeaderNames,
+		extractor.BaseHeaderNames,
 	))
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to construct the link resolver")
