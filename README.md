@@ -10,6 +10,10 @@ The library that implements crawling of all relative links for specified ones.
 ## Features
 
 - crawling of all relative links for specified ones:
+  - resolving of relative links:
+    - by the `base` tag;
+    - by the `Content-Base` and `Content-Location` headers;
+    - by the request URI;
   - supporting of leading and trailing spaces trimming in extracted links (optional);
   - repeated extracting of relative links on error (optional):
     - only specified repeat count;
