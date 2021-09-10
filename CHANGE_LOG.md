@@ -1,5 +1,13 @@
 # Change Log
 
+## [v1.11](https://github.com/thewizardplusplus/go-crawler/tree/v1.11) (2021-09-10)
+
+- crawling of all relative links for specified ones:
+  - resolving of relative links:
+    - by the `base` tag;
+    - by the `Content-Base` and `Content-Location` headers;
+    - by the request URI.
+
 ## [v1.10.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.10.1) (2021-07-16)
 
 - perform the refactoring:
