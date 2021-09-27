@@ -6,6 +6,11 @@ import (
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
+// ResolvingTransformer ...
+type ResolvingTransformer struct {
+	BaseHeaderNames []string
+}
+
 func selectBaseTag(data []byte) string {
 	var builder BaseTagBuilder
 	htmlselector.SelectTags( // nolint: errcheck, gosec
