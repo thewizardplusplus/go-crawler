@@ -12,6 +12,15 @@ import (
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
+// LinkTransformer ...
+type LinkTransformer interface {
+	TransformLinks(
+		links []string,
+		response *http.Response,
+		responseContent []byte,
+	) ([]string, error)
+}
+
 // DefaultExtractor ...
 type DefaultExtractor struct {
 	HTTPClient httputils.HTTPClient
