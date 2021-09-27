@@ -18,8 +18,9 @@ import (
 
 func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
-		HTTPClient httputils.HTTPClient
-		Filters    htmlselector.OptimizedFilterGroup
+		HTTPClient      httputils.HTTPClient
+		Filters         htmlselector.OptimizedFilterGroup
+		LinkTransformer LinkTransformer
 	}
 	type args struct {
 		ctx      context.Context
@@ -35,7 +36,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 		wantErr   assert.ErrorAssertionFunc
 	}{
 		{
-			name: "success",
+			name: "success without transformation of the links",
 			fields: fields{
 				HTTPClient: func() httputils.HTTPClient {
 					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
@@ -69,6 +70,70 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 			wantErr:   assert.NoError,
 		},
 		{
+			name: "success with transformation of the links",
+			fields: fields{
+				HTTPClient: func() httputils.HTTPClient {
+					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
+					request = request.WithContext(context.Background())
+
+					responseContent := `
+						<ul>
+							<li><a href="http://example.com/1">1</a></li>
+							<li><a href="http://example.com/2">2</a></li>
+						</ul>
+					`
+					response := &http.Response{
+						Body:    ioutil.NopCloser(strings.NewReader(responseContent)),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+					"a": {"href"},
+				}),
+				LinkTransformer: func() LinkTransformer {
+					links := []string{"http://example.com/1", "http://example.com/2"}
+					transformedLinks := []string{
+						"http://example.com/transformed/1",
+						"http://example.com/transformed/2",
+					}
+
+					responseContent := `
+						<ul>
+							<li><a href="http://example.com/1">1</a></li>
+							<li><a href="http://example.com/2">2</a></li>
+						</ul>
+					`
+					response := &http.Response{
+						Body:    ioutil.NopCloser(strings.NewReader(responseContent)),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
+					}
+					ioutil.ReadAll(response.Body) // nolint: errcheck
+
+					linkTransformer := new(MockLinkTransformer)
+					linkTransformer.
+						On("TransformLinks", links, response, []byte(responseContent)).
+						Return(transformedLinks, nil)
+
+					return linkTransformer
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{
+				"http://example.com/transformed/1",
+				"http://example.com/transformed/2",
+			},
+			wantErr: assert.NoError,
+		},
+		{
 			name: "error with loading of the data",
 			fields: fields{
 				HTTPClient: new(MockHTTPClient),
@@ -84,11 +149,69 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 			wantLinks: nil,
 			wantErr:   assert.Error,
 		},
+		{
+			name: "error with transformation of the links",
+			fields: fields{
+				HTTPClient: func() httputils.HTTPClient {
+					request, _ := http.NewRequest(http.MethodGet, "http://example.com/", nil)
+					request = request.WithContext(context.Background())
+
+					responseContent := `
+						<ul>
+							<li><a href="http://example.com/1">1</a></li>
+							<li><a href="http://example.com/2">2</a></li>
+						</ul>
+					`
+					response := &http.Response{
+						Body:    ioutil.NopCloser(strings.NewReader(responseContent)),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
+					}
+
+					httpClient := new(MockHTTPClient)
+					httpClient.On("Do", request).Return(response, nil)
+
+					return httpClient
+				}(),
+				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+					"a": {"href"},
+				}),
+				LinkTransformer: func() LinkTransformer {
+					links := []string{"http://example.com/1", "http://example.com/2"}
+
+					responseContent := `
+						<ul>
+							<li><a href="http://example.com/1">1</a></li>
+							<li><a href="http://example.com/2">2</a></li>
+						</ul>
+					`
+					response := &http.Response{
+						Body:    ioutil.NopCloser(strings.NewReader(responseContent)),
+						Request: httptest.NewRequest(http.MethodGet, "http://example.com/", nil),
+					}
+					ioutil.ReadAll(response.Body) // nolint: errcheck
+
+					linkTransformer := new(MockLinkTransformer)
+					linkTransformer.
+						On("TransformLinks", links, response, []byte(responseContent)).
+						Return(nil, iotest.ErrTimeout)
+
+					return linkTransformer
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractor := DefaultExtractor{
-				HTTPClient: data.fields.HTTPClient,
-				Filters:    data.fields.Filters,
+				HTTPClient:      data.fields.HTTPClient,
+				Filters:         data.fields.Filters,
+				LinkTransformer: data.fields.LinkTransformer,
 			}
 			gotLinks, gotErr := extractor.ExtractLinks(
 				data.args.ctx,
@@ -97,6 +220,9 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 			)
 
 			mock.AssertExpectationsForObjects(test, data.fields.HTTPClient)
+			if data.fields.LinkTransformer != nil {
+				mock.AssertExpectationsForObjects(test, data.fields.LinkTransformer)
+			}
 			assert.Equal(test, data.wantLinks, gotLinks)
 			data.wantErr(test, gotErr)
 		})
