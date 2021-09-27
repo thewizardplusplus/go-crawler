@@ -12,7 +12,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
@@ -347,109 +346,6 @@ func TestDefaultExtractor_selectLinks(test *testing.T) {
 			gotLinks := extractor.selectLinks(data.args.data)
 
 			assert.Equal(test, data.wantLinks, gotLinks)
-		})
-	}
-}
-
-func TestDefaultExtractor_resolveLinks(test *testing.T) {
-	type fields struct {
-		BaseHeaderNames []string
-	}
-	type args struct {
-		links    []string
-		data     []byte
-		response *http.Response
-	}
-
-	for _, data := range []struct {
-		name      string
-		fields    fields
-		args      args
-		wantLinks []string
-		wantErr   assert.ErrorAssertionFunc
-	}{
-		{
-			name: "success",
-			fields: fields{
-				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
-			},
-			args: args{
-				links: []string{"one", "two"},
-				data:  []byte(`<base href="g/h/" />`),
-				response: &http.Response{
-					Header: http.Header{
-						"Content-Base":     {"e/f/"},
-						"Content-Location": {"c/d/"},
-					},
-					Request: httptest.NewRequest(
-						http.MethodGet,
-						"http://example.com/a/b/",
-						nil,
-					),
-				},
-			},
-			wantLinks: []string{
-				"http://example.com/a/b/c/d/e/f/g/h/one",
-				"http://example.com/a/b/c/d/e/f/g/h/two",
-			},
-			wantErr: assert.NoError,
-		},
-		{
-			name: "error with constructing of the link resolver",
-			fields: fields{
-				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
-			},
-			args: args{
-				links: []string{"one", "two"},
-				data:  []byte(`<base href=":" />`),
-				response: &http.Response{
-					Header: http.Header{
-						"Content-Base":     {"e/f/"},
-						"Content-Location": {"c/d/"},
-					},
-					Request: httptest.NewRequest(
-						http.MethodGet,
-						"http://example.com/a/b/",
-						nil,
-					),
-				},
-			},
-			wantLinks: nil,
-			wantErr:   assert.Error,
-		},
-		{
-			name: "error with resolving of the link",
-			fields: fields{
-				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
-			},
-			args: args{
-				links: []string{":", "two"},
-				data:  []byte(`<base href="g/h/" />`),
-				response: &http.Response{
-					Header: http.Header{
-						"Content-Base":     {"e/f/"},
-						"Content-Location": {"c/d/"},
-					},
-					Request: httptest.NewRequest(
-						http.MethodGet,
-						"http://example.com/a/b/",
-						nil,
-					),
-				},
-			},
-			wantLinks: nil,
-			wantErr:   assert.Error,
-		},
-	} {
-		test.Run(data.name, func(test *testing.T) {
-			extractor := DefaultExtractor{
-				BaseHeaderNames: data.fields.BaseHeaderNames,
-			}
-			gotLinks, gotErr :=
-				extractor.resolveLinks(data.args.links, data.args.data, data.args.response)
-
-			assert.Equal(test, data.wantLinks, gotLinks)
-			data.wantErr(test, gotErr)
 		})
 	}
 }

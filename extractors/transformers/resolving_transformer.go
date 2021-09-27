@@ -2,13 +2,44 @@ package transformers
 
 import (
 	"bytes"
+	"net/http"
 
+	"github.com/pkg/errors"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
 // ResolvingTransformer ...
 type ResolvingTransformer struct {
 	BaseHeaderNames []string
+}
+
+// TransformLinks ...
+func (transformer ResolvingTransformer) TransformLinks(
+	links []string,
+	response *http.Response,
+	responseContent []byte,
+) ([]string, error) {
+	linkResolver, err := urlutils.NewLinkResolver(urlutils.GenerateBaseLinks(
+		response,
+		selectBaseTag(responseContent),
+		transformer.BaseHeaderNames,
+	))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to construct the link resolver")
+	}
+
+	var resolvedLinks []string
+	for _, link := range links {
+		resolvedLink, err := linkResolver.ResolveLink(link)
+		if err != nil {
+			return nil, errors.Wrapf(err, "unable to resolve link %q", link)
+		}
+
+		resolvedLinks = append(resolvedLinks, resolvedLink)
+	}
+
+	return resolvedLinks, nil
 }
 
 func selectBaseTag(data []byte) string {

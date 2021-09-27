@@ -1,10 +1,119 @@
 package transformers
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
+
+func TestResolvingTransformer_TransformLinks(test *testing.T) {
+	type fields struct {
+		BaseHeaderNames []string
+	}
+	type args struct {
+		links           []string
+		response        *http.Response
+		responseContent []byte
+	}
+
+	for _, data := range []struct {
+		name      string
+		fields    fields
+		args      args
+		wantLinks []string
+		wantErr   assert.ErrorAssertionFunc
+	}{
+		{
+			name: "success",
+			fields: fields{
+				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+			},
+			args: args{
+				links: []string{"one", "two"},
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				responseContent: []byte(`<base href="g/h/" />`),
+			},
+			wantLinks: []string{
+				"http://example.com/a/b/c/d/e/f/g/h/one",
+				"http://example.com/a/b/c/d/e/f/g/h/two",
+			},
+			wantErr: assert.NoError,
+		},
+		{
+			name: "error with constructing of the link resolver",
+			fields: fields{
+				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+			},
+			args: args{
+				links: []string{"one", "two"},
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				responseContent: []byte(`<base href=":" />`),
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
+		{
+			name: "error with resolving of the link",
+			fields: fields{
+				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+			},
+			args: args{
+				links: []string{":", "two"},
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				responseContent: []byte(`<base href="g/h/" />`),
+			},
+			wantLinks: nil,
+			wantErr:   assert.Error,
+		},
+	} {
+		test.Run(data.name, func(t *testing.T) {
+			transformer := ResolvingTransformer{
+				BaseHeaderNames: data.fields.BaseHeaderNames,
+			}
+			gotLinks, gotErr := transformer.TransformLinks(
+				data.args.links,
+				data.args.response,
+				data.args.responseContent,
+			)
+
+			assert.Equal(test, data.wantLinks, gotLinks)
+			data.wantErr(test, gotErr)
+		})
+	}
+}
 
 func Test_selectBaseTag(test *testing.T) {
 	type args struct {
