@@ -23,8 +23,9 @@ type LinkTransformer interface {
 
 // DefaultExtractor ...
 type DefaultExtractor struct {
-	HTTPClient httputils.HTTPClient
-	Filters    htmlselector.OptimizedFilterGroup
+	HTTPClient      httputils.HTTPClient
+	Filters         htmlselector.OptimizedFilterGroup
+	LinkTransformer LinkTransformer
 }
 
 // ExtractLinks ...
@@ -39,12 +40,17 @@ func (extractor DefaultExtractor) ExtractLinks(
 	}
 
 	links := extractor.selectLinks(data)
-	resolvedLinks, err := extractor.resolveLinks(links, data, response)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to resolve the links")
+	if extractor.LinkTransformer != nil {
+		transformedLinks, err :=
+			extractor.LinkTransformer.TransformLinks(links, response, data)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to transform the links")
+		}
+
+		links = transformedLinks
 	}
 
-	return resolvedLinks, nil
+	return links, nil
 }
 
 func (extractor DefaultExtractor) loadData(
