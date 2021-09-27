@@ -12,6 +12,8 @@ import (
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
+//go:generate mockery --name=LinkTransformer --inpackage --case=underscore --testonly
+
 // LinkTransformer ...
 type LinkTransformer interface {
 	TransformLinks(
