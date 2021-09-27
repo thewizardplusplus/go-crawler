@@ -1,4 +1,4 @@
-package extractors
+package transformers
 
 import (
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
