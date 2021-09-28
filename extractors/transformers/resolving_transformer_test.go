@@ -27,7 +27,30 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 		wantErr   assert.ErrorAssertionFunc
 	}{
 		{
-			name: "success",
+			name: "success without links",
+			fields: fields{
+				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+			},
+			args: args{
+				links: nil,
+				response: &http.Response{
+					Header: http.Header{
+						"Content-Base":     {"e/f/"},
+						"Content-Location": {"c/d/"},
+					},
+					Request: httptest.NewRequest(
+						http.MethodGet,
+						"http://example.com/a/b/",
+						nil,
+					),
+				},
+				responseContent: []byte(`<base href="g/h/" />`),
+			},
+			wantLinks: nil,
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "success with links",
 			fields: fields{
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
 			},
