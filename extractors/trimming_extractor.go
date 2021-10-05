@@ -3,7 +3,6 @@ package extractors
 import (
 	"context"
 
-	"github.com/pkg/errors"
 	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
@@ -23,7 +22,7 @@ func (extractor TrimmingExtractor) ExtractLinks(
 ) ([]string, error) {
 	links, err := extractor.LinkExtractor.ExtractLinks(ctx, threadID, link)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to extract links")
+		return nil, err
 	}
 
 	trimmingTransformer := transformers.TrimmingTransformer{
