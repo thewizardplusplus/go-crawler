@@ -4,7 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
@@ -13,6 +15,7 @@ import (
 func TestDuplicateChecker_CheckLink(test *testing.T) {
 	type fields struct {
 		LinkRegister registers.LinkRegister
+		Logger       log.Logger
 	}
 	type args struct {
 		ctx  context.Context
@@ -29,7 +32,8 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		{
 			name: "without a duplicate",
 			fields: fields{
-				LinkRegister: registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil),
+				LinkRegister: registers.NewLinkRegister(urlutils.DoNotSanitizeLink),
+				Logger:       new(MockLogger),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -39,8 +43,8 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				},
 			},
 			wantLinkRegister: func() registers.LinkRegister {
-				linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil)
-				linkRegister.RegisterLink("http://example.com/test")
+				linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink)
+				linkRegister.RegisterLink("http://example.com/test") // nolint: errcheck
 
 				return linkRegister
 			}(),
@@ -50,12 +54,12 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 			name: "with a duplicate",
 			fields: fields{
 				LinkRegister: func() registers.LinkRegister {
-					linkRegister :=
-						registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil)
-					linkRegister.RegisterLink("http://example.com/test")
+					linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink)
+					linkRegister.RegisterLink("http://example.com/test") // nolint: errcheck
 
 					return linkRegister
 				}(),
+				Logger: new(MockLogger),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -65,8 +69,8 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				},
 			},
 			wantLinkRegister: func() registers.LinkRegister {
-				linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink, nil)
-				linkRegister.RegisterLink("http://example.com/test")
+				linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink)
+				linkRegister.RegisterLink("http://example.com/test") // nolint: errcheck
 
 				return linkRegister
 			}(),
@@ -76,9 +80,11 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		test.Run(data.name, func(test *testing.T) {
 			checker := DuplicateChecker{
 				LinkRegister: data.fields.LinkRegister,
+				Logger:       data.fields.Logger,
 			}
 			got := checker.CheckLink(data.args.ctx, data.args.link)
 
+			mock.AssertExpectationsForObjects(test, data.fields.Logger)
 			assert.Equal(test, data.wantLinkRegister, checker.LinkRegister)
 			data.wantOk(test, got)
 		})
