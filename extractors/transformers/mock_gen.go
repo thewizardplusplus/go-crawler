@@ -1,7 +1,7 @@
 package transformers
 
 import (
-	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 //go:generate mockery --name=LinkTransformer --inpackage --case=underscore --testonly
@@ -11,5 +11,5 @@ import (
 // It's used only for mock generating.
 //
 type LinkTransformer interface {
-	extractors.LinkTransformer
+	models.LinkTransformer
 }

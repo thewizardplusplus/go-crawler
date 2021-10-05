@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 func TestTransformerGroup_TransformLinks(test *testing.T) {
@@ -54,7 +54,7 @@ func TestTransformerGroup_TransformLinks(test *testing.T) {
 		{
 			name: "success with transformers",
 			transformers: TransformerGroup{
-				func() extractors.LinkTransformer {
+				func() models.LinkTransformer {
 					links := []string{"http://example.com/1", "http://example.com/2"}
 					transformedLinks := []string{
 						"http://example.com/1/transformed/1",
@@ -79,7 +79,7 @@ func TestTransformerGroup_TransformLinks(test *testing.T) {
 
 					return transformer
 				}(),
-				func() extractors.LinkTransformer {
+				func() models.LinkTransformer {
 					links := []string{
 						"http://example.com/1/transformed/1",
 						"http://example.com/2/transformed/1",
@@ -137,7 +137,7 @@ func TestTransformerGroup_TransformLinks(test *testing.T) {
 		{
 			name: "error",
 			transformers: TransformerGroup{
-				func() extractors.LinkTransformer {
+				func() models.LinkTransformer {
 					links := []string{"http://example.com/1", "http://example.com/2"}
 
 					responseContent := `

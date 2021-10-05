@@ -12,6 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/thewizardplusplus/go-crawler/models"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
@@ -20,7 +21,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 	type fields struct {
 		HTTPClient      httputils.HTTPClient
 		Filters         htmlselector.OptimizedFilterGroup
-		LinkTransformer LinkTransformer
+		LinkTransformer models.LinkTransformer
 	}
 	type args struct {
 		ctx      context.Context
@@ -95,7 +96,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 					"a": {"href"},
 				}),
-				LinkTransformer: func() LinkTransformer {
+				LinkTransformer: func() models.LinkTransformer {
 					links := []string{"http://example.com/1", "http://example.com/2"}
 					transformedLinks := []string{
 						"http://example.com/transformed/1",
@@ -175,7 +176,7 @@ func TestDefaultExtractor_ExtractLinks(test *testing.T) {
 				Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 					"a": {"href"},
 				}),
-				LinkTransformer: func() LinkTransformer {
+				LinkTransformer: func() models.LinkTransformer {
 					links := []string{"http://example.com/1", "http://example.com/2"}
 
 					responseContent := `

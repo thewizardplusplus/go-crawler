@@ -4,11 +4,11 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/models"
 )
 
 // TransformerGroup ...
-type TransformerGroup []extractors.LinkTransformer
+type TransformerGroup []models.LinkTransformer
 
 // TransformLinks ...
 func (transformers TransformerGroup) TransformLinks(

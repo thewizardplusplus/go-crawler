@@ -7,27 +7,17 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/thewizardplusplus/go-crawler/models"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 	"github.com/thewizardplusplus/go-html-selector/builders"
 	httputils "github.com/thewizardplusplus/go-http-utils"
 )
 
-//go:generate mockery --name=LinkTransformer --inpackage --case=underscore --testonly
-
-// LinkTransformer ...
-type LinkTransformer interface {
-	TransformLinks(
-		links []string,
-		response *http.Response,
-		responseContent []byte,
-	) ([]string, error)
-}
-
 // DefaultExtractor ...
 type DefaultExtractor struct {
 	HTTPClient      httputils.HTTPClient
 	Filters         htmlselector.OptimizedFilterGroup
-	LinkTransformer LinkTransformer
+	LinkTransformer models.LinkTransformer
 }
 
 // ExtractLinks ...

@@ -2,11 +2,21 @@ package models
 
 import (
 	"context"
+	"net/http"
 )
 
 // LinkExtractor ...
 type LinkExtractor interface {
 	ExtractLinks(ctx context.Context, threadID int, link string) ([]string, error)
+}
+
+// LinkTransformer ...
+type LinkTransformer interface {
+	TransformLinks(
+		links []string,
+		response *http.Response,
+		responseContent []byte,
+	) ([]string, error)
 }
 
 // LinkChecker ...
