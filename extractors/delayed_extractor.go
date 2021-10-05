@@ -37,6 +37,7 @@ func (extractor *DelayingExtractor) ExtractLinks(
 ) ([]string, error) {
 	if lastExtractionTime, ok := extractor.timestamps.Load(threadID); ok {
 		expiredTime := time.Since(lastExtractionTime.(time.Time))
+		// negative or zero delays should be ignored by the sleeper
 		extractor.sleeper(extractor.minimalDelay - expiredTime)
 	}
 
