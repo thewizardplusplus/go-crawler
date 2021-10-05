@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
@@ -25,11 +26,10 @@ func (extractor TrimmingExtractor) ExtractLinks(
 		return nil, errors.Wrap(err, "unable to extract links")
 	}
 
-	var trimmedLinks []string
-	for _, link := range links {
-		trimmedLink := urlutils.ApplyLinkTrimming(link, extractor.TrimLink)
-		trimmedLinks = append(trimmedLinks, trimmedLink)
+	trimmingTransformer := transformers.TrimmingTransformer{
+		TrimLink: extractor.TrimLink,
 	}
-
+	// this method never returns an error
+	trimmedLinks, _ := trimmingTransformer.TransformLinks(links, nil, nil)
 	return trimmedLinks, nil
 }
