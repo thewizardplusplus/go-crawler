@@ -101,8 +101,10 @@ func TestHostChecker_CheckLink(test *testing.T) {
 					logger.
 						On(
 							"Logf",
-							"%s: unable to compare link hosts: %s",
+							"%s: unable to compare the hosts of links %q and %q: %s",
 							"host checking",
+							":",
+							"http://example.com/test",
 							mock.MatchedBy(func(err error) bool {
 								wantErrMessage := `unable to parse link ":": ` + urlErr.Error()
 								return err.Error() == wantErrMessage
@@ -134,8 +136,10 @@ func TestHostChecker_CheckLink(test *testing.T) {
 					logger.
 						On(
 							"Logf",
-							"%s: unable to compare link hosts: %s",
+							"%s: unable to compare the hosts of links %q and %q: %s",
 							"host checking",
+							"http://example.com/",
+							":",
 							mock.MatchedBy(func(err error) bool {
 								wantErrMessage := `unable to parse link ":": ` + urlErr.Error()
 								return err.Error() == wantErrMessage

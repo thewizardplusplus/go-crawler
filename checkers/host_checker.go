@@ -23,8 +23,8 @@ func (checker HostChecker) CheckLink(
 
 	result, err := urlutils.CompareLinkHosts(link.SourceLink, link.Link)
 	if err != nil {
-		const logMessage = "%s: unable to compare link hosts: %s"
-		checker.Logger.Logf(logMessage, logPrefix, err)
+		const logMessage = "%s: unable to compare the hosts of links %q and %q: %s"
+		checker.Logger.Logf(logMessage, logPrefix, link.SourceLink, link.Link, err)
 
 		return false
 	}
