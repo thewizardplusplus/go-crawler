@@ -2,6 +2,8 @@ package checkers
 
 import (
 	"context"
+	"errors"
+	"net/url"
 	"testing"
 
 	"github.com/go-log/log"
@@ -30,7 +32,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 		wantOk           assert.BoolAssertionFunc
 	}{
 		{
-			name: "without a duplicate",
+			name: "success without a duplicate",
 			fields: fields{
 				LinkRegister: registers.NewLinkRegister(urlutils.DoNotSanitizeLink),
 				Logger:       new(MockLogger),
@@ -51,7 +53,7 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 			wantOk: assert.True,
 		},
 		{
-			name: "with a duplicate",
+			name: "success with a duplicate",
 			fields: fields{
 				LinkRegister: func() registers.LinkRegister {
 					linkRegister := registers.NewLinkRegister(urlutils.DoNotSanitizeLink)
@@ -75,6 +77,43 @@ func TestDuplicateChecker_CheckLink(test *testing.T) {
 				return linkRegister
 			}(),
 			wantOk: assert.False,
+		},
+		{
+			name: "error",
+			fields: fields{
+				LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+				Logger: func() Logger {
+					err := errors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
+					logger := new(MockLogger)
+					logger.
+						On(
+							"Logf",
+							"%s: unable to register link %q: %s",
+							"duplicate checking",
+							":",
+							mock.MatchedBy(func(err error) bool {
+								wantErrMessage := "unable to sanitize the link: " +
+									"unable to parse the link: " +
+									urlErr.Error()
+								return err.Error() == wantErrMessage
+							}),
+						).
+						Return()
+
+					return logger
+				}(),
+			},
+			args: args{
+				ctx: context.Background(),
+				link: models.SourcedLink{
+					SourceLink: "http://example.com/",
+					Link:       ":",
+				},
+			},
+			wantLinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+			wantOk:           assert.False,
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
