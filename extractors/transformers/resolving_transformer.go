@@ -20,11 +20,10 @@ func (transformer ResolvingTransformer) TransformLinks(
 	response *http.Response,
 	responseContent []byte,
 ) ([]string, error) {
-	linkResolver, err := urlutils.NewLinkResolver(urlutils.GenerateBaseLinks(
-		response,
-		selectBaseTag(responseContent),
-		transformer.BaseHeaderNames,
-	))
+	baseTag := selectBaseTag(responseContent)
+	baseLinks :=
+		urlutils.GenerateBaseLinks(response, baseTag, transformer.BaseHeaderNames)
+	linkResolver, err := urlutils.NewLinkResolver(baseLinks)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to construct the link resolver")
 	}
