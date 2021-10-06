@@ -70,7 +70,8 @@ func TestBaseTagBuilder_AddAttribute(test *testing.T) {
 
 func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
 	type fields struct {
-		isFirstFound bool
+		baseTagSelection BaseTagSelection
+		isFirstFound     bool
 	}
 
 	for _, data := range []struct {
@@ -79,23 +80,42 @@ func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
 		wantOk assert.BoolAssertionFunc
 	}{
 		{
-			name: "selection is not terminated",
+			name: "selection is not terminated (SelectFirstBaseTag)",
 			fields: fields{
-				isFirstFound: false,
+				baseTagSelection: SelectFirstBaseTag,
+				isFirstFound:     false,
+			},
+			wantOk: assert.False,
+		},
+		{
+			name: "selection is not terminated (SelectLastBaseTag)",
+			fields: fields{
+				baseTagSelection: SelectLastBaseTag,
+				isFirstFound:     false,
+			},
+			wantOk: assert.False,
+		},
+		{
+			name: "selection is not terminated (SelectLastBaseTag and isFirstFound)",
+			fields: fields{
+				baseTagSelection: SelectLastBaseTag,
+				isFirstFound:     true,
 			},
 			wantOk: assert.False,
 		},
 		{
 			name: "selection is terminated",
 			fields: fields{
-				isFirstFound: true,
+				baseTagSelection: SelectFirstBaseTag,
+				isFirstFound:     true,
 			},
 			wantOk: assert.True,
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			builder := BaseTagBuilder{
-				isFirstFound: data.fields.isFirstFound,
+				baseTagSelection: data.fields.baseTagSelection,
+				isFirstFound:     data.fields.isFirstFound,
 			}
 			gotOk := builder.IsSelectionTerminated()
 
