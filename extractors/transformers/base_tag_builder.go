@@ -21,8 +21,9 @@ const (
 
 // BaseTagBuilder ...
 type BaseTagBuilder struct {
-	baseLink     []byte
-	isFirstFound bool
+	baseTagSelection BaseTagSelection
+	baseLink         []byte
+	isFirstFound     bool
 }
 
 // BaseLink ...
@@ -45,5 +46,5 @@ func (builder *BaseTagBuilder) AddAttribute(name []byte, value []byte) {
 
 // IsSelectionTerminated ...
 func (builder BaseTagBuilder) IsSelectionTerminated() bool {
-	return builder.isFirstFound
+	return builder.baseTagSelection == SelectFirstBaseTag && builder.isFirstFound
 }
