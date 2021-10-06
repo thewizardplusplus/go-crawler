@@ -26,6 +26,13 @@ type BaseTagBuilder struct {
 	isFirstFound     bool
 }
 
+// NewBaseTagBuilder ...
+func NewBaseTagBuilder(baseTagSelection BaseTagSelection) BaseTagBuilder {
+	return BaseTagBuilder{
+		baseTagSelection: baseTagSelection,
+	}
+}
+
 // BaseLink ...
 func (builder BaseTagBuilder) BaseLink() (baseLink []byte, isFound bool) {
 	if !builder.isFirstFound {
