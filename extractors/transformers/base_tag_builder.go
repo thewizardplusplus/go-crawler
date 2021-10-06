@@ -10,6 +10,15 @@ var BaseTagFilters = htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 	"base": {"href"},
 })
 
+// BaseTagSelection ...
+type BaseTagSelection int
+
+// ...
+const (
+	SelectFirstBaseTag BaseTagSelection = iota
+	SelectLastBaseTag
+)
+
 // BaseTagBuilder ...
 type BaseTagBuilder struct {
 	baseLink     []byte
