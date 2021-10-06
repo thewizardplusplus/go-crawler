@@ -6,6 +6,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewBaseTagBuilder(test *testing.T) {
+	got := NewBaseTagBuilder(SelectLastBaseTag)
+
+	want := BaseTagBuilder{
+		baseTagSelection: SelectLastBaseTag,
+	}
+	assert.Equal(test, want, got)
+}
+
 func TestBaseTagBuilder_BaseLink(test *testing.T) {
 	type fields struct {
 		baseLink     []byte
