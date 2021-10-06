@@ -5,10 +5,12 @@ import (
 	"github.com/thewizardplusplus/go-html-selector/builders"
 )
 
-// BaseTagFilters ...
-var BaseTagFilters = htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-	"base": {"href"},
-})
+// DefaultBaseTagFilters ...
+var DefaultBaseTagFilters = htmlselector.OptimizeFilters(
+	htmlselector.FilterGroup{
+		"base": {"href"},
+	},
+)
 
 // BaseTagSelection ...
 type BaseTagSelection int

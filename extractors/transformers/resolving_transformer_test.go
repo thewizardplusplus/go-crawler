@@ -38,7 +38,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "success without links",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 				BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
 				Logger:           new(MockLogger),
 			},
@@ -64,7 +64,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "success with links",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 				BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
 				Logger:           new(MockLogger),
 			},
@@ -93,7 +93,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "error with constructing of the link resolver",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 				BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
 				Logger:           new(MockLogger),
 			},
@@ -119,7 +119,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "error with resolving of the link",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 				BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
 				Logger: func() Logger {
 					err := errors.New("missing protocol scheme")
@@ -199,7 +199,7 @@ func TestResolvingTransformer_selectBaseTag(test *testing.T) {
 			name: "without the base tag",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 			},
 			args: args{
 				data: []byte(`
@@ -215,7 +215,7 @@ func TestResolvingTransformer_selectBaseTag(test *testing.T) {
 			name: "with the base tag without the href attribute",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 			},
 			args: args{
 				data: []byte(`
@@ -233,7 +233,7 @@ func TestResolvingTransformer_selectBaseTag(test *testing.T) {
 			name: "with the base tag with the href attribute",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 			},
 			args: args{
 				data: []byte(`
@@ -252,7 +252,7 @@ func TestResolvingTransformer_selectBaseTag(test *testing.T) {
 				"(SelectFirstBaseTag)",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 			},
 			args: args{
 				data: []byte(`
@@ -272,7 +272,7 @@ func TestResolvingTransformer_selectBaseTag(test *testing.T) {
 				"(SelectLastBaseTag)",
 			fields: fields{
 				BaseTagSelection: SelectLastBaseTag,
-				BaseTagFilters:   BaseTagFilters,
+				BaseTagFilters:   DefaultBaseTagFilters,
 			},
 			args: args{
 				data: []byte(`
