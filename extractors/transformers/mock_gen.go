@@ -1,6 +1,7 @@
 package transformers
 
 import (
+	"github.com/go-log/log"
 	"github.com/thewizardplusplus/go-crawler/models"
 )
 
@@ -12,4 +13,14 @@ import (
 //
 type LinkTransformer interface {
 	models.LinkTransformer
+}
+
+//go:generate mockery --name=Logger --inpackage --case=underscore --testonly
+
+// Logger ...
+//
+// It's used only for mock generating.
+//
+type Logger interface {
+	log.Logger
 }
