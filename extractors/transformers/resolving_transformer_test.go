@@ -248,7 +248,8 @@ func TestResolvingTransformer_selectBaseTag(test *testing.T) {
 			want: "http://example.com/",
 		},
 		{
-			name: "with the several base tags with the href attribute",
+			name: "with the several base tags with the href attribute " +
+				"(SelectFirstBaseTag)",
 			fields: fields{
 				BaseTagSelection: SelectFirstBaseTag,
 				BaseTagFilters:   BaseTagFilters,
@@ -265,6 +266,26 @@ func TestResolvingTransformer_selectBaseTag(test *testing.T) {
 				`),
 			},
 			want: "http://example.com/1/",
+		},
+		{
+			name: "with the several base tags with the href attribute " +
+				"(SelectLastBaseTag)",
+			fields: fields{
+				BaseTagSelection: SelectLastBaseTag,
+				BaseTagFilters:   BaseTagFilters,
+			},
+			args: args{
+				data: []byte(`
+					<base href="http://example.com/1/" />
+					<base href="http://example.com/2/" />
+
+					<ul>
+						<li><a href="3">3</a></li>
+						<li><a href="4">4</a></li>
+					</ul>
+				`),
+			},
+			want: "http://example.com/2/",
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
