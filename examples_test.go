@@ -247,10 +247,8 @@ func ExampleCrawl_withoutDuplicatesOnExtracting() {
 					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
-					LinkRegister: registers.NewLinkRegister(
-						urlutils.SanitizeLink,
-						wrappedLogger,
-					),
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
 				},
 			},
 			LinkHandler: LinkHandler{
@@ -308,19 +306,15 @@ func ExampleCrawl_withoutDuplicatesOnHandling() {
 					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
-					LinkRegister: registers.NewLinkRegister(
-						urlutils.SanitizeLink,
-						wrappedLogger,
-					),
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
 				},
 			},
 			LinkHandler: handlers.CheckedHandler{
 				LinkChecker: checkers.DuplicateChecker{
 					// don't use here the link register from the duplicate checker above
-					LinkRegister: registers.NewLinkRegister(
-						urlutils.SanitizeLink,
-						wrappedLogger,
-					),
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
 				},
 				LinkHandler: LinkHandler{
 					ServerURL: server.URL,
@@ -381,19 +375,15 @@ func ExampleCrawl_withDelayingExtracting() {
 					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
-					LinkRegister: registers.NewLinkRegister(
-						urlutils.SanitizeLink,
-						wrappedLogger,
-					),
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
 				},
 			},
 			LinkHandler: handlers.CheckedHandler{
 				LinkChecker: checkers.DuplicateChecker{
 					// don't use here the link register from the duplicate checker above
-					LinkRegister: registers.NewLinkRegister(
-						urlutils.SanitizeLink,
-						wrappedLogger,
-					),
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
 				},
 				LinkHandler: LinkHandler{
 					ServerURL: server.URL,
@@ -594,19 +584,15 @@ func ExampleCrawl_withSitemap() {
 					Logger:           wrappedLogger,
 				},
 				checkers.DuplicateChecker{
-					LinkRegister: registers.NewLinkRegister(
-						urlutils.SanitizeLink,
-						wrappedLogger,
-					),
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
 				},
 			},
 			LinkHandler: handlers.CheckedHandler{
 				LinkChecker: checkers.DuplicateChecker{
 					// don't use here the link register from the duplicate checker above
-					LinkRegister: registers.NewLinkRegister(
-						urlutils.SanitizeLink,
-						wrappedLogger,
-					),
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
 				},
 				LinkHandler: LinkHandler{
 					ServerURL: server.URL,
