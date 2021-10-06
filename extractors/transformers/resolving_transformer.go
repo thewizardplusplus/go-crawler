@@ -12,9 +12,10 @@ import (
 
 // ResolvingTransformer ...
 type ResolvingTransformer struct {
-	BaseTagFilters  htmlselector.OptimizedFilterGroup
-	BaseHeaderNames []string
-	Logger          log.Logger
+	BaseTagSelection BaseTagSelection
+	BaseTagFilters   htmlselector.OptimizedFilterGroup
+	BaseHeaderNames  []string
+	Logger           log.Logger
 }
 
 // TransformLinks ...
@@ -46,7 +47,7 @@ func (transformer ResolvingTransformer) TransformLinks(
 }
 
 func (transformer ResolvingTransformer) selectBaseTag(data []byte) string {
-	var builder BaseTagBuilder
+	builder := NewBaseTagBuilder(transformer.BaseTagSelection)
 	htmlselector.SelectTags( // nolint: errcheck, gosec
 		bytes.NewReader(data),
 		transformer.BaseTagFilters,
