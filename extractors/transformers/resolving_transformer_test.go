@@ -11,10 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
+	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
 func TestResolvingTransformer_TransformLinks(test *testing.T) {
 	type fields struct {
+		BaseTagFilters  htmlselector.OptimizedFilterGroup
 		BaseHeaderNames []string
 		Logger          log.Logger
 	}
@@ -34,6 +36,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 		{
 			name: "success without links",
 			fields: fields{
+				BaseTagFilters:  BaseTagFilters,
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
 				Logger:          new(MockLogger),
 			},
@@ -58,6 +61,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 		{
 			name: "success with links",
 			fields: fields{
+				BaseTagFilters:  BaseTagFilters,
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
 				Logger:          new(MockLogger),
 			},
@@ -85,6 +89,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 		{
 			name: "error with constructing of the link resolver",
 			fields: fields{
+				BaseTagFilters:  BaseTagFilters,
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
 				Logger:          new(MockLogger),
 			},
@@ -109,6 +114,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 		{
 			name: "error with resolving of the link",
 			fields: fields{
+				BaseTagFilters:  BaseTagFilters,
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
 				Logger: func() Logger {
 					err := errors.New("missing protocol scheme")
@@ -151,6 +157,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 	} {
 		test.Run(data.name, func(t *testing.T) {
 			transformer := ResolvingTransformer{
+				BaseTagFilters:  data.fields.BaseTagFilters,
 				BaseHeaderNames: data.fields.BaseHeaderNames,
 				Logger:          data.fields.Logger,
 			}
@@ -167,18 +174,25 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 	}
 }
 
-func Test_selectBaseTag(test *testing.T) {
+func TestResolvingTransformer_selectBaseTag(test *testing.T) {
+	type fields struct {
+		BaseTagFilters htmlselector.OptimizedFilterGroup
+	}
 	type args struct {
 		data []byte
 	}
 
 	for _, data := range []struct {
-		name string
-		args args
-		want string
+		name   string
+		fields fields
+		args   args
+		want   string
 	}{
 		{
 			name: "without the base tag",
+			fields: fields{
+				BaseTagFilters: BaseTagFilters,
+			},
 			args: args{
 				data: []byte(`
 					<ul>
@@ -191,6 +205,9 @@ func Test_selectBaseTag(test *testing.T) {
 		},
 		{
 			name: "with the base tag without the href attribute",
+			fields: fields{
+				BaseTagFilters: BaseTagFilters,
+			},
 			args: args{
 				data: []byte(`
 					<base target="_blank" />
@@ -205,6 +222,9 @@ func Test_selectBaseTag(test *testing.T) {
 		},
 		{
 			name: "with the base tag with the href attribute",
+			fields: fields{
+				BaseTagFilters: BaseTagFilters,
+			},
 			args: args{
 				data: []byte(`
 					<base href="http://example.com/" />
@@ -219,6 +239,9 @@ func Test_selectBaseTag(test *testing.T) {
 		},
 		{
 			name: "with the several base tags with the href attribute",
+			fields: fields{
+				BaseTagFilters: BaseTagFilters,
+			},
 			args: args{
 				data: []byte(`
 					<base href="http://example.com/1/" />
@@ -234,7 +257,10 @@ func Test_selectBaseTag(test *testing.T) {
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			got := selectBaseTag(data.args.data)
+			transformer := ResolvingTransformer{
+				BaseTagFilters: data.fields.BaseTagFilters,
+			}
+			got := transformer.selectBaseTag(data.args.data)
 
 			assert.Equal(test, data.want, got)
 		})
