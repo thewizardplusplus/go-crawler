@@ -79,14 +79,14 @@ func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
 		wantOk assert.BoolAssertionFunc
 	}{
 		{
-			name: "selection is terminated",
+			name: "selection is not terminated",
 			fields: fields{
 				isFirstFound: false,
 			},
 			wantOk: assert.False,
 		},
 		{
-			name: "selection is not terminated",
+			name: "selection is terminated",
 			fields: fields{
 				isFirstFound: true,
 			},
