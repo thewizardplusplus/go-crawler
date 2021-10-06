@@ -17,8 +17,7 @@ func TestNewBaseTagBuilder(test *testing.T) {
 
 func TestBaseTagBuilder_BaseLink(test *testing.T) {
 	type fields struct {
-		baseLink     []byte
-		isFirstFound bool
+		attributeValues [][]byte
 	}
 
 	for _, data := range []struct {
@@ -30,8 +29,7 @@ func TestBaseTagBuilder_BaseLink(test *testing.T) {
 		{
 			name: "was not found",
 			fields: fields{
-				baseLink:     []byte("base link"),
-				isFirstFound: false,
+				attributeValues: nil,
 			},
 			wantBaseLink: nil,
 			wantIsFound:  assert.False,
@@ -39,18 +37,21 @@ func TestBaseTagBuilder_BaseLink(test *testing.T) {
 		{
 			name: "was found",
 			fields: fields{
-				baseLink:     []byte("base link"),
-				isFirstFound: true,
+				attributeValues: [][]byte{
+					[]byte("base link 1"),
+					[]byte("base link 2"),
+				},
 			},
-			wantBaseLink: []byte("base link"),
+			wantBaseLink: []byte("base link 2"),
 			wantIsFound:  assert.True,
 		},
 	} {
 		test.Run(data.name, func(test *testing.T) {
-			builder := BaseTagBuilder{
-				baseLink:     data.fields.baseLink,
-				isFirstFound: data.fields.isFirstFound,
+			var builder BaseTagBuilder
+			for _, attributeValue := range data.fields.attributeValues {
+				builder.AddAttribute(nil, attributeValue)
 			}
+
 			gotBaseLink, gotIsFound := builder.BaseLink()
 
 			assert.Equal(test, data.wantBaseLink, gotBaseLink)
@@ -59,28 +60,10 @@ func TestBaseTagBuilder_BaseLink(test *testing.T) {
 	}
 }
 
-func TestBaseTagBuilder_AddTag(test *testing.T) {
-	var builder BaseTagBuilder
-	builder.AddTag([]byte("tag"))
-
-	assert.Equal(test, BaseTagBuilder{}, builder)
-}
-
-func TestBaseTagBuilder_AddAttribute(test *testing.T) {
-	var builder BaseTagBuilder
-	builder.AddAttribute([]byte("tag"), []byte("attribute"))
-
-	wantBuilder := BaseTagBuilder{
-		baseLink:     []byte("attribute"),
-		isFirstFound: true,
-	}
-	assert.Equal(test, wantBuilder, builder)
-}
-
 func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
 	type fields struct {
+		attributeValues  [][]byte
 		baseTagSelection BaseTagSelection
-		isFirstFound     bool
 	}
 
 	for _, data := range []struct {
@@ -89,34 +72,35 @@ func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
 		wantOk assert.BoolAssertionFunc
 	}{
 		{
-			name: "selection is not terminated (SelectFirstBaseTag)",
+			name: "selection is not terminated (with SelectFirstBaseTag)",
 			fields: fields{
+				attributeValues:  nil,
 				baseTagSelection: SelectFirstBaseTag,
-				isFirstFound:     false,
 			},
 			wantOk: assert.False,
 		},
 		{
-			name: "selection is not terminated (SelectLastBaseTag)",
+			name: "selection is not terminated (with SelectLastBaseTag)",
 			fields: fields{
+				attributeValues:  nil,
 				baseTagSelection: SelectLastBaseTag,
-				isFirstFound:     false,
 			},
 			wantOk: assert.False,
 		},
 		{
-			name: "selection is not terminated (SelectLastBaseTag and isFirstFound)",
+			name: "selection is not terminated " +
+				"(with SelectLastBaseTag and attribute values)",
 			fields: fields{
+				attributeValues:  [][]byte{[]byte("base link")},
 				baseTagSelection: SelectLastBaseTag,
-				isFirstFound:     true,
 			},
 			wantOk: assert.False,
 		},
 		{
 			name: "selection is terminated",
 			fields: fields{
+				attributeValues:  [][]byte{[]byte("base link")},
 				baseTagSelection: SelectFirstBaseTag,
-				isFirstFound:     true,
 			},
 			wantOk: assert.True,
 		},
@@ -124,8 +108,11 @@ func TestBaseTagBuilder_IsSelectionTerminated(test *testing.T) {
 		test.Run(data.name, func(test *testing.T) {
 			builder := BaseTagBuilder{
 				baseTagSelection: data.fields.baseTagSelection,
-				isFirstFound:     data.fields.isFirstFound,
 			}
+			for _, attributeValue := range data.fields.attributeValues {
+				builder.AddAttribute(nil, attributeValue)
+			}
+
 			gotOk := builder.IsSelectionTerminated()
 
 			data.wantOk(test, gotOk)

@@ -2,7 +2,7 @@ package transformers
 
 import (
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
-	byteutils "github.com/thewizardplusplus/go-html-selector/byte-utils"
+	"github.com/thewizardplusplus/go-html-selector/builders"
 )
 
 // BaseTagFilters ...
@@ -21,9 +21,9 @@ const (
 
 // BaseTagBuilder ...
 type BaseTagBuilder struct {
+	builders.FlattenBuilder
+
 	baseTagSelection BaseTagSelection
-	baseLink         []byte
-	isFirstFound     bool
 }
 
 // NewBaseTagBuilder ...
@@ -35,23 +35,16 @@ func NewBaseTagBuilder(baseTagSelection BaseTagSelection) BaseTagBuilder {
 
 // BaseLink ...
 func (builder BaseTagBuilder) BaseLink() (baseLink []byte, isFound bool) {
-	if !builder.isFirstFound {
+	if len(builder.AttributeValues()) == 0 {
 		return nil, false
 	}
 
-	return builder.baseLink, true
-}
-
-// AddTag ...
-func (builder BaseTagBuilder) AddTag(name []byte) {}
-
-// AddAttribute ...
-func (builder *BaseTagBuilder) AddAttribute(name []byte, value []byte) {
-	builder.baseLink = byteutils.Copy(value)
-	builder.isFirstFound = true
+	baseLink = builder.AttributeValues()[len(builder.AttributeValues())-1]
+	return baseLink, true
 }
 
 // IsSelectionTerminated ...
 func (builder BaseTagBuilder) IsSelectionTerminated() bool {
-	return builder.baseTagSelection == SelectFirstBaseTag && builder.isFirstFound
+	return builder.baseTagSelection == SelectFirstBaseTag &&
+		len(builder.AttributeValues()) > 0
 }
