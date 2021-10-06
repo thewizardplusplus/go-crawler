@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 
+	"github.com/go-log/log"
 	"github.com/pkg/errors"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
@@ -12,6 +13,7 @@ import (
 // ResolvingTransformer ...
 type ResolvingTransformer struct {
 	BaseHeaderNames []string
+	Logger          log.Logger
 }
 
 // TransformLinks ...
@@ -32,7 +34,8 @@ func (transformer ResolvingTransformer) TransformLinks(
 	for _, link := range links {
 		resolvedLink, err := linkResolver.ResolveLink(link)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to resolve link %q", link)
+			transformer.Logger.Logf("unable to resolve link %q: %s", link, err)
+			continue
 		}
 
 		resolvedLinks = append(resolvedLinks, resolvedLink)

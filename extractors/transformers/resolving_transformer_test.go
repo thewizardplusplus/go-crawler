@@ -1,17 +1,22 @@
 package transformers
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
+	"github.com/go-log/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 )
 
 func TestResolvingTransformer_TransformLinks(test *testing.T) {
 	type fields struct {
 		BaseHeaderNames []string
+		Logger          log.Logger
 	}
 	type args struct {
 		links           []string
@@ -30,6 +35,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "success without links",
 			fields: fields{
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+				Logger:          new(MockLogger),
 			},
 			args: args{
 				links: nil,
@@ -53,6 +59,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "success with links",
 			fields: fields{
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+				Logger:          new(MockLogger),
 			},
 			args: args{
 				links: []string{"one", "two"},
@@ -79,6 +86,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "error with constructing of the link resolver",
 			fields: fields{
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+				Logger:          new(MockLogger),
 			},
 			args: args{
 				links: []string{"one", "two"},
@@ -102,6 +110,25 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 			name: "error with resolving of the link",
 			fields: fields{
 				BaseHeaderNames: urlutils.DefaultBaseHeaderNames,
+				Logger: func() Logger {
+					err := errors.New("missing protocol scheme")
+					urlErr := &url.Error{Op: "parse", URL: ":", Err: err}
+
+					logger := new(MockLogger)
+					logger.
+						On(
+							"Logf",
+							"unable to resolve link %q: %s",
+							":",
+							mock.MatchedBy(func(err error) bool {
+								wantErrMessage := "unable to parse the link: " + urlErr.Error()
+								return err.Error() == wantErrMessage
+							}),
+						).
+						Return()
+
+					return logger
+				}(),
 			},
 			args: args{
 				links: []string{":", "two"},
@@ -118,13 +145,14 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 				},
 				responseContent: []byte(`<base href="g/h/" />`),
 			},
-			wantLinks: nil,
-			wantErr:   assert.Error,
+			wantLinks: []string{"http://example.com/a/b/c/d/e/f/g/h/two"},
+			wantErr:   assert.NoError,
 		},
 	} {
 		test.Run(data.name, func(t *testing.T) {
 			transformer := ResolvingTransformer{
 				BaseHeaderNames: data.fields.BaseHeaderNames,
+				Logger:          data.fields.Logger,
 			}
 			gotLinks, gotErr := transformer.TransformLinks(
 				data.args.links,
@@ -132,6 +160,7 @@ func TestResolvingTransformer_TransformLinks(test *testing.T) {
 				data.args.responseContent,
 			)
 
+			mock.AssertExpectationsForObjects(test, data.fields.Logger)
 			assert.Equal(test, data.wantLinks, gotLinks)
 			data.wantErr(test, gotErr)
 		})
