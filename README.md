@@ -715,7 +715,6 @@ func RunServer() *httptest.Server {
 			compressingWriter := gzip.NewWriter(writer)
 			defer compressingWriter.Close() // nolint: errcheck
 
-			// nolint: errcheck
 			renderTemplate(compressingWriter, links, `
 				<?xml version="1.0" encoding="UTF-8" ?>
 				<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -741,7 +740,6 @@ func RunServer() *httptest.Server {
 			links = []string{"/hidden/1/test"}
 		}
 
-		// nolint: errcheck
 		renderTemplate(writer, links, `
 			<ul>
 				{{ range $link := . }}
@@ -758,14 +756,9 @@ func completeLinkWithHost(link string, host string) string {
 	return "http://" + path.Join(host, link)
 }
 
-// nolint: unparam
-func renderTemplate(writer io.Writer, data interface{}, text string) error {
-	template, err := template.New("").Parse(text)
-	if err != nil {
-		return err
-	}
-
-	return template.Execute(writer, data)
+func renderTemplate(writer io.Writer, data interface{}, text string) {
+	template, _ := template.New("").Parse(text) // nolint: errcheck
+	template.Execute(writer, data)              // nolint: errcheck
 }
 
 func main() {
