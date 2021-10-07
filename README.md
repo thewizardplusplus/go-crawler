@@ -703,6 +703,8 @@ func RunServer() *httptest.Server {
 		case "/hidden/1/sitemap.xml":
 			links = []string{"/hidden/5", "/hidden/6"}
 		case "/1/sitemap.xml", "/2/sitemap.xml", "/hidden/sitemap.xml":
+			// render the empty Sitemap to escape the error logging
+			// for reproducibility of the example
 			links = []string{}
 		}
 		for index := range links {
