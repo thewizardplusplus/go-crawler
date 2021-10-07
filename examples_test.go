@@ -13,7 +13,6 @@ import (
 	"path"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-log/log/print"
@@ -596,73 +595,4 @@ func ExampleCrawl_withFewHandlers() {
 	// [inner] received link "http://example.com/2/2" from page "http://example.com/2"
 	// [inner] received link "http://example.com/2/2" from page "http://example.com/2"
 	// [outer] received link "https://golang.org/" from page "http://example.com"
-}
-
-func ExampleHandleLinksConcurrently() {
-	server := RunServer()
-	defer server.Close()
-
-	links := make(chan string, 1000)
-	links <- server.URL
-
-	var waiter sync.WaitGroup
-	waiter.Add(1)
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.HandleLinksConcurrently(
-		context.Background(),
-		runtime.NumCPU(),
-		links,
-		crawler.HandleLinkDependencies{
-			CrawlDependencies: crawler.CrawlDependencies{
-				LinkExtractor: extractors.RepeatingExtractor{
-					LinkExtractor: extractors.TrimmingExtractor{
-						TrimLink: urlutils.TrimLink,
-						LinkExtractor: extractors.DefaultExtractor{
-							HTTPClient: http.DefaultClient,
-							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-								"a": {"href"},
-							}),
-							LinkTransformer: transformers.ResolvingTransformer{
-								BaseTagSelection: transformers.SelectFirstBaseTag,
-								BaseTagFilters:   transformers.DefaultBaseTagFilters,
-								BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-								Logger:           wrappedLogger,
-							},
-						},
-					},
-					RepeatCount:  5,
-					RepeatDelay:  time.Second,
-					Logger:       wrappedLogger,
-					SleepHandler: time.Sleep,
-				},
-				LinkChecker: checkers.HostChecker{
-					ComparisonResult: urlutils.Same,
-					Logger:           wrappedLogger,
-				},
-				LinkHandler: LinkHandler{
-					ServerURL: server.URL,
-				},
-				Logger: wrappedLogger,
-			},
-			Waiter: &waiter,
-		},
-	)
-
-	waiter.Wait()
-
-	// Unordered output:
-	// received link "http://example.com/1" from page "http://example.com"
-	// received link "http://example.com/1/1" from page "http://example.com/1"
-	// received link "http://example.com/1/2" from page "http://example.com/1"
-	// received link "http://example.com/2" from page "http://example.com"
-	// received link "http://example.com/2" from page "http://example.com"
-	// received link "http://example.com/2/1" from page "http://example.com/2"
-	// received link "http://example.com/2/1" from page "http://example.com/2"
-	// received link "http://example.com/2/2" from page "http://example.com/2"
-	// received link "http://example.com/2/2" from page "http://example.com/2"
-	// received link "https://golang.org/" from page "http://example.com"
 }
