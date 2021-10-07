@@ -346,7 +346,7 @@ func ExampleCrawl_withoutDuplicatesOnHandling() {
 	// received link "https://golang.org/" from page "http://example.com"
 }
 
-func ExampleCrawl_withRobotsTXTOnExtracting() {
+func ExampleCrawl_withRobotsTXT() {
 	server := RunServer()
 	defer server.Close()
 
@@ -407,68 +407,6 @@ func ExampleCrawl_withRobotsTXTOnExtracting() {
 	// received link "http://example.com/1/2" from page "http://example.com/1"
 	// received link "http://example.com/2" from page "http://example.com"
 	// received link "http://example.com/2" from page "http://example.com"
-	// received link "https://golang.org/" from page "http://example.com"
-}
-
-func ExampleCrawl_withRobotsTXTOnHandling() {
-	server := RunServer()
-	defer server.Close()
-
-	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
-	// wrap the standard logger via the github.com/go-log/log package
-	wrappedLogger := print.New(logger)
-
-	crawler.Crawl(
-		context.Background(),
-		crawler.ConcurrencyConfig{
-			ConcurrencyFactor: runtime.NumCPU(),
-			BufferSize:        1000,
-		},
-		[]string{server.URL},
-		crawler.CrawlDependencies{
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.TrimmingExtractor{
-					TrimLink: urlutils.TrimLink,
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-						LinkTransformer: transformers.ResolvingTransformer{
-							BaseTagSelection: transformers.SelectFirstBaseTag,
-							BaseTagFilters:   transformers.DefaultBaseTagFilters,
-							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-							Logger:           wrappedLogger,
-						},
-					},
-				},
-				RepeatCount:  5,
-				RepeatDelay:  time.Second,
-				Logger:       wrappedLogger,
-				SleepHandler: time.Sleep,
-			},
-			LinkChecker: checkers.HostChecker{
-				ComparisonResult: urlutils.Same,
-				Logger:           wrappedLogger,
-			},
-			LinkHandler: handlers.CheckedHandler{
-				LinkChecker: checkers.RobotsTXTChecker{
-					UserAgent:         "go-crawler",
-					RobotsTXTRegister: registers.NewRobotsTXTRegister(http.DefaultClient),
-					Logger:            wrappedLogger,
-				},
-				LinkHandler: LinkHandler{
-					ServerURL: server.URL,
-				},
-			},
-			Logger: wrappedLogger,
-		},
-	)
-
-	// Unordered output:
-	// received link "http://example.com/1" from page "http://example.com"
-	// received link "http://example.com/1/1" from page "http://example.com/1"
-	// received link "http://example.com/1/2" from page "http://example.com/1"
 	// received link "https://golang.org/" from page "http://example.com"
 }
 
