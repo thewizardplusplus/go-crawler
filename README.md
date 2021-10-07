@@ -111,6 +111,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
@@ -149,11 +150,6 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -190,6 +186,12 @@ func main() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -243,6 +245,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
@@ -283,11 +286,6 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -324,6 +322,12 @@ func main() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -381,6 +385,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
@@ -422,11 +427,6 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -463,6 +463,12 @@ func main() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -526,6 +532,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
@@ -567,11 +574,6 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -611,6 +613,12 @@ func main() {
 							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 								"a": {"href"},
 							}),
+							LinkTransformer: transformers.ResolvingTransformer{
+								BaseTagSelection: transformers.SelectFirstBaseTag,
+								BaseTagFilters:   transformers.DefaultBaseTagFilters,
+								BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+								Logger:           wrappedLogger,
+							},
 						},
 					},
 				),
@@ -675,6 +683,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
@@ -723,11 +732,6 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -764,6 +768,12 @@ func main() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -820,6 +830,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
@@ -869,11 +880,6 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -910,6 +916,12 @@ func main() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -967,6 +979,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
@@ -1025,7 +1038,9 @@ func RunServer() *httptest.Server {
 		case "/1/sitemap.xml", "/2/sitemap.xml", "/hidden/sitemap.xml":
 			links = []string{}
 		}
-		completeLinksWithHost(links, request.Host)
+		for index := range links {
+			links[index] = completeLinkWithHost(links[index], request.Host)
+		}
 
 		if links != nil {
 			writer.Header().Set("Content-Encoding", "gzip")
@@ -1058,7 +1073,6 @@ func RunServer() *httptest.Server {
 		case "/hidden/1":
 			links = []string{"/hidden/1/test"}
 		}
-		completeLinksWithHost(links, request.Host)
 
 		// nolint: errcheck
 		renderTemplate(writer, links, `
@@ -1075,14 +1089,6 @@ func RunServer() *httptest.Server {
 
 func completeLinkWithHost(link string, host string) string {
 	return "http://" + path.Join(host, link)
-}
-
-func completeLinksWithHost(links []string, host string) {
-	for index := range links {
-		if strings.HasPrefix(links[index], "/") {
-			links[index] = completeLinkWithHost(links[index], host)
-		}
-	}
 }
 
 // nolint: unparam
@@ -1121,6 +1127,12 @@ func main() {
 								Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 									"a": {"href"},
 								}),
+								LinkTransformer: transformers.ResolvingTransformer{
+									BaseTagSelection: transformers.SelectFirstBaseTag,
+									BaseTagFilters:   transformers.DefaultBaseTagFilters,
+									BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+									Logger:           wrappedLogger,
+								},
 							},
 						},
 						extractors.TrimmingExtractor{
@@ -1219,6 +1231,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
@@ -1261,11 +1274,6 @@ func RunServer() *httptest.Server {
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
 		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
-		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
 			`<ul>
@@ -1302,6 +1310,12 @@ func main() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -1374,6 +1388,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
@@ -1411,11 +1426,6 @@ func RunServer() *httptest.Server {
 			links = []string{"/1/1", "/1/2"}
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
-		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
 		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
@@ -1457,6 +1467,12 @@ func main() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -1511,6 +1527,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
@@ -1548,11 +1565,6 @@ func RunServer() *httptest.Server {
 			links = []string{"/1/1", "/1/2"}
 		case "/2":
 			links = []string{"/2/1", "/2/2"}
-		}
-		for index := range links {
-			if strings.HasPrefix(links[index], "/") {
-				links[index] = "http://" + request.Host + links[index]
-			}
 		}
 
 		template, _ := template.New("").Parse( // nolint: errcheck
@@ -1594,6 +1606,12 @@ func main() {
 							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 								"a": {"href"},
 							}),
+							LinkTransformer: transformers.ResolvingTransformer{
+								BaseTagSelection: transformers.SelectFirstBaseTag,
+								BaseTagFilters:   transformers.DefaultBaseTagFilters,
+								BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+								Logger:           wrappedLogger,
+							},
 						},
 					},
 					RepeatCount:  5,

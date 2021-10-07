@@ -20,6 +20,7 @@ import (
 	crawler "github.com/thewizardplusplus/go-crawler"
 	"github.com/thewizardplusplus/go-crawler/checkers"
 	"github.com/thewizardplusplus/go-crawler/extractors"
+	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/handlers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
@@ -85,7 +86,9 @@ func RunServer() *httptest.Server {
 		case "/1/sitemap.xml", "/2/sitemap.xml", "/hidden/sitemap.xml":
 			links = []string{}
 		}
-		completeLinksWithHost(links, request.Host)
+		for index := range links {
+			links[index] = completeLinkWithHost(links[index], request.Host)
+		}
 
 		if links != nil {
 			writer.Header().Set("Content-Encoding", "gzip")
@@ -118,7 +121,6 @@ func RunServer() *httptest.Server {
 		case "/hidden/1":
 			links = []string{"/hidden/1/test"}
 		}
-		completeLinksWithHost(links, request.Host)
 
 		// nolint: errcheck
 		renderTemplate(writer, links, `
@@ -135,14 +137,6 @@ func RunServer() *httptest.Server {
 
 func completeLinkWithHost(link string, host string) string {
 	return "http://" + path.Join(host, link)
-}
-
-func completeLinksWithHost(links []string, host string) {
-	for index := range links {
-		if strings.HasPrefix(links[index], "/") {
-			links[index] = completeLinkWithHost(links[index], host)
-		}
-	}
 }
 
 // nolint: unparam
@@ -179,6 +173,12 @@ func ExampleCrawl() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -234,6 +234,12 @@ func ExampleCrawl_withoutDuplicatesOnExtracting() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -293,6 +299,12 @@ func ExampleCrawl_withoutDuplicatesOnHandling() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -361,6 +373,12 @@ func ExampleCrawl_withDelayingExtracting() {
 							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 								"a": {"href"},
 							}),
+							LinkTransformer: transformers.ResolvingTransformer{
+								BaseTagSelection: transformers.SelectFirstBaseTag,
+								BaseTagFilters:   transformers.DefaultBaseTagFilters,
+								BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+								Logger:           wrappedLogger,
+							},
 						},
 					},
 				),
@@ -427,6 +445,12 @@ func ExampleCrawl_withRobotsTXTOnExtracting() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -485,6 +509,12 @@ func ExampleCrawl_withRobotsTXTOnHandling() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -543,6 +573,12 @@ func ExampleCrawl_withSitemap() {
 								Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 									"a": {"href"},
 								}),
+								LinkTransformer: transformers.ResolvingTransformer{
+									BaseTagSelection: transformers.SelectFirstBaseTag,
+									BaseTagFilters:   transformers.DefaultBaseTagFilters,
+									BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+									Logger:           wrappedLogger,
+								},
 							},
 						},
 						extractors.TrimmingExtractor{
@@ -643,6 +679,12 @@ func ExampleCrawl_withFewHandlers() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -721,6 +763,12 @@ func ExampleCrawlByConcurrentHandler() {
 						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 							"a": {"href"},
 						}),
+						LinkTransformer: transformers.ResolvingTransformer{
+							BaseTagSelection: transformers.SelectFirstBaseTag,
+							BaseTagFilters:   transformers.DefaultBaseTagFilters,
+							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+							Logger:           wrappedLogger,
+						},
 					},
 				},
 				RepeatCount:  5,
@@ -780,6 +828,12 @@ func ExampleHandleLinksConcurrently() {
 							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
 								"a": {"href"},
 							}),
+							LinkTransformer: transformers.ResolvingTransformer{
+								BaseTagSelection: transformers.SelectFirstBaseTag,
+								BaseTagFilters:   transformers.DefaultBaseTagFilters,
+								BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+								Logger:           wrappedLogger,
+							},
 						},
 					},
 					RepeatCount:  5,
