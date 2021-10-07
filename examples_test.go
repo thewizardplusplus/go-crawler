@@ -164,26 +164,20 @@ func ExampleCrawl() {
 		},
 		[]string{server.URL},
 		crawler.CrawlDependencies{
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.TrimmingExtractor{
-					TrimLink: urlutils.TrimLink,
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-						LinkTransformer: transformers.ResolvingTransformer{
-							BaseTagSelection: transformers.SelectFirstBaseTag,
-							BaseTagFilters:   transformers.DefaultBaseTagFilters,
-							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-							Logger:           wrappedLogger,
-						},
+			LinkExtractor: extractors.TrimmingExtractor{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+					LinkTransformer: transformers.ResolvingTransformer{
+						BaseTagSelection: transformers.SelectFirstBaseTag,
+						BaseTagFilters:   transformers.DefaultBaseTagFilters,
+						BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+						Logger:           wrappedLogger,
 					},
 				},
-				RepeatCount:  5,
-				RepeatDelay:  time.Second,
-				Logger:       wrappedLogger,
-				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
 				ComparisonResult: urlutils.Same,
@@ -225,26 +219,20 @@ func ExampleCrawl_withoutDuplicatesOnExtracting() {
 		},
 		[]string{server.URL},
 		crawler.CrawlDependencies{
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.TrimmingExtractor{
-					TrimLink: urlutils.TrimLink,
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-						LinkTransformer: transformers.ResolvingTransformer{
-							BaseTagSelection: transformers.SelectFirstBaseTag,
-							BaseTagFilters:   transformers.DefaultBaseTagFilters,
-							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-							Logger:           wrappedLogger,
-						},
+			LinkExtractor: extractors.TrimmingExtractor{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+					LinkTransformer: transformers.ResolvingTransformer{
+						BaseTagSelection: transformers.SelectFirstBaseTag,
+						BaseTagFilters:   transformers.DefaultBaseTagFilters,
+						BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+						Logger:           wrappedLogger,
 					},
 				},
-				RepeatCount:  5,
-				RepeatDelay:  time.Second,
-				Logger:       wrappedLogger,
-				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
@@ -290,26 +278,20 @@ func ExampleCrawl_withoutDuplicatesOnHandling() {
 		},
 		[]string{server.URL},
 		crawler.CrawlDependencies{
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.TrimmingExtractor{
-					TrimLink: urlutils.TrimLink,
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-						LinkTransformer: transformers.ResolvingTransformer{
-							BaseTagSelection: transformers.SelectFirstBaseTag,
-							BaseTagFilters:   transformers.DefaultBaseTagFilters,
-							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-							Logger:           wrappedLogger,
-						},
+			LinkExtractor: extractors.TrimmingExtractor{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+					LinkTransformer: transformers.ResolvingTransformer{
+						BaseTagSelection: transformers.SelectFirstBaseTag,
+						BaseTagFilters:   transformers.DefaultBaseTagFilters,
+						BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+						Logger:           wrappedLogger,
 					},
 				},
-				RepeatCount:  5,
-				RepeatDelay:  time.Second,
-				Logger:       wrappedLogger,
-				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
@@ -361,26 +343,20 @@ func ExampleCrawl_withRobotsTXT() {
 		},
 		[]string{server.URL},
 		crawler.CrawlDependencies{
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.TrimmingExtractor{
-					TrimLink: urlutils.TrimLink,
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-						LinkTransformer: transformers.ResolvingTransformer{
-							BaseTagSelection: transformers.SelectFirstBaseTag,
-							BaseTagFilters:   transformers.DefaultBaseTagFilters,
-							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-							Logger:           wrappedLogger,
-						},
+			LinkExtractor: extractors.TrimmingExtractor{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+					LinkTransformer: transformers.ResolvingTransformer{
+						BaseTagSelection: transformers.SelectFirstBaseTag,
+						BaseTagFilters:   transformers.DefaultBaseTagFilters,
+						BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+						Logger:           wrappedLogger,
 					},
 				},
-				RepeatCount:  5,
-				RepeatDelay:  time.Second,
-				Logger:       wrappedLogger,
-				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
@@ -425,56 +401,50 @@ func ExampleCrawl_withSitemap() {
 		},
 		[]string{server.URL},
 		crawler.CrawlDependencies{
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.ExtractorGroup{
-					LinkExtractors: []models.LinkExtractor{
-						extractors.TrimmingExtractor{
-							TrimLink: urlutils.TrimLink,
-							LinkExtractor: extractors.DefaultExtractor{
-								HTTPClient: http.DefaultClient,
-								Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-									"a": {"href"},
-								}),
-								LinkTransformer: transformers.ResolvingTransformer{
-									BaseTagSelection: transformers.SelectFirstBaseTag,
-									BaseTagFilters:   transformers.DefaultBaseTagFilters,
-									BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-									Logger:           wrappedLogger,
-								},
-							},
-						},
-						extractors.TrimmingExtractor{
-							TrimLink: urlutils.TrimLink,
-							LinkExtractor: extractors.SitemapExtractor{
-								SitemapRegister: registers.NewSitemapRegister(
-									time.Second,
-									extractors.ExtractorGroup{
-										LinkExtractors: []models.LinkExtractor{
-											sitemap.HierarchicalGenerator{
-												SanitizeLink: urlutils.SanitizeLink,
-												MaximalDepth: -1,
-											},
-											sitemap.RobotsTXTGenerator{
-												RobotsTXTRegister: registers.NewRobotsTXTRegister(
-													http.DefaultClient,
-												),
-											},
-										},
-										Logger: wrappedLogger,
-									},
-									wrappedLogger,
-									sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
-								),
-								Logger: wrappedLogger,
+			LinkExtractor: extractors.ExtractorGroup{
+				LinkExtractors: []models.LinkExtractor{
+					extractors.TrimmingExtractor{
+						TrimLink: urlutils.TrimLink,
+						LinkExtractor: extractors.DefaultExtractor{
+							HTTPClient: http.DefaultClient,
+							Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+								"a": {"href"},
+							}),
+							LinkTransformer: transformers.ResolvingTransformer{
+								BaseTagSelection: transformers.SelectFirstBaseTag,
+								BaseTagFilters:   transformers.DefaultBaseTagFilters,
+								BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+								Logger:           wrappedLogger,
 							},
 						},
 					},
-					Logger: wrappedLogger,
+					extractors.TrimmingExtractor{
+						TrimLink: urlutils.TrimLink,
+						LinkExtractor: extractors.SitemapExtractor{
+							SitemapRegister: registers.NewSitemapRegister(
+								time.Second,
+								extractors.ExtractorGroup{
+									LinkExtractors: []models.LinkExtractor{
+										sitemap.HierarchicalGenerator{
+											SanitizeLink: urlutils.SanitizeLink,
+											MaximalDepth: -1,
+										},
+										sitemap.RobotsTXTGenerator{
+											RobotsTXTRegister: registers.NewRobotsTXTRegister(
+												http.DefaultClient,
+											),
+										},
+									},
+									Logger: wrappedLogger,
+								},
+								wrappedLogger,
+								sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
+							),
+							Logger: wrappedLogger,
+						},
+					},
 				},
-				RepeatCount:  5,
-				RepeatDelay:  time.Second,
-				Logger:       wrappedLogger,
-				SleepHandler: time.Sleep,
+				Logger: wrappedLogger,
 			},
 			LinkChecker: checkers.CheckerGroup{
 				checkers.HostChecker{
@@ -533,26 +503,20 @@ func ExampleCrawl_withFewHandlers() {
 		},
 		[]string{server.URL},
 		crawler.CrawlDependencies{
-			LinkExtractor: extractors.RepeatingExtractor{
-				LinkExtractor: extractors.TrimmingExtractor{
-					TrimLink: urlutils.TrimLink,
-					LinkExtractor: extractors.DefaultExtractor{
-						HTTPClient: http.DefaultClient,
-						Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
-							"a": {"href"},
-						}),
-						LinkTransformer: transformers.ResolvingTransformer{
-							BaseTagSelection: transformers.SelectFirstBaseTag,
-							BaseTagFilters:   transformers.DefaultBaseTagFilters,
-							BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
-							Logger:           wrappedLogger,
-						},
+			LinkExtractor: extractors.TrimmingExtractor{
+				TrimLink: urlutils.TrimLink,
+				LinkExtractor: extractors.DefaultExtractor{
+					HTTPClient: http.DefaultClient,
+					Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+						"a": {"href"},
+					}),
+					LinkTransformer: transformers.ResolvingTransformer{
+						BaseTagSelection: transformers.SelectFirstBaseTag,
+						BaseTagFilters:   transformers.DefaultBaseTagFilters,
+						BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+						Logger:           wrappedLogger,
 					},
 				},
-				RepeatCount:  5,
-				RepeatDelay:  time.Second,
-				Logger:       wrappedLogger,
-				SleepHandler: time.Sleep,
 			},
 			LinkChecker: checkers.HostChecker{
 				ComparisonResult: urlutils.Same,
