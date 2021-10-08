@@ -83,7 +83,7 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 			wantErr: assert.NoError,
 		},
 		{
-			name: "with some failed extractings",
+			name: "with some failed extractings (with the specified name)",
 			fields: fields{
 				Name: "test extractors",
 				LinkExtractors: []models.LinkExtractor{
@@ -111,6 +111,52 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 							"Logf",
 							"%sunable to extract links for link %q via extractor #%d: %s",
 							"test extractors: ",
+							"http://example.com/",
+							0,
+							iotest.ErrTimeout,
+						).
+						Return()
+
+					return logger
+				}(),
+			},
+			args: args{
+				ctx:      context.Background(),
+				threadID: 23,
+				link:     "http://example.com/",
+			},
+			wantLinks: []string{"http://example.com/3", "http://example.com/4"},
+			wantErr:   assert.NoError,
+		},
+		{
+			name: "with some failed extractings (without the specified name)",
+			fields: fields{
+				Name: "",
+				LinkExtractors: []models.LinkExtractor{
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return(nil, iotest.ErrTimeout)
+
+						return extractor
+					}(),
+					func() models.LinkExtractor {
+						extractor := new(MockLinkExtractor)
+						extractor.
+							On("ExtractLinks", context.Background(), 23, "http://example.com/").
+							Return([]string{"http://example.com/3", "http://example.com/4"}, nil)
+
+						return extractor
+					}(),
+				},
+				Logger: func() Logger {
+					logger := new(MockLogger)
+					logger.
+						On(
+							"Logf",
+							"%sunable to extract links for link %q via extractor #%d: %s",
+							"",
 							"http://example.com/",
 							0,
 							iotest.ErrTimeout,
