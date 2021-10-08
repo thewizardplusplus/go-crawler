@@ -13,6 +13,7 @@ import (
 
 func TestExtractorGroup_ExtractLinks(test *testing.T) {
 	type fields struct {
+		Name           string
 		LinkExtractors []models.LinkExtractor
 		Logger         log.Logger
 	}
@@ -32,6 +33,7 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 		{
 			name: "empty",
 			fields: fields{
+				Name:           "test extractors",
 				LinkExtractors: nil,
 				Logger:         new(MockLogger),
 			},
@@ -46,6 +48,7 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 		{
 			name: "without failed extractings",
 			fields: fields{
+				Name: "test extractors",
 				LinkExtractors: []models.LinkExtractor{
 					func() models.LinkExtractor {
 						extractor := new(MockLinkExtractor)
@@ -82,6 +85,7 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 		{
 			name: "with some failed extractings",
 			fields: fields{
+				Name: "test extractors",
 				LinkExtractors: []models.LinkExtractor{
 					func() models.LinkExtractor {
 						extractor := new(MockLinkExtractor)
@@ -105,7 +109,8 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 					logger.
 						On(
 							"Logf",
-							"unable to extract links for link %q via extractor #%d: %s",
+							"%sunable to extract links for link %q via extractor #%d: %s",
+							"test extractors: ",
 							"http://example.com/",
 							0,
 							iotest.ErrTimeout,
@@ -126,6 +131,7 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 		{
 			name: "with all failed extractings",
 			fields: fields{
+				Name: "test extractors",
 				LinkExtractors: []models.LinkExtractor{
 					func() models.LinkExtractor {
 						extractor := new(MockLinkExtractor)
@@ -150,7 +156,8 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 						logger.
 							On(
 								"Logf",
-								"unable to extract links for link %q via extractor #%d: %s",
+								"%sunable to extract links for link %q via extractor #%d: %s",
+								"test extractors: ",
 								"http://example.com/",
 								index,
 								iotest.ErrTimeout,
@@ -172,6 +179,7 @@ func TestExtractorGroup_ExtractLinks(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			extractors := ExtractorGroup{
+				Name:           data.fields.Name,
 				LinkExtractors: data.fields.LinkExtractors,
 				Logger:         data.fields.Logger,
 			}

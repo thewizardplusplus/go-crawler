@@ -2,6 +2,7 @@ package extractors
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/go-log/log"
@@ -10,6 +11,7 @@ import (
 
 // ExtractorGroup ...
 type ExtractorGroup struct {
+	Name           string
 	LinkExtractors []models.LinkExtractor
 	Logger         log.Logger
 }
@@ -23,6 +25,11 @@ func (extractors ExtractorGroup) ExtractLinks(
 	var waiter sync.WaitGroup
 	waiter.Add(len(extractors.LinkExtractors))
 
+	var logPrefix string
+	if extractors.Name != "" {
+		logPrefix = fmt.Sprintf("%s: ", extractors.Name)
+	}
+
 	linkGroups := make([][]string, len(extractors.LinkExtractors))
 	for index, extractor := range extractors.LinkExtractors {
 		go func(index int, extractor models.LinkExtractor) {
@@ -30,9 +37,11 @@ func (extractors ExtractorGroup) ExtractLinks(
 
 			links, err := extractor.ExtractLinks(ctx, threadID, link)
 			if err != nil {
-				const logMessage = "unable to extract links for link %q " +
+				const logMessage = "%sunable to extract links for link %q " +
 					"via extractor #%d: %s"
-				extractors.Logger.Logf(logMessage, link, index, err)
+				extractors.Logger.Logf(logMessage, logPrefix, link, index, err)
+
+				return
 			}
 
 			linkGroups[index] = links
