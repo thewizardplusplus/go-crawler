@@ -143,6 +143,152 @@ func renderTemplate(writer io.Writer, data interface{}, text string) {
 	template.Execute(writer, data)              // nolint: errcheck
 }
 
+func ExampleCrawl_withAllFeatures() {
+	server := RunServer()
+	defer server.Close()
+
+	logger := stdlog.New(os.Stderr, "", stdlog.LstdFlags|stdlog.Lmicroseconds)
+	// wrap the standard logger via the github.com/go-log/log package
+	wrappedLogger := print.New(logger)
+
+	robotsTXTRegister := registers.NewRobotsTXTRegister(http.DefaultClient)
+	crawler.CrawlByConcurrentHandler(
+		context.Background(),
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		crawler.ConcurrencyConfig{
+			ConcurrencyFactor: runtime.NumCPU(),
+			BufferSize:        1000,
+		},
+		[]string{server.URL},
+		crawler.CrawlDependencies{
+			LinkExtractor: extractors.NewDelayingExtractor(
+				time.Second,
+				time.Sleep,
+				extractors.ExtractorGroup{
+					Name: "main extractors",
+					LinkExtractors: []models.LinkExtractor{
+						extractors.RepeatingExtractor{
+							LinkExtractor: extractors.DefaultExtractor{
+								HTTPClient: http.DefaultClient,
+								Filters: htmlselector.OptimizeFilters(htmlselector.FilterGroup{
+									"a": {"href"},
+								}),
+								LinkTransformer: transformers.TransformerGroup{
+									transformers.TrimmingTransformer{
+										TrimLink: urlutils.TrimLink,
+									},
+									transformers.ResolvingTransformer{
+										BaseTagSelection: transformers.SelectFirstBaseTag,
+										BaseTagFilters:   transformers.DefaultBaseTagFilters,
+										BaseHeaderNames:  urlutils.DefaultBaseHeaderNames,
+										Logger:           wrappedLogger,
+									},
+								},
+							},
+							RepeatCount:  5,
+							RepeatDelay:  time.Second,
+							Logger:       wrappedLogger,
+							SleepHandler: time.Sleep,
+						},
+						extractors.RepeatingExtractor{
+							LinkExtractor: extractors.TrimmingExtractor{
+								TrimLink: urlutils.TrimLink,
+								LinkExtractor: extractors.SitemapExtractor{
+									SitemapRegister: registers.NewSitemapRegister(
+										time.Second,
+										extractors.ExtractorGroup{
+											Name: "extractors of Sitemap links",
+											LinkExtractors: []models.LinkExtractor{
+												sitemap.HierarchicalGenerator{
+													SanitizeLink: urlutils.SanitizeLink,
+													MaximalDepth: -1,
+												},
+												sitemap.RobotsTXTGenerator{
+													RobotsTXTRegister: robotsTXTRegister,
+												},
+											},
+											Logger: wrappedLogger,
+										},
+										wrappedLogger,
+										sitemap.Loader{HTTPClient: http.DefaultClient}.LoadLink,
+									),
+									Logger: wrappedLogger,
+								},
+							},
+							RepeatCount:  5,
+							RepeatDelay:  time.Second,
+							Logger:       wrappedLogger,
+							SleepHandler: time.Sleep,
+						},
+					},
+					Logger: wrappedLogger,
+				},
+			),
+			LinkChecker: checkers.CheckerGroup{
+				checkers.HostChecker{
+					Logger: wrappedLogger,
+				},
+				checkers.DuplicateChecker{
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
+				},
+				checkers.RobotsTXTChecker{
+					UserAgent:         "go-crawler",
+					RobotsTXTRegister: robotsTXTRegister,
+					Logger:            wrappedLogger,
+				},
+			},
+			LinkHandler: handlers.CheckedHandler{
+				LinkChecker: checkers.DuplicateChecker{
+					// don't use here the link register from the duplicate checker above
+					LinkRegister: registers.NewLinkRegister(urlutils.SanitizeLink),
+					Logger:       wrappedLogger,
+				},
+				LinkHandler: handlers.HandlerGroup{
+					handlers.CheckedHandler{
+						LinkChecker: checkers.HostChecker{
+							ComparisonResult: urlutils.Same,
+							Logger:           wrappedLogger,
+						},
+						LinkHandler: LinkHandler{
+							Name:      "inner",
+							ServerURL: server.URL,
+						},
+					},
+					handlers.CheckedHandler{
+						LinkChecker: checkers.HostChecker{
+							ComparisonResult: urlutils.Different,
+							Logger:           wrappedLogger,
+						},
+						LinkHandler: LinkHandler{
+							Name:      "outer",
+							ServerURL: server.URL,
+						},
+					},
+				},
+			},
+			Logger: wrappedLogger,
+		},
+	)
+
+	// Unordered output:
+	// [inner] received link "http://example.com/1" from page "http://example.com"
+	// [inner] received link "http://example.com/1/1" from page "http://example.com/1"
+	// [inner] received link "http://example.com/1/2" from page "http://example.com/1"
+	// [inner] received link "http://example.com/2" from page "http://example.com"
+	// [inner] received link "http://example.com/hidden/1" from page "http://example.com"
+	// [inner] received link "http://example.com/hidden/1/test" from page "http://example.com/hidden/1"
+	// [inner] received link "http://example.com/hidden/2" from page "http://example.com"
+	// [inner] received link "http://example.com/hidden/3" from page "http://example.com"
+	// [inner] received link "http://example.com/hidden/4" from page "http://example.com"
+	// [inner] received link "http://example.com/hidden/5" from page "http://example.com/hidden/1/test"
+	// [inner] received link "http://example.com/hidden/6" from page "http://example.com/hidden/1/test"
+	// [outer] received link "https://golang.org/" from page "http://example.com"
+}
+
 func ExampleCrawl() {
 	server := RunServer()
 	defer server.Close()
