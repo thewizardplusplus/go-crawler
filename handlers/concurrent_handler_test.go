@@ -15,7 +15,14 @@ func TestNewConcurrentHandler(test *testing.T) {
 
 	mock.AssertExpectationsForObjects(test, innerHandler)
 	assert.Equal(test, innerHandler, handler.linkHandler)
-	assert.NotNil(test, handler.links)
+	assert.Equal(test, &startModeHolder{}, handler.startMode)
+	for _, field := range []interface{}{
+		handler.stoppingCtx,
+		handler.stoppingCtxCanceller,
+		handler.links,
+	} {
+		assert.NotNil(test, field)
+	}
 	assert.Len(test, handler.links, 0)
 	assert.Equal(test, 1000, cap(handler.links))
 }
@@ -35,21 +42,36 @@ func TestConcurrentHandler_HandleLink(test *testing.T) {
 }
 
 func TestConcurrentHandler_running(test *testing.T) {
+	type fields struct {
+		startMode            *startModeHolder
+		stoppingCtxCanceller ContextCancellerInterface
+		links                []models.SourcedLink
+	}
+
 	for _, data := range []struct {
 		name       string
-		links      []models.SourcedLink
+		fields     fields
 		runHandler func(ctx context.Context, handler ConcurrentHandler)
 	}{
 		{
 			name: "with the Run() method",
-			links: []models.SourcedLink{
-				{
-					SourceLink: "http://example.com/",
-					Link:       "http://example.com/1",
-				},
-				{
-					SourceLink: "http://example.com/",
-					Link:       "http://example.com/2",
+			fields: fields{
+				startMode: &startModeHolder{},
+				stoppingCtxCanceller: func() ContextCancellerInterface {
+					stoppingCtxCanceller := new(MockContextCancellerInterface)
+					stoppingCtxCanceller.On("CancelContext").Return().Once()
+
+					return stoppingCtxCanceller
+				}(),
+				links: []models.SourcedLink{
+					{
+						SourceLink: "http://example.com/",
+						Link:       "http://example.com/1",
+					},
+					{
+						SourceLink: "http://example.com/",
+						Link:       "http://example.com/2",
+					},
 				},
 			},
 			runHandler: func(ctx context.Context, handler ConcurrentHandler) {
@@ -58,14 +80,23 @@ func TestConcurrentHandler_running(test *testing.T) {
 		},
 		{
 			name: "with the RunConcurrently() method",
-			links: []models.SourcedLink{
-				{
-					SourceLink: "http://example.com/",
-					Link:       "http://example.com/1",
-				},
-				{
-					SourceLink: "http://example.com/",
-					Link:       "http://example.com/2",
+			fields: fields{
+				startMode: &startModeHolder{},
+				stoppingCtxCanceller: func() ContextCancellerInterface {
+					stoppingCtxCanceller := new(MockContextCancellerInterface)
+					stoppingCtxCanceller.On("CancelContext").Return().Once()
+
+					return stoppingCtxCanceller
+				}(),
+				links: []models.SourcedLink{
+					{
+						SourceLink: "http://example.com/",
+						Link:       "http://example.com/1",
+					},
+					{
+						SourceLink: "http://example.com/",
+						Link:       "http://example.com/2",
+					},
 				},
 			},
 			runHandler: func(ctx context.Context, handler ConcurrentHandler) {
@@ -75,27 +106,40 @@ func TestConcurrentHandler_running(test *testing.T) {
 	} {
 		test.Run(data.name, func(test *testing.T) {
 			innerHandler := new(MockLinkHandler)
-			for _, link := range data.links {
+			for _, link := range data.fields.links {
 				innerHandler.On("HandleLink", context.Background(), link).Return()
 			}
 
-			linkChannel := make(chan models.SourcedLink, len(data.links))
-			for _, link := range data.links {
+			linkChannel := make(chan models.SourcedLink, len(data.fields.links))
+			for _, link := range data.fields.links {
 				linkChannel <- link
 			}
 			close(linkChannel)
 
-			handler := ConcurrentHandler{linkHandler: innerHandler, links: linkChannel}
+			handler := ConcurrentHandler{
+				linkHandler: innerHandler,
+
+				startMode:            data.fields.startMode,
+				stoppingCtxCanceller: data.fields.stoppingCtxCanceller.CancelContext,
+				links:                linkChannel,
+			}
 			data.runHandler(context.Background(), handler)
 
-			mock.AssertExpectationsForObjects(test, innerHandler)
+			mock.AssertExpectationsForObjects(
+				test,
+				data.fields.stoppingCtxCanceller,
+				innerHandler,
+			)
 		})
 	}
 }
 
 func TestConcurrentHandler_Stop(test *testing.T) {
+	stoppingCtx, stoppingCtxCanceller := context.WithCancel(context.Background())
+	stoppingCtxCanceller()
+
 	links := make(chan models.SourcedLink)
-	handler := ConcurrentHandler{links: links}
+	handler := ConcurrentHandler{stoppingCtx: stoppingCtx, links: links}
 	handler.Stop()
 
 	isNotClosed := true
