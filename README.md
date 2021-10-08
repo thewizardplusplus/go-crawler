@@ -780,6 +780,7 @@ func main() {
 		[]string{server.URL},
 		crawler.CrawlDependencies{
 			LinkExtractor: extractors.ExtractorGroup{
+				Name: "main extractors",
 				LinkExtractors: []models.LinkExtractor{
 					extractors.DefaultExtractor{
 						HTTPClient: http.DefaultClient,
@@ -797,6 +798,7 @@ func main() {
 						SitemapRegister: registers.NewSitemapRegister(
 							time.Second,
 							extractors.ExtractorGroup{
+								Name: "extractors of Sitemap links",
 								LinkExtractors: []models.LinkExtractor{
 									sitemap.HierarchicalGenerator{
 										SanitizeLink: urlutils.SanitizeLink,
