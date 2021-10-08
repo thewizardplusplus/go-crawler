@@ -29,6 +29,7 @@ func (extractor TrimmingExtractor) ExtractLinks(
 		TrimLink: extractor.TrimLink,
 	}
 	// this method never returns an error
-	trimmedLinks, _ := trimmingTransformer.TransformLinks(links, nil, nil)
+	trimmedLinks, _ := // nolint: gosec
+		trimmingTransformer.TransformLinks(links, nil, nil)
 	return trimmedLinks, nil
 }

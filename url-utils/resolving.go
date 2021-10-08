@@ -8,7 +8,7 @@ import (
 )
 
 // DefaultBaseHeaderNames ...
-var DefaultBaseHeaderNames = []string{"Content-Base", "Content-Location"}
+var DefaultBaseHeaderNames = []string{"Content-Base", "Content-Location"} // nolint: gochecknoglobals, lll
 
 // LinkResolver ...
 type LinkResolver struct {

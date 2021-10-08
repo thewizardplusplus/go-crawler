@@ -64,12 +64,16 @@ func RunServer() *httptest.Server {
 		if request.URL.Path == "/robots.txt" {
 			sitemapLink :=
 				completeLinkWithHost("/sitemap_from_robots_txt.xml", request.Host)
-			fmt.Fprintf(writer, `
-				User-agent: go-crawler
-				Disallow: /2
+			fmt.Fprintf( // nolint: errcheck
+				writer,
+				`
+					User-agent: go-crawler
+					Disallow: /2
 
-				Sitemap: %s
-			`, sitemapLink)
+					Sitemap: %s
+				`,
+				sitemapLink,
+			)
 
 			return
 		}

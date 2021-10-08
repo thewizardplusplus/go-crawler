@@ -6,7 +6,7 @@ import (
 )
 
 // DefaultBaseTagFilters ...
-var DefaultBaseTagFilters = htmlselector.OptimizeFilters(
+var DefaultBaseTagFilters = htmlselector.OptimizeFilters( // nolint: gochecknoglobals, lll
 	htmlselector.FilterGroup{
 		"base": {"href"},
 	},

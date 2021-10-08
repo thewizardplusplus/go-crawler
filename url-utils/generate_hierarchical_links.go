@@ -8,7 +8,7 @@ import (
 )
 
 // GenerateHierarchicalLinks ...
-func GenerateHierarchicalLinks(
+func GenerateHierarchicalLinks( // nolint: gocyclo
 	baseLink string,
 	linkSuffix string,
 	options ...HierarchicalLinkOption,
