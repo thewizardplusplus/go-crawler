@@ -406,7 +406,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/go-log/log/print"
 	crawler "github.com/thewizardplusplus/go-crawler"
@@ -414,6 +413,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/extractors"
 	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -531,7 +531,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/go-log/log/print"
 	crawler "github.com/thewizardplusplus/go-crawler"
@@ -662,7 +661,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/go-log/log/print"
 	crawler "github.com/thewizardplusplus/go-crawler"
@@ -800,7 +798,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/go-log/log/print"
 	crawler "github.com/thewizardplusplus/go-crawler"
@@ -809,6 +806,7 @@ import (
 	"github.com/thewizardplusplus/go-crawler/extractors/transformers"
 	"github.com/thewizardplusplus/go-crawler/models"
 	"github.com/thewizardplusplus/go-crawler/registers"
+	urlutils "github.com/thewizardplusplus/go-crawler/url-utils"
 	htmlselector "github.com/thewizardplusplus/go-html-selector"
 )
 
@@ -838,10 +836,13 @@ func RunServer() *httptest.Server {
 		request *http.Request,
 	) {
 		if request.URL.Path == "/robots.txt" {
-			fmt.Fprint(writer, `
-				User-agent: go-crawler
-				Disallow: /2
-			`)
+			fmt.Fprint( // nolint: errcheck
+				writer,
+				`
+					User-agent: go-crawler
+					Disallow: /2
+				`,
+			)
 
 			return
 		}
@@ -1182,7 +1183,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
 	"github.com/go-log/log/print"
 	crawler "github.com/thewizardplusplus/go-crawler"
