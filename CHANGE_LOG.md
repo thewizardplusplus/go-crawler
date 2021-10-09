@@ -1,5 +1,68 @@
 # Change Log
 
+## [v1.11.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.11.1) (2021-10-09)
+
+- crawling of all relative links for specified ones:
+  - supporting of an outer transformer for the extracted links (optional):
+    - data passed to the transformer:
+      - extracted links;
+      - service data of the HTTP response;
+      - content of the HTTP response as bytes;
+    - transformers:
+      - leading and trailing spaces trimming in the extracted links;
+      - resolving of relative links:
+        - by the base tag:
+          - tag and attribute names may be configured (`<base href="..." />` by default);
+          - tag selection:
+            - first occurrence;
+            - last occurrence;
+        - by the header list:
+          - the headers are listed in the descending order of the priority;
+          - `Content-Base` and `Content-Location` by default;
+        - by the request URI;
+    - supporting of grouping of transformers:
+      - the transformers are processed sequentially, so one transformer can influence another one;
+- minor improvements:
+  - rename the `transformers.BaseTagFilters` variable to the `DefaultBaseTagFilters`;
+  - add the waiting of the completion of the processing in the `handlers.ConcurrentHandler` structure;
+  - error handling:
+    - improve the error handling in the `sitemap.HierarchicalGenerator.ExtractLinks()` method;
+    - simplify the error handling in the `extractors.TrimmingExtractor.ExtractLinks()` method;
+    - replace the error producing to the logging in the `transformers.ResolvingTransformer.TransformLinks()` method;
+  - logging:
+    - move the logging from the `registers.LinkRegister` structure to the `checkers.DuplicateChecker` structure:
+      - return the error instead of the logging in the `registers.LinkRegister` structure;
+      - add the logging to the `checkers.DuplicateChecker` structure;
+    - improve the logging in the `checkers.HostChecker.CheckLink()` method;
+    - add the `Name` field to the `extractors.ExtractorGroup` structure:
+      - use it in the log messages as a prefix (optional);
+  - refactoring:
+    - use the `transformers.TrimmingTransformer` structure in the `extractors.TrimmingExtractor.ExtractLinks()` method;
+    - simplify the `extractors.DelayingExtractor.ExtractLinks()` method;
+    - add the explanatory comment to the `extractors.DelayingExtractor.ExtractLinks()` method;
+    - use the `builders.FlattenBuilder` structure from the [github.com/thewizardplusplus/go-html-selector](https://github.com/thewizardplusplus/go-html-selector) package in the `transformers.BaseTagBuilder` structure;
+  - unit testing:
+    - complete the tests of the `transformers.ResolvingTransformer.TransformLinks()` method;
+    - fix the tests of the `transformers.BaseTagBuilder.IsSelectionTerminated()` method;
+- examples:
+  - use the relative link resolving;
+  - add the explanatory comment to the example with the processing of a `sitemap.xml` file;
+  - add the example with all the features;
+  - simplify the examples:
+    - simplify the `renderTemplate()` function;
+    - remove the use:
+      - of the `extractors.RepeatingExtractor` structure;
+      - of the `extractors.TrimmingExtractor` structure;
+    - remove the example:
+      - with the delaying extracting;
+      - with the processing of a `robots.txt` file on the handling;
+      - with the `crawler.CrawlByConcurrentHandler()` function;
+      - with the `crawler.HandleLinksConcurrently()` function;
+- documentation:
+  - complete the `README.md` file:
+    - describe the bibliography;
+    - complete the description of the features.
+
 ## [v1.11](https://github.com/thewizardplusplus/go-crawler/tree/v1.11) (2021-09-10)
 
 - crawling of all relative links for specified ones:
