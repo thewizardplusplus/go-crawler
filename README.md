@@ -10,61 +10,84 @@ The library that implements crawling of all relative links for specified ones.
 ## Features
 
 - crawling of all relative links for specified ones:
-  - resolving of relative links:
-    - by the `base` tag;
-    - by the `Content-Base` and `Content-Location` headers;
-    - by the request URI;
-  - supporting of leading and trailing spaces trimming in extracted links (optional);
+  - names of tags and attributes of links may be configured;
+  - supporting of an outer transformer for the extracted links (optional):
+    - data passed to the transformer:
+      - extracted links;
+      - service data of the HTTP response;
+      - content of the HTTP response as bytes;
+    - transformers:
+      - leading and trailing spaces trimming in the extracted links;
+      - resolving of relative links:
+        - by the base tag:
+          - tag and attribute names may be configured (`<base href="..." />` by default);
+          - tag selection:
+            - first occurrence;
+            - last occurrence;
+        - by the header list:
+          - the headers are listed in the descending order of the priority;
+          - `Content-Base` and `Content-Location` by default;
+        - by the request URI;
+    - supporting of grouping of transformers:
+      - the transformers are processed sequentially, so one transformer can influence another one;
+  - supporting of leading and trailing spaces trimming in extracted links (optional):
+    - as the transformer for the extracted links (see above);
+    - as the wrapper for a link extractor;
   - repeated extracting of relative links on error (optional):
-    - only specified repeat count;
-    - supporting of delay between repeats;
+    - only the specified repeat count;
+    - supporting of a delay between repeats;
   - delayed extracting of relative links (optional):
     - reducing of a delay time by the time elapsed since the last request;
     - using of individual delays for each thread;
   - extracting links from a `sitemap.xml` file (optional):
+    - in-memory caching of the loaded `sitemap.xml` files;
     - ignoring of the error on loading of the `sitemap.xml` file:
       - logging of the received error;
-      - returning of an empty Sitemap instead;
+      - returning of the empty Sitemap instead;
     - supporting of few `sitemap.xml` files for a single link:
       - processing of each `sitemap.xml` file is done in a separate goroutine;
-      - supporting of an outer generator for `sitemap.xml` links:
+      - supporting of an outer generator for the `sitemap.xml` links:
         - generators:
-          - simple generator (it returns the `sitemap.xml` file in the site root);
-          - hierarchical generator (it returns the suitable `sitemap.xml` file for each part of the URL path);
+          - hierarchical generator:
+            - returns the suitable `sitemap.xml` file for each part of the URL path;
+            - supporting of sanitizing of the base link before generating of the `sitemap.xml` links;
+            - supporting of the restriction of the maximal depth;
           - generator based on the `robots.txt` file;
         - supporting of grouping of generators:
           - result of group generating is merged results of each generator in the group;
-          - generating concurrently:
-            - processing of each generator is done in a separate goroutine;
+          - processing of each generator is done in a separate goroutine;
     - supporting of a Sitemap index file:
       - supporting of a delay before loading of each `sitemap.xml` file listed in the index;
     - supporting of a gzip compression of a `sitemap.xml` file;
   - supporting of grouping of link extractors:
-    - result of group extracting is merged results of each extractor in the group;
-    - extracting links concurrently:
-      - processing of each link extractor is done in a separate goroutine;
-- calling of an outer handler for an each found link:
-  - it's called directly during crawling;
-  - handling of links immediately after they have been extracted;
-  - passing of the source link in the outer handler;
-  - handling links filtered by a custom link filter (optional);
-  - handling links concurrently (optional);
-  - supporting of grouping of outer handlers:
-    - processing of each outer handler is done in a separate goroutine;
-- custom filtering of considered links:
-  - by relativity of a link (optional):
+    - result of group extracting is merged results of each link extractor in the group;
+    - processing of each link extractor is done in a separate goroutine;
+- calling of an outer handler for each extracted link:
+  - handling of the extracted links directly during the crawling, i.e., immediately after they have been extracted;
+  - data passed to the handler:
+    - extracted link;
+    - source link for the extracted link;
+  - handling only of those extracted links that have been filtered by a link filter (see below; optional);
+  - handling of the extracted links concurrently, i.e., in the goroutine pool (optional);
+  - supporting of grouping of handlers:
+    - processing of each handler is done in a separate goroutine;
+- filtering of the extracted links by an outer link filter:
+  - by relativity of the extracted link (optional):
     - supporting of result inverting;
-  - by uniqueness of an extracted link (optional):
-    - supporting of sanitizing of a link before checking of uniqueness (optional);
+  - by uniqueness of the extracted link (optional):
+    - supporting of sanitizing of the link before checking of uniqueness;
   - by a `robots.txt` file (optional):
     - customized user agent;
+    - in-memory caching of the loaded `robots.txt` files;
   - supporting of grouping of link filters:
-    - result of group filtering is successful only when all filters are successful;
+    - the link filters are processed sequentially, so one link filter can influence another one;
+    - result of group filtering is successful only when all link filters are successful;
+    - the empty group of link filters is always failed;
 - parallelization possibilities:
-  - crawling of relative links in parallel;
-  - supporting of background working:
-    - automatic completion after processing all filtered links;
-  - simulate an unbounded channel of links to avoid a deadlock.
+  - crawling of relative links concurrently, i.e., in the goroutine pool;
+  - simulation of an unbounded channel of links to avoid a deadlock;
+  - waiting of completion of processing of all extracted links;
+  - supporting of stopping of all operations via the context.
 
 ## Installation
 
