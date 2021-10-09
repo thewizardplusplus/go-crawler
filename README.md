@@ -1315,6 +1315,25 @@ func main() {
 }
 ```
 
+## Bibliography
+
+- [Official Website of the Robots Exclusion Standard (`robots.txt`)](http://www.robotstxt.org/)
+- [Official Website of the Sitemaps Protocol (`sitemap.xml`)](https://www.sitemaps.org/):
+  - [Using Sitemap Index Files](https://www.sitemaps.org/protocol.html#index)
+  - [Sitemap File Location](https://www.sitemaps.org/protocol.html#location)
+- [Is There an HTTP Header to Say What Base URL to Use for Relative Links?](https://stackoverflow.com/a/48409040)
+  - [HTML 4.0 Specification, 5.1.3 URLs in HTML](https://www.w3.org/TR/WD-html40-970917/htmlweb.html#h-5.1.3):
+    1. [`<base>`: The Document Base URL element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base)
+    2. HTTP headers:
+       1. RFC 2068 Hypertext Transfer Protocol &mdash; HTTP/1.1:
+          1. [14.11 `Content-Base`](https://datatracker.ietf.org/doc/html/rfc2068#section-14.11)
+          2. [14.15 `Content-Location`](https://datatracker.ietf.org/doc/html/rfc2068#section-14.15)
+       2. RFC 2616 Hypertext Transfer Protocol &mdash; HTTP/1.1:
+          - [14.14 `Content-Location`](https://datatracker.ietf.org/doc/html/rfc2616#section-14.14)
+       3. RFC 7231 Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content:
+          - [Appendix B Changes from RFC 2616](https://datatracker.ietf.org/doc/html/rfc7231#appendix-B)
+  - [HTML Living Standard, 2.4.1 URLs: Terminology](https://html.spec.whatwg.org/multipage/urls-and-fetching.html#terminology-2)
+
 ## License
 
 The MIT License (MIT)
