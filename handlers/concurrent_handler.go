@@ -2,19 +2,26 @@ package handlers
 
 import (
 	"context"
-	"sync"
 
 	"github.com/thewizardplusplus/go-crawler/models"
+	syncutils "github.com/thewizardplusplus/go-sync-utils"
 )
+
+type linkHandlerWrapper struct {
+	linkHandler models.LinkHandler
+}
+
+func (wrapper linkHandlerWrapper) Handle(
+	ctx context.Context,
+	data interface{},
+) {
+	wrapper.linkHandler.HandleLink(ctx, data.(models.SourcedLink))
+}
 
 // ConcurrentHandler ...
 type ConcurrentHandler struct {
-	linkHandler models.LinkHandler
-
-	startMode            *startModeHolder
-	stoppingCtx          context.Context
-	stoppingCtxCanceller context.CancelFunc
-	links                chan models.SourcedLink
+	// do not use embedding to hide the Handle() method
+	innerConcurrentHandler syncutils.ConcurrentHandler
 }
 
 // NewConcurrentHandler ...
@@ -22,14 +29,13 @@ func NewConcurrentHandler(
 	bufferSize int,
 	linkHandler models.LinkHandler,
 ) ConcurrentHandler {
-	stoppingCtx, stoppingCtxCanceller := context.WithCancel(context.Background())
 	return ConcurrentHandler{
-		linkHandler: linkHandler,
-
-		startMode:            &startModeHolder{},
-		stoppingCtx:          stoppingCtx,
-		stoppingCtxCanceller: stoppingCtxCanceller,
-		links:                make(chan models.SourcedLink, bufferSize),
+		innerConcurrentHandler: syncutils.NewConcurrentHandler(
+			bufferSize,
+			linkHandlerWrapper{
+				linkHandler: linkHandler,
+			},
+		),
 	}
 }
 
@@ -38,51 +44,23 @@ func (handler ConcurrentHandler) HandleLink(
 	ctx context.Context,
 	link models.SourcedLink,
 ) {
-	handler.links <- link
+	handler.innerConcurrentHandler.Handle(link)
 }
 
-// Run ...
-func (handler ConcurrentHandler) Run(ctx context.Context) {
-	handler.basicRun(started, func() {
-		for link := range handler.links {
-			handler.linkHandler.HandleLink(ctx, link)
-		}
-	})
+// Start ...
+func (handler ConcurrentHandler) Start(ctx context.Context) {
+	handler.innerConcurrentHandler.Start(ctx)
 }
 
-// RunConcurrently ...
-func (handler ConcurrentHandler) RunConcurrently(
+// StartConcurrently ...
+func (handler ConcurrentHandler) StartConcurrently(
 	ctx context.Context,
 	concurrencyFactor int,
 ) {
-	handler.basicRun(startedConcurrently, func() {
-		var waiter sync.WaitGroup
-		waiter.Add(concurrencyFactor)
-
-		for threadID := 0; threadID < concurrencyFactor; threadID++ {
-			go func() {
-				defer waiter.Done()
-
-				handler.Run(ctx)
-			}()
-		}
-
-		waiter.Wait()
-	})
+	handler.innerConcurrentHandler.StartConcurrently(ctx, concurrencyFactor)
 }
 
 // Stop ...
 func (handler ConcurrentHandler) Stop() {
-	close(handler.links)
-	<-handler.stoppingCtx.Done()
-}
-
-func (handler ConcurrentHandler) basicRun(mode startMode, runHandler func()) {
-	handler.startMode.setStartModeOnce(mode)
-
-	runHandler()
-
-	if handler.startMode.getStartMode() == mode {
-		handler.stoppingCtxCanceller()
-	}
+	handler.innerConcurrentHandler.Stop()
 }
