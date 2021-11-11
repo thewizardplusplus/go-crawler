@@ -482,7 +482,6 @@
     "github.com/temoto/robotstxt",
     "github.com/thewizardplusplus/go-html-selector",
     "github.com/thewizardplusplus/go-html-selector/builders",
-    "github.com/thewizardplusplus/go-html-selector/byte-utils",
     "github.com/thewizardplusplus/go-http-utils",
     "github.com/thewizardplusplus/go-sync-utils",
     "github.com/vektra/mockery/cmd",
