@@ -30,7 +30,7 @@ required = [
 
 [[constraint]]
   name = "github.com/thewizardplusplus/go-sync-utils"
-  version = "1.1.0"
+  version = "1.2.0"
 
 [[constraint]]
   name = "github.com/temoto/robotstxt"

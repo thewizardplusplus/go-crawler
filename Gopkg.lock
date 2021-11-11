@@ -303,12 +303,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:17bdda8989d1457dd9822247c7d7790c51deb396449507e6531a4906c6d68a03"
+  digest = "1:6e0f622e5600ec038d0071e98fd6144e4f0c65f4b26a78df1199d036ade28a12"
   name = "github.com/thewizardplusplus/go-sync-utils"
   packages = ["."]
   pruneopts = "UT"
-  revision = "74f86728f3e59b7dd74ac4d7fb53a23f29ef5e23"
-  version = "v1.1"
+  revision = "67377bc08f93a31dbd8fca104e0de14168bcf85a"
+  version = "v1.2"
 
 [[projects]]
   digest = "1:5f23ddb9541511a69abb9cd315a527e336743198bf486c57fc6db7daf66d924a"
