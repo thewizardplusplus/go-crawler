@@ -1,5 +1,11 @@
 # Change Log
 
+## [v1.11.2](https://github.com/thewizardplusplus/go-crawler/tree/v1.11.2) (2021-11-13)
+
+- refactoring:
+  - update the [github.com/thewizardplusplus/go-sync-utils](https://github.com/thewizardplusplus/go-sync-utils) package in the dependencies;
+  - simplify the `handlers.ConcurrentHandler` structure via the [github.com/thewizardplusplus/go-sync-utils](https://github.com/thewizardplusplus/go-sync-utils) package.
+
 ## [v1.11.1](https://github.com/thewizardplusplus/go-crawler/tree/v1.11.1) (2021-10-09)
 
 - crawling of all relative links for specified ones:
